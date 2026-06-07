@@ -16,7 +16,10 @@ class OptionsManager {
       chrome.storage.sync.get(['settings'], (result) => {
         this.settings = result.settings || {
           defaultFormat: 'hex',
-          autoSave: true
+          autoSave: true,
+          maxColorsPerPalette: 20,
+          headerColor: '#F85E9F',
+          buttonColor: '#F85E9F'
         };
         resolve();
       });
@@ -32,14 +35,22 @@ class OptionsManager {
   updateUI() {
     document.getElementById('defaultFormat').value = this.settings.defaultFormat;
     document.getElementById('autoSave').checked = this.settings.autoSave;
+    document.getElementById('maxColors').value = this.settings.maxColorsPerPalette || 20;
+    document.getElementById('headerColor').value = this.settings.headerColor || '#F85E9F';
+    document.getElementById('buttonColor').value = this.settings.buttonColor || '#F85E9F';
+    this.applyTheme();
   }
 
   bindEvents() {
     // 保存设置
     document.getElementById('saveSettings').addEventListener('click', async () => {
+      const maxVal = parseInt(document.getElementById('maxColors').value) || 20;
       this.settings = {
         defaultFormat: document.getElementById('defaultFormat').value,
-        autoSave: document.getElementById('autoSave').checked
+        autoSave: document.getElementById('autoSave').checked,
+        maxColorsPerPalette: Math.max(1, Math.min(100, maxVal)),
+        headerColor: document.getElementById('headerColor').value,
+        buttonColor: document.getElementById('buttonColor').value
       };
       
       await this.saveSettings();
@@ -150,7 +161,7 @@ v1.0.0 (2026-06-07)
   showNotification(message) {
     const existing = document.querySelector('.notification');
     if (existing) existing.remove();
-    
+
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.textContent = message;
@@ -168,14 +179,22 @@ v1.0.0 (2026-06-07)
       box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
       z-index: 1000;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       notification.style.opacity = '0';
       notification.style.transition = 'opacity 0.3s';
       setTimeout(() => notification.remove(), 300);
     }, 2000);
+  }
+
+  applyTheme() {
+    const headerColor = this.settings?.headerColor || '#F85E9F';
+    const buttonColor = this.settings?.buttonColor || '#F85E9F';
+    const root = document.documentElement;
+    root.style.setProperty('--header-bg', headerColor);
+    root.style.setProperty('--button-bg', buttonColor);
   }
 }
 

@@ -8,21 +8,55 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <!-- 标题 -->
+  <!-- ====== 列表视图 ====== -->
+  <div class="container" id="listView">
     <header class="pixel-header">
       <div class="title-icon">🎨</div>
       <h1>像素吸色器</h1>
     </header>
 
-    <!-- 取色控制区 -->
     <section class="picker-section">
       <button id="quickPickBtn" class="pixel-button quick-pick">
         <span class="button-icon">⚡</span>
         <span class="button-text">快速取色</span>
       </button>
+    </section>
 
+    <section class="palette-section">
+      <div class="section-header">
+        <h2>我的色卡组</h2>
+        <div class="header-actions">
+          <button class="sort-btn" id="sortBtn" title="切换排序">🔽最新</button>
+          <button class="add-btn" id="newPaletteBtn" title="新建色卡组">+</button>
+        </div>
+      </div>
+      <div class="palette-card-list" id="paletteCardList">
+        <div class="empty-state">
+          <span class="empty-icon">🌈</span>
+          <p>还没有色卡组</p>
+          <p class="empty-hint">点击 + 新建色卡组</p>
+        </div>
+      </div>
+    </section>
 
+    <footer class="pixel-footer">
+      <button id="openOptions" class="footer-btn">⚙️ 设置</button>
+      <button id="viewHistory" class="footer-btn">📜 历史</button>
+    </footer>
+  </div>
+
+  <!-- ====== 详情视图 ====== -->
+  <div class="container" id="detailView" style="display:none">
+    <header class="pixel-header">
+      <div class="title-icon">🎨</div>
+      <h1>像素吸色器</h1>
+    </header>
+
+    <section class="picker-section">
+      <button id="quickPickBtn2" class="pixel-button quick-pick">
+        <span class="button-icon">⚡</span>
+        <span class="button-text">快速取色</span>
+      </button>
     </section>
 
     <!-- 当前颜色显示 -->
@@ -49,26 +83,30 @@
           </div>
         </div>
       </div>
-      
       <button id="saveColor" class="pixel-button secondary" disabled>
         <span class="button-icon">💾</span>
         <span class="button-text">保存到色卡</span>
       </button>
     </section>
 
-    <!-- 色卡区域 -->
+    <!-- 色卡详情 -->
     <section class="palette-section">
-      <div class="section-header">
-        <h2>我的色卡</h2>
-        <span class="color-count" id="colorCount">0 个颜色</span>
+      <div class="detail-header">
+        <button class="back-btn" id="backBtn">←</button>
+        <div class="palette-name-row">
+          <span class="palette-name" id="paletteName">默认色卡</span>
+          <button class="icon-btn" id="editNameBtn" title="重命名">✏️</button>
+        </div>
+        <button class="icon-btn palette-delete-btn" id="deletePaletteBtn" title="删除色卡组">🗑️</button>
       </div>
-      
+      <div class="palette-meta" id="paletteMeta">创建于 6月7日 · 0个颜色</div>
+
       <div class="palette-controls">
         <button class="pixel-button small" id="clearPalette">清空</button>
-        <button class="pixel-button small" id="exportCSS">导出 CSS</button>
+        <button class="pixel-button small" id="exportCSS">导出CSS</button>
         <button class="pixel-button small" id="exportPNG">导出图片</button>
       </div>
-      
+
       <div class="palette-grid" id="paletteGrid">
         <div class="empty-state">
           <span class="empty-icon">🌈</span>
@@ -78,13 +116,11 @@
       </div>
     </section>
 
-    <!-- 底部导航 -->
     <footer class="pixel-footer">
-      <button id="openOptions" class="footer-btn">⚙️ 设置</button>
-      <button id="viewHistory" class="footer-btn">📜 历史</button>
+      <button id="openOptions2" class="footer-btn">⚙️ 设置</button>
     </footer>
   </div>
-  
+
   <script src="popup.js"></script>
 </body>
 </html>
