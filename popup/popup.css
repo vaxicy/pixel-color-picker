@@ -1,5 +1,10 @@
 /* 像素风吸色器样式 */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Fusion Pixel 12px';
