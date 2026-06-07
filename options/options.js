@@ -15,10 +15,8 @@ class OptionsManager {
     return new Promise((resolve) => {
       chrome.storage.sync.get(['settings'], (result) => {
         this.settings = result.settings || {
-          pixelSize: 8,
           defaultFormat: 'hex',
-          autoSave: true,
-          showGrid: true
+          autoSave: true
         };
         resolve();
       });
@@ -32,20 +30,16 @@ class OptionsManager {
   }
 
   updateUI() {
-    document.getElementById('pixelSize').value = this.settings.pixelSize;
     document.getElementById('defaultFormat').value = this.settings.defaultFormat;
     document.getElementById('autoSave').checked = this.settings.autoSave;
-    document.getElementById('showGrid').checked = this.settings.showGrid;
   }
 
   bindEvents() {
     // 保存设置
     document.getElementById('saveSettings').addEventListener('click', async () => {
       this.settings = {
-        pixelSize: parseInt(document.getElementById('pixelSize').value),
         defaultFormat: document.getElementById('defaultFormat').value,
-        autoSave: document.getElementById('autoSave').checked,
-        showGrid: document.getElementById('showGrid').checked
+        autoSave: document.getElementById('autoSave').checked
       };
       
       await this.saveSettings();

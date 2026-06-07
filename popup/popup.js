@@ -2,7 +2,6 @@
 class PixelColorPicker {
   constructor() {
     this.currentColor = null;
-    this.isPicking = false;
     this.palette = [];
     
     this.init();
@@ -23,11 +22,6 @@ class PixelColorPicker {
     // 快速取色按钮（EyeDropper API）
     document.getElementById('quickPickBtn').addEventListener('click', () => {
       this.quickPick();
-    });
-
-    // 放大镜取色按钮
-    document.getElementById('pickButton').addEventListener('click', () => {
-      this.togglePicker();
     });
 
     // 保存颜色按钮
@@ -62,107 +56,13 @@ class PixelColorPicker {
     document.getElementById('openOptions').addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
     });
-
-    // 监听来自content script的消息
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === 'COLOR_PICKED') {
-        this.handleColorPicked(message.color);
-      }
-    });
   }
 
-  async togglePicker() {
-    this.isPicking = !this.isPicking;
-
-    const button = document.getElementById('pickButton');
-    const status = document.getElementById('pickerStatus');
-
-    if (this.isPicking) {
-      button.querySelector('.button-text').textContent = '停止放大镜';
-      button.classList.add('active');
-      status.querySelector('.status-dot').classList.add('active');
-      status.querySelector('.status-text').textContent = '取色中… 按 E 记录，ESC 取消';
-
-      try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (!tab || !tab.id) {
-          throw new Error('无法获取当前标签页');
-        }
-
-        // 禁止在 Chrome 系统页面、扩展商店等无法注入 content script 的页面取色
-        const url = tab.url || '';
-        const blocked = url.startsWith('chrome://') || url.startsWith('edge://') || url.startsWith('about:') || url.startsWith('https://chrome.google.com/webstore');
-        if (blocked) {
-          throw new Error('此页面不支持取色');
-        }
-
-        // 先 ping 一次，确认 content script 已连接
-        try {
-          await chrome.tabs.sendMessage(tab.id, { type: 'PING' });
-        } catch (pingErr) {
-          console.log('Ping failed:', pingErr.message);
-          throw new Error('页面脚本未就绪，请关闭当前标签页重新打开');
-        }
-
-        await chrome.tabs.sendMessage(tab.id, { type: 'ACTIVATE_PICKER' });
-      } catch (e) {
-        console.log('取色启动失败:', e.message || e);
-        this.isPicking = false;
-        button.querySelector('.button-text').textContent = '放大镜取色';
-        button.classList.remove('active');
-        status.querySelector('.status-dot').classList.remove('active');
-        status.querySelector('.status-text').textContent = '就绪';
-        this.showNotification(e.message || '此页面暂不支持取色，请刷新后重试');
-      }
-    } else {
-      button.querySelector('.button-text').textContent = '放大镜取色';
-      button.classList.remove('active');
-      status.querySelector('.status-dot').classList.remove('active');
-      status.querySelector('.status-text').textContent = '就绪';
-
-      try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab && tab.id) {
-          await chrome.tabs.sendMessage(tab.id, { type: 'DEACTIVATE_PICKER' }).catch(() => {});
-        }
-      } catch (e) {
-        console.log('Stop picker error:', e);
-      }
-    }
-  }
-
-  handleColorPicked(color) {
-    if (!color) return;
-    this.currentColor = color;
-
-    // 更新颜色预览
-    this.updateColorPreview(color);
-
-    // 停止取色模式 UI
-    this.isPicking = false;
-    const button = document.getElementById('pickButton');
-    button.querySelector('.button-text').textContent = '放大镜取色';
-    button.classList.remove('active');
-
-    const status = document.getElementById('pickerStatus');
-    status.querySelector('.status-dot').classList.remove('active');
-    status.querySelector('.status-text').textContent = '就绪';
-
-    // background 已自动保存到 storage；延迟刷新 UI 确保数据已写入
-    setTimeout(() => {
-      this.loadPalette().then(() => {
-        this.updatePaletteUI();
-        this.showNotification('颜色已保存到色卡！');
-      });
-    }, 150);
-  }
-
-  // ========== 快速取色（EyeDropper API）==========
+  // ========== 取色（EyeDropper API）==========
   async quickPick() {
     // 检查浏览器是否支持 EyeDropper API（Chrome 95+）
     if (!window.EyeDropper) {
-      this.showNotification('浏览器不支持快速取色，请使用放大镜模式');
-      this.togglePicker();
+      this.showNotification('浏览器不支持取色功能，请升级到 Chrome 95+');
       return;
     }
 
@@ -318,7 +218,7 @@ class PixelColorPicker {
         <div class="empty-state">
           <span class="empty-icon">🌈</span>
           <p>还没有颜色</p>
-          <p class="empty-hint">点击"快速取色"或"放大镜取色"</p>
+          <p class="empty-hint">点击"快速取色"开始取色</p>
         </div>
       `;
       return;
