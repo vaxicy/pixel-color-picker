@@ -173,7 +173,7 @@ v1.0.0 (2026-06-07)
       background: #4CAF50;
       color: white;
       padding: 16px 32px;
-      font-family: 'Press Start 2P', monospace;
+      font-family: 'Press Start 2P', 'SimSun', '宋体', monospace;
       font-size: 10px;
       border: 4px solid #4A4A4A;
       box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
