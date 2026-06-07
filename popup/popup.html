@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Color Picker</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- 标题 -->
+    <header class="pixel-header">
+      <div class="title-icon">🎨</div>
+      <h1>像素吸色器</h1>
+      <div class="pixel-divider"></div>
+    </header>
+
+    <!-- 取色控制区 -->
+    <section class="picker-section">
+      <button id="quickPickBtn" class="pixel-button quick-pick">
+        <span class="button-icon">⚡</span>
+        <span class="button-text">快速取色</span>
+      </button>
+
+      <button id="pickButton" class="pixel-button secondary magnifier">
+        <span class="button-icon">🔍</span>
+        <span class="button-text">放大镜取色</span>
+      </button>
+      
+      <div class="picker-status" id="pickerStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">就绪</span>
+      </div>
+    </section>
+
+    <!-- 当前颜色显示 -->
+    <section class="current-color-section">
+      <div class="color-display">
+        <div class="color-preview" id="colorPreview">
+          <div class="pixel-grid"></div>
+        </div>
+        <div class="color-info">
+          <div class="color-format">
+            <label>HEX</label>
+            <input type="text" id="hexValue" placeholder="#FF6B9D" readonly>
+            <button class="copy-btn" data-target="hexValue" title="复制">📋</button>
+          </div>
+          <div class="color-format">
+            <label>RGB</label>
+            <input type="text" id="rgbValue" placeholder="rgb(255,107,157)" readonly>
+            <button class="copy-btn" data-target="rgbValue" title="复制">📋</button>
+          </div>
+          <div class="color-format">
+            <label>HSL</label>
+            <input type="text" id="hslValue" placeholder="hsl(340,100%,71%)" readonly>
+            <button class="copy-btn" data-target="hslValue" title="复制">📋</button>
+          </div>
+        </div>
+      </div>
+      
+      <button id="saveColor" class="pixel-button secondary" disabled>
+        <span class="button-icon">💾</span>
+        <span class="button-text">保存到色卡</span>
+      </button>
+    </section>
+
+    <!-- 色卡区域 -->
+    <section class="palette-section">
+      <div class="section-header">
+        <h2>我的色卡</h2>
+        <span class="color-count" id="colorCount">0 个颜色</span>
+      </div>
+      
+      <div class="palette-controls">
+        <button class="pixel-button small" id="clearPalette">清空</button>
+        <button class="pixel-button small" id="exportCSS">导出 CSS</button>
+        <button class="pixel-button small" id="exportPNG">导出图片</button>
+      </div>
+      
+      <div class="palette-grid" id="paletteGrid">
+        <div class="empty-state">
+          <span class="empty-icon">🌈</span>
+          <p>还没有颜色</p>
+          <p class="empty-hint">点击"快速取色"或"放大镜取色"</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 底部导航 -->
+    <footer class="pixel-footer">
+      <button id="openOptions" class="footer-btn">⚙️ 设置</button>
+      <button id="viewHistory" class="footer-btn">📜 历史</button>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

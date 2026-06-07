@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 像素风调色板图标 -->
+  <defs>
+    <style>
+      .pixel { shape-rendering: crispEdges; }
+    </style>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="128" height="128" fill="#FFF5F7" class="pixel"/>
+  
+  <!-- 调色板格子 -->
+  <!-- 粉色 -->
+  <rect x="16" y="16" width="32" height="32" fill="#FF6B9D" stroke="#4A4A4A" stroke-width="4" class="pixel"/>
+  
+  <!-- 紫色 -->
+  <rect x="80" y="16" width="32" height="32" fill="#C44AFF" stroke="#4A4A4A" stroke-width="4" class="pixel"/>
+  
+  <!-- 青色 -->
+  <rect x="16" y="80" width="32" height="32" fill="#4ECDC4" stroke="#4A4A4A" stroke-width="4" class="pixel"/>
+  
+  <!-- 黄色 -->
+  <rect x="80" y="80" width="32" height="32" fill="#FFE66D" stroke="#4A4A4A" stroke-width="4" class="pixel"/>
+  
+  <!-- 吸管图标 -->
+  <rect x="52" y="52" width="24" height="24" fill="#4A4A4A" class="pixel"/>
+  <rect x="56" y="48" width="16" height="8" fill="#4A4A4A" class="pixel"/>
+  <rect x="60" y="44" width="8" height="8" fill="#4A4A4A" class="pixel"/>
+</svg>

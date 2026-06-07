@@ -1,0 +1,181 @@
+/* 设置页面样式 */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --primary: #FF6B9D;
+  --secondary: #C44AFF;
+  --bg: #FFF5F7;
+  --text: #4A4A4A;
+  --border: #4A4A4A;
+  --pixel-size: 4px;
+  --shadow-offset: 4px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+}
+
+body {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-width: 600px;
+  min-height: 800px;
+}
+
+.container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pixel-header {
+  text-align: center;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: var(--pixel-size) solid var(--border);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3);
+  margin-bottom: 24px;
+}
+
+.pixel-header h1 {
+  font-size: 18px;
+  color: white;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+.pixel-divider {
+  height: var(--pixel-size);
+  background: var(--border);
+  margin-top: 16px;
+}
+
+.settings-section {
+  background: white;
+  border: var(--pixel-size) solid var(--border);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.2);
+}
+
+.settings-section h2 {
+  font-size: 12px;
+  margin-bottom: 20px;
+  color: var(--primary);
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+.setting-item {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-item label {
+  font-size: 9px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.setting-item select,
+.setting-item input[type="text"] {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 8px 12px;
+  border: 3px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  min-width: 200px;
+}
+
+.setting-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.pixel-button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 12px 24px;
+  background: var(--primary);
+  color: white;
+  border: var(--pixel-size) solid var(--border);
+  cursor: pointer;
+  box-shadow: 
+    inset -4px -4px 0px 0px rgba(0,0,0,0.2),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.2),
+    var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3);
+  transition: all 0.1s;
+}
+
+.pixel-button:hover {
+  background: var(--primary-dark);
+}
+
+.pixel-button:active {
+  box-shadow: 
+    inset 4px 4px 0px 0px rgba(0,0,0,0.2),
+    inset -4px -4px 0px 0px rgba(255,255,255,0.2),
+    2px 2px 0px 0px rgba(0,0,0,0.3);
+  transform: translate(2px, 2px);
+}
+
+.pixel-button.small {
+  font-size: 8px;
+  padding: 8px 16px;
+}
+
+.pixel-button.primary {
+  background: var(--primary);
+}
+
+.pixel-button.danger {
+  background: #F44336;
+}
+
+.pixel-button.danger:hover {
+  background: #D32F2F;
+}
+
+.about-info {
+  margin-bottom: 20px;
+}
+
+.about-info p {
+  font-size: 8px;
+  margin: 8px 0;
+  color: var(--text);
+}
+
+.pixel-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  body {
+    min-width: auto;
+  }
+  
+  .container {
+    padding: 16px;
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .setting-item select,
+  .setting-item input[type="text"] {
+    width: 100%;
+  }
+}

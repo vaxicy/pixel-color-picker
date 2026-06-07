@@ -1,0 +1,528 @@
+/* 像素风吸色器样式 */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Chrome Popup 根元素设置 */
+html {
+  width: 400px;
+  min-width: 400px;
+  max-width: 400px;
+  overflow-x: hidden;
+}
+
+:root {
+  --primary: #FF6B9D;
+  --primary-dark: #E5558A;
+  --secondary: #C44AFF;
+  --secondary-dark: #A33DE6;
+  --bg: #FFF5F7;
+  --bg-dark: #FCE4EC;
+  --text: #4A4A4A;
+  --text-light: #999;
+  --border: #4A4A4A;
+  --success: #4CAF50;
+  --danger: #F44336;
+  --pixel-size: 4px;
+  --shadow-offset: 4px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+body {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg);
+  color: var(--text);
+  width: 400px;
+  min-width: 400px;
+  max-width: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 580px;
+  padding: 12px;
+}
+
+/* 自定义滚动条 */
+body::-webkit-scrollbar {
+  width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-left: 2px solid var(--border);
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 2px solid var(--border);
+}
+
+.container {
+  width: 100%;
+  min-width: 376px;
+  max-width: 376px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 像素风标题 */
+.pixel-header {
+  text-align: center;
+  padding: 14px 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: var(--pixel-size) solid var(--border);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+}
+
+.pixel-header h1 {
+  font-size: 12px;
+  color: white;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.pixel-divider {
+  height: var(--pixel-size);
+  background: var(--border);
+  margin-top: 10px;
+  box-shadow: 0 2px 0px var(--primary-dark);
+}
+
+/* 像素按钮 */
+.pixel-button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 12px 20px;
+  border: var(--pixel-size) solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-shadow: 
+    inset -4px -4px 0px 0px rgba(0,0,0,0.2),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.2),
+    var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3);
+}
+
+.pixel-button:active {
+  box-shadow: 
+    inset 4px 4px 0px 0px rgba(0,0,0,0.2),
+    inset -4px -4px 0px 0px rgba(255,255,255,0.2),
+    2px 2px 0px 0px rgba(0,0,0,0.3);
+  transform: translate(var(--shadow-offset), var(--shadow-offset));
+}
+
+.pixel-button.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.pixel-button.primary:hover {
+  background: var(--primary-dark);
+}
+
+.pixel-button.secondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.pixel-button.secondary:hover {
+  background: var(--secondary-dark);
+}
+
+.pixel-button.secondary:disabled {
+  background: #CCC;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pixel-button.small {
+  font-size: 8px;
+  padding: 8px 12px;
+  width: auto;
+}
+
+/* 取色区域 */
+.picker-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+/* 快速取色按钮 - 醒目渐变色 */
+.pixel-button.quick-pick {
+  background: linear-gradient(135deg, #FF6B9D 0%, #C44AFF 100%);
+  color: white;
+  font-size: 11px;
+  padding: 14px 24px;
+  animation: quickGlow 2s infinite;
+}
+
+.pixel-button.quick-pick:hover {
+  background: linear-gradient(135deg, #E5558A 0%, #A33DE6 100%);
+}
+
+@keyframes quickGlow {
+  0%, 100% { box-shadow: 
+    inset -4px -4px 0px 0px rgba(0,0,0,0.2),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.2),
+    var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3),
+    0 0 12px rgba(196,74,255,0.4); }
+  50% { box-shadow: 
+    inset -4px -4px 0px 0px rgba(0,0,0,0.2),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.2),
+    var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3),
+    0 0 20px rgba(196,74,255,0.7); }
+}
+
+/* 放大镜取色按钮（次要） */
+.pixel-button.magnifier {
+  font-size: 9px;
+  padding: 10px 20px;
+  background: white;
+  color: var(--text);
+  border: 3px solid var(--border);
+}
+
+.pixel-button.magnifier:hover {
+  background: var(--bg);
+}
+
+.pixel-button.magnifier.active {
+  background: var(--secondary);
+  color: white;
+}
+
+/* 分隔线 */
+.picker-or {
+  font-size: 7px;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.picker-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  color: var(--text-light);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: var(--success);
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+
+.status-dot.active {
+  background: var(--primary);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 当前颜色显示 */
+.current-color-section {
+  background: white;
+  border: var(--pixel-size) solid var(--border);
+  padding: 14px;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.2);
+  width: 100%;
+}
+
+.color-display {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.color-preview {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  border: var(--pixel-size) solid var(--border);
+  box-shadow: 
+    inset -4px -4px 0px 0px rgba(0,0,0,0.1),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.1),
+    4px 4px 0px 0px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(45deg, #CCC 25%, transparent 25%),
+    linear-gradient(-45deg, #CCC 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #CCC 75%),
+    linear-gradient(-45deg, transparent 75%, #CCC 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  opacity: 0.1;
+}
+
+.color-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.color-format {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.color-format label {
+  font-size: 7px;
+  color: var(--text-light);
+  min-width: 32px;
+  flex-shrink: 0;
+}
+
+.color-format input {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  padding: 4px 6px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-btn {
+  background: none;
+  border: 2px solid var(--border);
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: var(--bg-dark);
+  transform: scale(1.1);
+}
+
+.copy-btn.copied {
+  background: var(--success);
+  color: white;
+}
+
+/* 色卡区域 */
+.palette-section {
+  background: white;
+  border: var(--pixel-size) solid var(--border);
+  padding: 14px;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.2);
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-header h2 {
+  font-size: 10px;
+  color: var(--text);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.color-count {
+  font-size: 7px;
+  color: var(--text-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.palette-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.palette-grid::-webkit-scrollbar {
+  width: 10px;
+}
+
+.palette-grid::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-left: 2px solid var(--border);
+}
+
+.palette-grid::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 2px solid var(--border);
+}
+
+.color-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+  min-height: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.3);
+}
+
+.color-swatch .delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 14px;
+  height: 14px;
+  background: var(--danger);
+  border: 2px solid var(--border);
+  color: white;
+  font-size: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+.color-swatch:hover .delete-btn {
+  display: flex;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: var(--text-light);
+}
+
+.empty-icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 8px;
+  margin: 4px 0;
+}
+
+.empty-hint {
+  font-size: 7px !important;
+  color: var(--text-light);
+}
+
+/* 底部导航 */
+.pixel-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.footer-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 8px 16px;
+  background: white;
+  border: var(--pixel-size) solid var(--border);
+  cursor: pointer;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+  transition: all 0.1s;
+}
+
+.footer-btn:hover {
+  background: var(--bg);
+}
+
+.footer-btn:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+/* 通知提示 */
+.notification {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--success);
+  color: white;
+  padding: 12px 24px;
+  font-size: 8px;
+  border: var(--pixel-size) solid var(--border);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+  z-index: 1000;
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+}

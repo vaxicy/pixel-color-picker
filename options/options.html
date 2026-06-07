@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - Pixel Color Picker</title>
+  <link rel="stylesheet" href="options.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header class="pixel-header">
+      <h1>⚙️ 设置</h1>
+      <div class="pixel-divider"></div>
+    </header>
+
+    <section class="settings-section">
+      <h2>取色设置</h2>
+      
+      <div class="setting-item">
+        <label>放大镜像素大小</label>
+        <select id="pixelSize">
+          <option value="4">4x</option>
+          <option value="8" selected>8x</option>
+          <option value="16">16x</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>默认颜色格式</label>
+        <select id="defaultFormat">
+          <option value="hex" selected>HEX</option>
+          <option value="rgb">RGB</option>
+          <option value="hsl">HSL</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="autoSave" checked>
+          自动保存到色卡
+        </label>
+      </div>
+      
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="showGrid" checked>
+          显示像素网格
+        </label>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>快捷键设置</h2>
+      
+      <div class="setting-item">
+        <label>激活取色器</label>
+        <input type="text" id="shortcutPicker" placeholder="Alt+C" readonly>
+        <button class="pixel-button small">修改</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>数据管理</h2>
+      
+      <div class="setting-item">
+        <button class="pixel-button" id="exportData">导出所有数据</button>
+        <button class="pixel-button" id="importData">导入数据</button>
+        <button class="pixel-button danger" id="clearData">清除所有数据</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>关于</h2>
+      
+      <div class="about-info">
+        <p>Pixel Color Picker v1.0.0</p>
+        <p>可爱的像素风网页吸色工具</p>
+        <p>© 2026 Pixel Color Picker</p>
+      </div>
+      
+      <div class="setting-item">
+        <button class="pixel-button" id="viewHistory">查看更新日志</button>
+      </div>
+    </section>
+
+    <footer class="pixel-footer">
+      <button id="saveSettings" class="pixel-button primary">保存设置</button>
+      <button id="backToPopup" class="pixel-button">返回</button>
+    </footer>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

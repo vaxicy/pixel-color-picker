@@ -1,0 +1,141 @@
+/* Content Script 样式 - 取色器UI */
+
+/* 放大镜样式 */
+.pixel-magnifier {
+  position: fixed;
+  width: 160px;
+  height: 160px;
+  border: 4px solid #4A4A4A;
+  box-shadow: 
+    8px 8px 0px 0px rgba(0,0,0,0.3),
+    inset 2px 2px 0px 0px rgba(255,255,255,0.2),
+    inset -2px -2px 0px 0px rgba(0,0,0,0.2);
+  z-index: 999999;
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: white;
+}
+
+.pixel-magnifier canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 十字准星样式 */
+.pixel-crosshair {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 999998;
+  transform: translate(-50%, -50%);
+}
+
+.pixel-crosshair::before,
+.pixel-crosshair::after {
+  content: '';
+  position: absolute;
+  background: #FF0000;
+  box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.5);
+}
+
+.pixel-crosshair::before {
+  width: 20px;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.pixel-crosshair::after {
+  width: 2px;
+  height: 20px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* 取色模式下的页面样式 */
+body.picker-active {
+  cursor: crosshair !important;
+}
+
+body.picker-active * {
+  cursor: crosshair !important;
+}
+
+/* 颜色预览tooltip */
+.color-preview-tooltip {
+  position: fixed;
+  padding: 8px 12px;
+  background: #4A4A4A;
+  color: white;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.5);
+  z-index: 999997;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.color-preview-tooltip .color-sample {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* 像素网格覆盖层 */
+.pixel-grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 999996;
+  background-image: 
+    linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  opacity: 0.3;
+}
+
+/* 禁用文本选择 */
+.no-select {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pixel-magnifier.active {
+  animation: pulse 1s infinite;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .pixel-magnifier {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .color-preview-tooltip {
+    font-size: 7px;
+    padding: 6px 10px;
+  }
+}

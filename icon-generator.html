@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Icon Generator - 像素图标生成器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #4A4A4A;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .generator-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .preview-title {
+      font-size: 18px;
+      color: #4A4A4A;
+      font-weight: bold;
+    }
+
+    .preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .preview-item {
+      text-align: center;
+    }
+
+    .preview-item label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .preview-canvas {
+      border: 3px solid #4A4A4A;
+      box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+      background: white;
+    }
+
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-group {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .control-group h3 {
+      font-size: 16px;
+      color: #4A4A4A;
+      margin-bottom: 15px;
+    }
+
+    .color-picker {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .color-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-input label {
+      font-size: 12px;
+      color: #666;
+      min-width: 60px;
+    }
+
+    .color-input input[type="color"] {
+      width: 50px;
+      height: 40px;
+      border: 2px solid #4A4A4A;
+      cursor: pointer;
+    }
+
+    .style-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .style-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .style-option label {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .style-option input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      font-size: 16px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      border: 3px solid #4A4A4A;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translate(0, 0);
+      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-info {
+      background: #4299e1;
+      color: white;
+    }
+    
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #48bb78;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .preview-item canvas {
+      transition: transform 0.2s;
+    }
+    
+    .preview-item canvas:hover {
+      transform: scale(1.1);
+    }
+    
+    .color-input input[type="color"] {
+      cursor: pointer;
+      padding: 0;
+      border: 2px solid #4A4A4A;
+    }
+    
+    .color-input input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .color-input input[type="color"]::-webkit-color-swatch {
+      border: none;
+    }
+
+    .instructions {
+      background: #fff5f7;
+      border-left: 4px solid #ff6b9d;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 5px;
+    }
+
+    .instructions h3 {
+      color: #ff6b9d;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .generator-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <h1>🎨 Pixel Icon Generator</h1>
+      <p class="subtitle">圆形像素调色盘图标生成器</p>
+
+    <div class="generator-section">
+      <!-- 预览面板 -->
+      <div class="preview-panel">
+        <h2 class="preview-title">图标预览</h2>
+        <div class="preview-grid">
+          <div class="preview-item">
+            <label>16x16 (工具栏)</label>
+            <canvas id="preview16" class="preview-canvas" width="16" height="16" style="width: 128px; height: 128px;"></canvas>
+          </div>
+          <div class="preview-item">
+            <label>48x48 (扩展管理页)</label>
+            <canvas id="preview48" class="preview-canvas" width="48" height="48" style="width: 128px; height: 128px;"></canvas>
+          </div>
+          <div class="preview-item">
+            <label>128x128 (Chrome商店)</label>
+            <canvas id="preview128" class="preview-canvas" width="128" height="128" style="width: 128px; height: 128px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 控制面板 -->
+      <div class="controls-panel">
+        <div class="control-group">
+          <h3>🎨 颜色设置</h3>
+          <div class="color-picker">
+            <div class="color-input">
+              <label>色块 1:</label>
+              <input type="color" id="color1" value="#FF6B9D">
+            </div>
+            <div class="color-input">
+              <label>色块 2:</label>
+              <input type="color" id="color2" value="#C44AFF">
+            </div>
+            <div class="color-input">
+              <label>色块 3:</label>
+              <input type="color" id="color3" value="#4ECDC4">
+            </div>
+            <div class="color-input">
+              <label>色块 4:</label>
+              <input type="color" id="color4" value="#FFE66D">
+            </div>
+            <div class="color-input">
+              <label>边框:</label>
+              <input type="color" id="borderColor" value="#4A4A4A">
+            </div>
+            <div class="color-input">
+              <label>吸管:</label>
+              <input type="color" id="eyeDropperColor" value="#4A4A4A">
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>⚙️ 样式选项</h3>
+          <div class="style-options">
+            <div class="style-option">
+              <input type="checkbox" id="whiteBackground" checked>
+              <label for="whiteBackground">白色背景</label>
+            </div>
+            <div class="style-option">
+              <input type="checkbox" id="showEyeDropper" checked>
+              <label for="showEyeDropper">显示吸管图标</label>
+            </div>
+            <div class="style-option">
+              <input type="checkbox" id="pixelBorder" checked>
+              <label for="pixelBorder">像素风边框</label>
+            </div>
+            <div class="style-option">
+              <input type="checkbox" id="showShadow">
+              <label for="showShadow">显示阴影</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+        <h3>📐 布局选择</h3>
+        <div class="style-options">
+          <div class="style-option">
+            <input type="radio" name="layout" id="layoutGrid" value="grid" checked>
+            <label for="layoutGrid">2x2 网格铺满（推荐）</label>
+          </div>
+          <div class="style-option">
+            <input type="radio" name="layout" id="layoutCircle" value="circle">
+            <label for="layoutCircle">圆形像素调色盘</label>
+          </div>
+          <div class="style-option">
+            <input type="radio" name="layout" id="layoutStrip" value="strip">
+            <label for="layoutStrip">横向色条</label>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- 按钮组 -->
+    <div class="button-group">
+      <button class="btn btn-primary" id="generateBtn">🔄 生成图标</button>
+      <button class="btn btn-success" id="downloadAllBtn">📦 下载全部</button>
+      <button class="btn btn-info" id="downloadZipBtn">📄 下载 ZIP</button>
+    </div>
+
+    <!-- 使用说明 -->
+      <div class="instructions">
+        <h3>📖 使用说明</h3>
+        <ol>
+          <li><strong>选择布局</strong>：默认已选择"2x2网格铺满"（推荐）</li>
+          <li><strong>调整颜色</strong>：自定义四个色块的颜色（默认已设置为可爱粉紫系）</li>
+          <li><strong>预览效果</strong>：左侧实时显示三个尺寸的图标效果（已放大方便查看）</li>
+          <li><strong>下载图标</strong>：点击"下载全部"按钮，自动下载三个尺寸</li>
+          <li><strong>放入项目</strong>：将下载的文件放到 <code>images/</code> 文件夹</li>
+          <li><strong>完成</strong>：在 <code>chrome://extensions/</code> 刷新扩展即可</li>
+        </ol>
+        <p style="margin-top: 15px; padding: 10px; background: #e6fffa; border-left: 4px solid #4ECDC4; border-radius: 5px;">
+          <strong>💡 提示：</strong>三个图标尺寸都是精确的实际像素尺寸（16x16、48x48、128x128），下载后可直接使用，无需缩放！
+        </p>
+      </div>
+  </div>
+
+  <div class="success-message" id="successMessage">
+    ✅ 图标已下载成功！请查看浏览器的下载文件夹
+  </div>
+
+  <script>
+    // 图标生成器核心代码
+    class IconGenerator {
+      constructor() {
+        this.sizes = [16, 48, 128];
+        this.canvases = {};
+        this.contexts = {};
+        
+        this.init();
+      }
+
+      init() {
+        // 获取canvas和context
+        this.sizes.forEach(size => {
+          const canvas = document.getElementById(`preview${size}`);
+          this.canvases[size] = canvas;
+          this.contexts[size] = canvas.getContext('2d');
+        });
+
+        // 绑定事件
+        this.bindEvents();
+        
+        // 生成初始图标
+        this.generateIcons();
+        
+        // 显示欢迎消息
+        setTimeout(() => {
+          this.showSuccessMessage('欢迎使用图标生成器！默认已选择圆形像素调色盘风格');
+        }, 500);
+      }
+
+      bindEvents() {
+        // 颜色输入
+        const colorInputs = ['color1', 'color2', 'color3', 'color4', 'borderColor', 'eyeDropperColor'];
+        colorInputs.forEach(id => {
+          document.getElementById(id).addEventListener('input', () => {
+            this.generateIcons();
+          });
+        });
+
+        // 样式选项
+        const styleInputs = ['whiteBackground', 'pixelBorder', 'showShadow'];
+        styleInputs.forEach(id => {
+          document.getElementById(id).addEventListener('change', () => {
+            this.generateIcons();
+          });
+        });
+
+        // 布局选择
+        const layoutInputs = document.querySelectorAll('input[name="layout"]');
+        layoutInputs.forEach(input => {
+          input.addEventListener('change', () => {
+            this.generateIcons();
+          });
+        });
+
+        // 按钮
+        document.getElementById('generateBtn').addEventListener('click', () => {
+          this.generateIcons();
+        });
+
+        document.getElementById('downloadAllBtn').addEventListener('click', () => {
+          this.downloadAll();
+        });
+
+        document.getElementById('downloadZipBtn').addEventListener('click', () => {
+          this.downloadAsZip();
+        });
+      }
+
+      getOptions() {
+        return {
+          colors: [
+            document.getElementById('color1').value,
+            document.getElementById('color2').value,
+            document.getElementById('color3').value,
+            document.getElementById('color4').value
+          ],
+          borderColor: document.getElementById('borderColor').value,
+          eyeDropperColor: document.getElementById('eyeDropperColor').value,
+          whiteBackground: document.getElementById('whiteBackground').checked,
+          showEyeDropper: document.getElementById('showEyeDropper').checked,
+          pixelBorder: document.getElementById('pixelBorder').checked,
+          showShadow: document.getElementById('showShadow').checked,
+          layout: document.querySelector('input[name="layout"]:checked').value
+        };
+      }
+
+      generateIcons() {
+        const options = this.getOptions();
+        
+        this.sizes.forEach(size => {
+          const canvas = this.canvases[size];
+          const ctx = this.contexts[size];
+          
+          // 清空canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          // 生成图标
+          this.drawIcon(ctx, size, options);
+        });
+      }
+
+      drawIcon(ctx, size, options) {
+        // 对于小尺寸图标，边框宽度固定为1像素，确保铺满效果
+        const borderWidth = 1;
+        
+        // 绘制背景
+        if (options.whiteBackground) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, size, size);
+        } else {
+          ctx.clearRect(0, 0, size, size);
+        }
+        
+        // 根据布局绘制
+        switch (options.layout) {
+          case 'grid':
+            this.drawGridLayout(ctx, size, options, borderWidth);
+            break;
+          case 'circle':
+            this.drawCircleLayout(ctx, size, options, borderWidth);
+            break;
+          case 'strip':
+            this.drawStripLayout(ctx, size, options, borderWidth);
+            break;
+        }
+      }
+
+      drawGridLayout(ctx, size, options, borderWidth) {
+        // 精确分为2x2网格，完全铺满
+        const halfSize = Math.floor(size / 2);
+        
+        options.colors.forEach((color, i) => {
+          const row = Math.floor(i / 2);
+          const col = i % 2;
+          
+          const x = col * halfSize;
+          const y = row * halfSize;
+          
+          // 填充颜色（铺满整个区块，不计算border间隙）
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y, halfSize, halfSize);
+          
+          // 绘制边框（覆盖在颜色之上，但不影响铺满效果）
+          if (options.pixelBorder) {
+            ctx.strokeStyle = options.borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.strokeRect(x, y, halfSize, halfSize);
+          }
+        });
+      }
+
+      drawCircleLayout(ctx, size, options, borderWidth) {
+        const centerX = size / 2;
+        const centerY = size / 2;
+        
+        // 绘制白色圆形背景
+        if (options.whiteBackground) {
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fill();
+          
+          if (options.pixelBorder) {
+            ctx.strokeStyle = options.borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.stroke();
+          }
+        }
+        
+        // 绘制圆形调色盘
+        const numColors = options.colors.length;
+        const radius = size / 2 - size / 5; // 调色盘半径
+        const colorRadius = size / 6; // 每个颜色块的半径
+        
+        options.colors.forEach((color, i) => {
+          const angle = (i / numColors) * Math.PI * 2 - Math.PI / 2;
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+          
+          // 绘制圆形色块
+          ctx.beginPath();
+          ctx.arc(x, y, colorRadius, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          
+          if (options.pixelBorder) {
+            ctx.strokeStyle = options.borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.stroke();
+          }
+        });
+        
+        // 绘制中心白色圆点
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, size / 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        
+        if (options.pixelBorder) {
+          ctx.strokeStyle = options.borderColor;
+          ctx.lineWidth = borderWidth;
+          ctx.stroke();
+        }
+      }
+
+      drawStripLayout(ctx, size, options, borderWidth) {
+        const stripHeight = Math.floor(size / options.colors.length);
+        
+        options.colors.forEach((color, i) => {
+          const y = i * stripHeight;
+          
+          ctx.fillStyle = color;
+          ctx.fillRect(0, y, size, stripHeight);
+          
+          if (options.pixelBorder) {
+            ctx.strokeStyle = options.borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.strokeRect(0, y, size, stripHeight);
+          }
+        });
+      }
+
+      downloadAll() {
+        this.downloadWithDelay(this.sizes);
+        this.showSuccessMessage('图标下载成功！文件已保存为 icon-16.png, icon-48.png, icon-128.png');
+      }
+      
+      showSuccessMessage(message) {
+        const msgEl = document.getElementById('successMessage');
+        msgEl.textContent = '✅ ' + message;
+        msgEl.style.display = 'block';
+        
+        setTimeout(() => {
+          msgEl.style.display = 'none';
+        }, 3000);
+      }
+
+      downloadIcon(size) {
+        const canvas = this.canvases[size];
+        const link = document.createElement('a');
+        link.download = `icon-${size}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      async downloadWithDelay(sizes) {
+        for (let i = 0; i < sizes.length; i++) {
+          this.downloadIcon(sizes[i]);
+          if (i < sizes.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 800)); // 延迟800ms避免浏览器阻止
+          }
+        }
+      }
+
+      downloadAsZip() {
+        // 直接下载所有图标
+        if (confirm('即将下载三个图标文件：\n- icon-16.png\n- icon-48.png\n- icon-128.png\n\n请选择保存位置为项目的 images/ 文件夹。\n\n点击"确定"开始下载。')) {
+          this.downloadAll();
+        }
+      }
+    }
+
+    // 初始化生成器
+    window.addEventListener('DOMContentLoaded', () => {
+      new IconGenerator();
+    });
+  </script>
+</body>
+</html>
