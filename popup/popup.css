@@ -85,8 +85,6 @@ body::-webkit-scrollbar-thumb {
 
 .container {
   width: 100%;
-  min-width: 256px;
-  max-width: 256px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -372,7 +370,7 @@ body::-webkit-scrollbar-thumb {
   gap: 5px;
   max-height: 150px;
   overflow-y: auto;
-  padding: 5px;
+  padding: 0;
   background: var(--bg);
   border: 2px solid var(--border);
 }
@@ -427,6 +425,20 @@ body::-webkit-scrollbar-thumb {
 
 .color-swatch:hover .delete-btn {
   display: flex;
+}
+
+.swatch-hex {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 6px;
+  font-family: 'Press Start 2P', 'Fusion Pixel 12px', 'SimSun', '宋体', monospace;
+  border: 1px solid var(--border);
+  padding: 1px 3px;
+  line-height: 1.4;
+  pointer-events: none;
+  z-index: 5;
+  white-space: nowrap;
 }
 
 .empty-state {
@@ -679,7 +691,7 @@ body::-webkit-scrollbar-thumb {
 .back-btn {
   font-family: 'Press Start 2P', 'Fusion Pixel 12px', 'SimSun', '宋体', monospace;
   font-size: 10px;
-  padding: 4px 6px;
+  padding: 2px 4px;
   background: white;
   border: 2px solid var(--border);
   cursor: pointer;
@@ -687,6 +699,7 @@ body::-webkit-scrollbar-thumb {
   white-space: nowrap;
   flex-shrink: 0;
   transition: all 0.1s;
+  line-height: 1;
 }
 
 .back-btn:hover {
@@ -707,13 +720,15 @@ body::-webkit-scrollbar-thumb {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 2px 0;
+  line-height: 1;
 }
 
 .icon-btn {
   font-size: 10px;
-  padding: 2px 3px;
+  padding: 2px 4px;
   background: none;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   cursor: pointer;
   flex-shrink: 0;
   transition: all 0.1s;

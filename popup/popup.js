@@ -249,14 +249,18 @@ class PixelColorPicker {
       return;
     }
 
-    grid.innerHTML = colors.map(color => `
-      <div class="color-swatch"
-           style="background-color: ${color.hex}"
-           data-id="${color.id}"
-           title="${color.hex}">
-        <div class="delete-btn" data-id="${color.id}">×</div>
-      </div>
-    `).join('');
+    grid.innerHTML = colors.map(color => {
+      const style = this.getSwatchHexStyle(color.r, color.g, color.b);
+      return `
+        <div class="color-swatch"
+             style="background-color: ${color.hex}"
+             data-id="${color.id}"
+             title="${color.hex}">
+          <span class="swatch-hex" style="background:${style.bg};color:${style.text}">${color.hex}</span>
+          <div class="delete-btn" data-id="${color.id}">×</div>
+        </div>
+      `;
+    }).join('');
 
     grid.querySelectorAll('.color-swatch').forEach(swatch => {
       swatch.addEventListener('click', (e) => {
@@ -581,7 +585,19 @@ class PixelColorPicker {
   }
 
   getContrastColor(r, g, b) {
-    return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000000' : '#FFFFFF';
+    return (r * 299 + g * 587 + b * 114) / 1000 > 200 ? '#000000' : '#FFFFFF';
+  }
+
+  // 根据颜色亮度返回右上角标签的 {bg, text} 样式
+  getSwatchHexStyle(r, g, b) {
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    if (brightness <= 200) {
+      // 深色色块 → 白底黑字
+      return { bg: 'rgba(255,255,255,0.9)', text: '#000000' };
+    } else {
+      // 浅色色块 → 黑底白字
+      return { bg: 'rgba(0,0,0,0.6)', text: '#FFFFFF' };
+    }
   }
 
   escapeHtml(str) {
