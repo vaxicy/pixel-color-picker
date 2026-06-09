@@ -1,4 +1,3 @@
-// Options 页面逻辑
 class OptionsManager {
   constructor() {
     this.settings = {};
@@ -14,12 +13,13 @@ class OptionsManager {
   async loadSettings() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(['settings'], (result) => {
-        this.settings = result.settings || {
+        this.settings = {
           defaultFormat: 'hex',
           autoSave: true,
           maxColorsPerPalette: 20,
-          headerColor: '#F85E9F',
-          buttonColor: '#F85E9F'
+          headerColor: '#ff6b9d',
+          buttonColor: '#ff6b9d',
+          ...(result.settings || {})
         };
         resolve();
       });
@@ -36,15 +36,14 @@ class OptionsManager {
     document.getElementById('defaultFormat').value = this.settings.defaultFormat;
     document.getElementById('autoSave').checked = this.settings.autoSave;
     document.getElementById('maxColors').value = this.settings.maxColorsPerPalette || 20;
-    document.getElementById('headerColor').value = this.settings.headerColor || '#F85E9F';
-    document.getElementById('buttonColor').value = this.settings.buttonColor || '#F85E9F';
+    document.getElementById('headerColor').value = this.settings.headerColor || '#ff6b9d';
+    document.getElementById('buttonColor').value = this.settings.buttonColor || '#ff6b9d';
     this.applyTheme();
   }
 
   bindEvents() {
-    // 保存设置
     document.getElementById('saveSettings').addEventListener('click', async () => {
-      const maxVal = parseInt(document.getElementById('maxColors').value) || 20;
+      const maxVal = parseInt(document.getElementById('maxColors').value, 10) || 20;
       this.settings = {
         defaultFormat: document.getElementById('defaultFormat').value,
         autoSave: document.getElementById('autoSave').checked,
@@ -52,32 +51,28 @@ class OptionsManager {
         headerColor: document.getElementById('headerColor').value,
         buttonColor: document.getElementById('buttonColor').value
       };
-      
+
       await this.saveSettings();
-      this.showNotification('设置已保存！');
+      this.applyTheme();
+      this.showNotification('设置已保存');
     });
 
-    // 返回
     document.getElementById('backToPopup').addEventListener('click', () => {
       window.close();
     });
 
-    // 导出数据
     document.getElementById('exportData').addEventListener('click', () => {
       this.exportData();
     });
 
-    // 导入数据
     document.getElementById('importData').addEventListener('click', () => {
       this.importData();
     });
 
-    // 清除数据
     document.getElementById('clearData').addEventListener('click', () => {
       this.clearData();
     });
 
-    // 查看历史
     document.getElementById('viewHistory').addEventListener('click', () => {
       this.viewHistory();
     });
@@ -87,74 +82,72 @@ class OptionsManager {
     const data = await new Promise((resolve) => {
       chrome.storage.sync.get(null, resolve);
     });
-    
+
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pixel-color-picker-backup.json';
-    a.click();
-    
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'pixel-color-picker-backup.json';
+    link.click();
+
     URL.revokeObjectURL(url);
-    this.showNotification('数据已导出！');
+    this.showNotification('数据已导出');
   }
 
   importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
+
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
       const reader = new FileReader();
-      
-      reader.onload = async (event) => {
+      reader.onload = async (readerEvent) => {
         try {
-          const data = JSON.parse(event.target.result);
-          
+          const data = JSON.parse(readerEvent.target.result);
           await new Promise((resolve) => {
             chrome.storage.sync.set(data, resolve);
           });
-          
+
           await this.loadSettings();
           this.updateUI();
-          this.showNotification('数据已导入！');
+          this.showNotification('数据已导入');
         } catch (error) {
           this.showNotification('导入失败：文件格式错误');
         }
       };
-      
+
       reader.readAsText(file);
     };
-    
+
     input.click();
   }
 
   async clearData() {
-    if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
-      await new Promise((resolve) => {
-        chrome.storage.sync.clear(resolve);
-      });
-      
-      await this.loadSettings();
-      this.updateUI();
-      this.showNotification('所有数据已清除');
-    }
+    if (!confirm('确定要清除所有数据吗？此操作不可恢复。')) return;
+
+    await new Promise((resolve) => {
+      chrome.storage.sync.clear(resolve);
+    });
+
+    await this.loadSettings();
+    this.updateUI();
+    this.showNotification('所有数据已清除');
   }
 
   viewHistory() {
-    const history = `
-Pixel Color Picker 更新日志
+    const history = `Pixel Color Picker 更新日志
 
 v1.0.0 (2026-06-07)
 - 初始版本发布
 - 实现基本取色功能
 - 支持颜色收藏
-- 支持导出CSS和PNG
-- 像素风UI设计
-    `;
-    
+- 支持导出 CSS 和 PNG
+- 像素风 UI 设计`;
+
     alert(history);
   }
 
@@ -165,21 +158,6 @@ v1.0.0 (2026-06-07)
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.textContent = message;
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #4CAF50;
-      color: white;
-      padding: 16px 32px;
-      font-family: 'Press Start 2P', 'Fusion Pixel 12px', 'SimSun', '宋体', monospace;
-      font-size: 10px;
-      border: 4px solid #4A4A4A;
-      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
-      z-index: 1000;
-    `;
-
     document.body.appendChild(notification);
 
     setTimeout(() => {
@@ -190,15 +168,12 @@ v1.0.0 (2026-06-07)
   }
 
   applyTheme() {
-    const headerColor = this.settings?.headerColor || '#F85E9F';
-    const buttonColor = this.settings?.buttonColor || '#F85E9F';
     const root = document.documentElement;
-    root.style.setProperty('--header-bg', headerColor);
-    root.style.setProperty('--button-bg', buttonColor);
+    root.style.setProperty('--header-bg', this.settings?.headerColor || '#ff6b9d');
+    root.style.setProperty('--button-bg', this.settings?.buttonColor || '#ff6b9d');
   }
 }
 
-// 初始化
 document.addEventListener('DOMContentLoaded', () => {
   new OptionsManager();
 });

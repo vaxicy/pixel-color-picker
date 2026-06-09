@@ -5,79 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>设置 - Pixel Color Picker</title>
   <link rel="stylesheet" href="options.css">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
     <header class="pixel-header">
-      <h1>⚙️ 设置</h1>
+      <div class="brand-mark">P</div>
+      <div>
+        <span class="eyebrow">PIXEL SETTINGS</span>
+        <h1>像素吸色器设置</h1>
+      </div>
     </header>
 
-    <section class="settings-section">
-      <h2>常规设置</h2>
-      
-      <div class="setting-item">
-        <label>默认颜色格式</label>
-        <select id="defaultFormat">
-          <option value="hex" selected>HEX</option>
-          <option value="rgb">RGB</option>
-          <option value="hsl">HSL</option>
-        </select>
-      </div>
-      
-      <div class="setting-item">
-        <label>
-          <input type="checkbox" id="autoSave" checked>
-          自动保存到色卡
-        </label>
-      </div>
+    <main class="settings-grid">
+      <section class="settings-section">
+        <h2>常规设置</h2>
 
-      <div class="setting-item">
-        <label for="maxColors">最大颜色数（每个色卡组）</label>
-        <input type="number" id="maxColors" min="1" max="100" value="20">
-      </div>
+        <div class="setting-item">
+          <label for="defaultFormat">默认颜色格式</label>
+          <select id="defaultFormat">
+            <option value="hex" selected>HEX</option>
+            <option value="rgb">RGB</option>
+            <option value="hsl">HSL</option>
+          </select>
+        </div>
 
-      <div class="setting-item">
-        <label for="headerColor">标题背景颜色</label>
-        <input type="color" id="headerColor" value="#F85E9F">
-      </div>
+        <div class="setting-item checkbox-row">
+          <label>
+            <input type="checkbox" id="autoSave" checked>
+            自动保存到色卡
+          </label>
+        </div>
 
-      <div class="setting-item">
-        <label for="buttonColor">按键背景颜色</label>
-        <input type="color" id="buttonColor" value="#F85E9F">
-      </div>
-    </section>
+        <div class="setting-item">
+          <label for="maxColors">每组最多颜色数</label>
+          <input type="number" id="maxColors" min="1" max="100" value="20">
+        </div>
+      </section>
 
-    <section class="settings-section">
-      <h2>数据管理</h2>
-      
-      <div class="setting-item">
-        <button class="pixel-button" id="exportData">导出所有数据</button>
-        <button class="pixel-button" id="importData">导入数据</button>
-        <button class="pixel-button danger" id="clearData">清除所有数据</button>
-      </div>
-    </section>
+      <section class="settings-section">
+        <h2>主题颜色</h2>
 
-    <section class="settings-section">
-      <h2>关于</h2>
-      
-      <div class="about-info">
-        <p>Pixel Color Picker v1.0.0</p>
-        <p>可爱的像素风网页吸色工具</p>
-        <p>© 2026 Pixel Color Picker</p>
-      </div>
-      
-      <div class="setting-item">
-        <button class="pixel-button" id="viewHistory">查看更新日志</button>
-      </div>
-    </section>
+        <div class="setting-item">
+          <label for="headerColor">标题栏颜色</label>
+          <input type="color" id="headerColor" value="#ff6b9d">
+        </div>
+
+        <div class="setting-item">
+          <label for="buttonColor">取色按钮颜色</label>
+          <input type="color" id="buttonColor" value="#ff6b9d">
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>数据管理</h2>
+
+        <div class="button-stack">
+          <button class="pixel-button" id="exportData">导出所有数据</button>
+          <button class="pixel-button mint" id="importData">导入数据</button>
+          <button class="pixel-button danger" id="clearData">清除所有数据</button>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h2>关于</h2>
+
+        <div class="about-info">
+          <p>Pixel Color Picker v1.0.0</p>
+          <p>小巧可爱的像素风网页吸色工具</p>
+          <p>© 2026 Pixel Color Picker</p>
+        </div>
+
+        <button class="pixel-button secondary" id="viewHistory">查看更新日志</button>
+      </section>
+    </main>
 
     <footer class="pixel-footer">
       <button id="saveSettings" class="pixel-button primary">保存设置</button>
-      <button id="backToPopup" class="pixel-button">返回</button>
+      <button id="backToPopup" class="pixel-button light">返回</button>
     </footer>
   </div>
-  
+
   <script src="options.js"></script>
 </body>
 </html>

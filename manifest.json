@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Pixel Color Picker - 像素吸色器",
   "version": "1.0.0",
-  "description": "可爱的像素风网页吸色工具，支持颜色收藏和色卡生成",
+  "description": "小巧可爱的像素风网页吸色工具，支持颜色收藏和色卡导出",
   "permissions": [
     "activeTab",
     "storage",
