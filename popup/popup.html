@@ -90,6 +90,7 @@
         <span class="button-icon">+</span>
         <span class="button-text">保存到色卡</span>
       </button>
+      <div class="color-advice" id="colorAdvice">取色后显示颜色建议</div>
     </section>
 
     <section class="palette-section">
@@ -100,9 +101,14 @@
         </div>
         <div class="palette-controls">
           <button class="pixel-button small" id="addColor">添加</button>
-          <button class="pixel-button small" id="exportCSS">CSS</button>
-          <button class="pixel-button small" id="exportPNG">PNG</button>
+          <button class="pixel-button small" id="sortColors">排序: 时间</button>
+          <button class="pixel-button small" id="importPalette">导入</button>
+          <button class="pixel-button small" id="openExportMenu">导出</button>
           <button class="pixel-button small danger" id="clearPalette">清空</button>
+        </div>
+        <div class="palette-search">
+          <input type="search" id="paletteSearch" placeholder="搜索 HEX / 备注 / RGB / HSL">
+          <button class="mini-btn" id="clearPaletteSearch" title="清空搜索">×</button>
         </div>
       </div>
 
@@ -161,6 +167,25 @@
             <p>更新小巧像素风弹窗、低对比像素背景、紧凑布局和弹窗内历史面板。</p>
           </article>
         </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="export-overlay" id="exportOverlay" hidden>
+    <section class="export-dialog" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+      <header class="export-header">
+        <div>
+          <span class="eyebrow">PIXEL EXPORT</span>
+          <h2 id="exportTitle">导出色卡</h2>
+        </div>
+        <button class="icon-btn" id="closeExport" title="关闭">×</button>
+      </header>
+      <div class="export-grid">
+        <button class="export-option" data-format="css">CSS</button>
+        <button class="export-option" data-format="scss">SCSS</button>
+        <button class="export-option" data-format="json">JSON</button>
+        <button class="export-option" data-format="tailwind">Tailwind</button>
+        <button class="export-option" data-format="png">PNG</button>
       </div>
     </section>
   </div>
