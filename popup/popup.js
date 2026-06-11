@@ -243,6 +243,7 @@ class PixelColorPicker {
     const searchInput = document.getElementById('paletteSearch');
     if (searchInput) searchInput.value = this.paletteSearchQuery;
     document.getElementById('saveColor').disabled = !this.currentColor;
+    if (this.currentColor) this.updateCurrentColorStatus(this.currentColor);
     this.renderColorGrid();
   }
 
@@ -278,8 +279,9 @@ class PixelColorPicker {
       const label = color.note ? this.escapeHtml(color.note) : color.hex;
       const labelTitle = color.note ? `${color.note} · ${color.hex}` : color.hex;
       const searchClass = this.paletteSearchQuery ? ' search-match' : '';
+      const selectedClass = this.currentColor?.hex === color.hex ? ' selected' : '';
       return `
-        <div class="color-swatch${searchClass}"
+        <div class="color-swatch${searchClass}${selectedClass}"
              style="background-color: ${color.hex}"
              data-id="${color.id}">
           <button class="note-btn" data-id="${color.id}" title="编辑备注">✎</button>
@@ -332,6 +334,17 @@ class PixelColorPicker {
     document.getElementById('editNameBtn').addEventListener('click', () => this.renamePalette());
     document.getElementById('deletePaletteBtn').addEventListener('click', () => this.deleteCurrentPalette());
     document.getElementById('addColor').addEventListener('click', () => this.addColorManual());
+    document.getElementById('closeAddColor').addEventListener('click', () => this.closeAddColorDialog());
+    document.getElementById('cancelAddColor').addEventListener('click', () => this.closeAddColorDialog());
+    document.getElementById('confirmAddColor').addEventListener('click', () => this.confirmManualColor());
+    document.getElementById('manualColorInput').addEventListener('input', () => this.updateManualColorPreview());
+    document.getElementById('manualColorInput').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') this.confirmManualColor();
+      if (event.key === 'Escape') this.closeAddColorDialog();
+    });
+    document.getElementById('addColorOverlay').addEventListener('click', (event) => {
+      if (event.target.id === 'addColorOverlay') this.closeAddColorDialog();
+    });
     document.getElementById('sortColors').addEventListener('click', () => this.cycleColorSort());
     document.getElementById('importPalette').addEventListener('click', () => this.importPaletteJSON());
     document.getElementById('clearPalette').addEventListener('click', () => this.clearPalette());
@@ -406,7 +419,8 @@ class PixelColorPicker {
     document.getElementById('rgbValue').value = `rgb(${color.r}, ${color.g}, ${color.b})`;
     document.getElementById('hslValue').value = color.hsl;
     document.getElementById('saveColor').disabled = false;
-    this.updateColorAdvice(color);
+    this.updateCurrentColorStatus(color);
+    this.renderColorGrid();
   }
 
   async saveCurrentColor() {
@@ -414,21 +428,56 @@ class PixelColorPicker {
     await this.addColorToCurrentPalette(this.currentColor, { successMessage: '颜色已保存' });
   }
 
-  async addColorManual() {
-    const input = prompt('请输入 HEX 颜色值，例如 #FF5733：', '');
-    if (input === null) return;
+  addColorManual() {
+    const overlay = document.getElementById('addColorOverlay');
+    const input = document.getElementById('manualColorInput');
+    overlay.hidden = false;
+    input.value = '';
+    this.updateManualColorPreview();
+    setTimeout(() => input.focus(), 0);
+  }
 
-    const hex = input.trim();
-    const color = this.parseSRGBHex(hex.startsWith('#') ? hex : `#${hex}`);
-    if (!color) {
-      this.showNotification('颜色格式无效');
-      return;
+  closeAddColorDialog() {
+    document.getElementById('addColorOverlay').hidden = true;
+  }
+
+  updateManualColorPreview() {
+    const input = document.getElementById('manualColorInput');
+    const preview = document.getElementById('addColorPreview');
+    const hint = document.getElementById('manualColorHint');
+    const raw = input.value.trim();
+
+    hint.className = 'add-color-hint';
+    preview.style.backgroundColor = '#ffffff';
+
+    if (!raw) {
+      hint.textContent = '请输入 6 位 HEX';
+      return null;
     }
 
+    const color = this.parseSRGBHex(raw.startsWith('#') ? raw : `#${raw}`);
+    if (!color) {
+      hint.textContent = '格式不正确，例如 #FF5733';
+      hint.classList.add('error');
+      return null;
+    }
+
+    preview.style.backgroundColor = color.hex;
+    hint.textContent = `${color.hex} 可以添加`;
+    hint.classList.add('ok');
+    return color;
+  }
+
+  async confirmManualColor() {
+    const color = this.updateManualColorPreview();
+    if (!color) return;
+
+    document.getElementById('manualColorInput').value = color.hex;
     this.currentColor = color;
     this.updateColorPreview(color);
     await this.addToHistory(color);
-    await this.addColorToCurrentPalette(color, { successMessage: '颜色已添加' });
+    const added = await this.addColorToCurrentPalette(color, { successMessage: '颜色已添加' });
+    if (added) this.closeAddColorDialog();
   }
 
   async addColorToCurrentPalette(color, { successMessage = '颜色已保存' } = {}) {
@@ -471,6 +520,7 @@ class PixelColorPicker {
       b: color.b,
       hex: color.hex,
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
+      note: color.note || '',
       createdAt: new Date().toISOString()
     };
 
@@ -624,6 +674,24 @@ class PixelColorPicker {
       ];
       return fields.some((field) => String(field).toLowerCase().includes(query));
     });
+  }
+
+  updateCurrentColorStatus(color) {
+    const status = document.getElementById('colorStatus');
+    if (!status) return;
+
+    const palette = this.getCurrentPalette();
+    const inPalette = Boolean(palette?.colors?.some((item) => item.hex === color.hex));
+    const paletteColor = palette?.colors?.find((item) => item.hex === color.hex);
+    const note = color.note || paletteColor?.note || '';
+    const brightness = this.getBrightness(color.r, color.g, color.b);
+    const textColor = brightness > 150 ? '黑字' : '白字';
+    let tone = '中间色';
+    if (brightness >= 200) tone = '浅色';
+    else if (brightness <= 90) tone = '深色';
+    const source = inPalette ? '已在色卡' : '可保存';
+    status.textContent = [source, note, `建议${textColor}`, tone].filter(Boolean).join(' · ');
+    status.classList.toggle('saved', inPalette);
   }
 
   async editColorNote(id) {
@@ -1112,25 +1180,6 @@ class PixelColorPicker {
 
   escapeLineComment(value) {
     return String(value || '').replace(/\r?\n/g, ' ');
-  }
-
-  updateColorAdvice(color) {
-    const advice = document.getElementById('colorAdvice');
-    if (!advice) return;
-
-    const brightness = this.getBrightness(color.r, color.g, color.b);
-    const textColor = brightness > 150 ? '黑字' : '白字';
-    let tone = '中间色';
-    if (brightness >= 200) tone = '浅色';
-    else if (brightness <= 90) tone = '深色';
-
-    const usage = brightness > 185
-      ? '适合浅色背景或柔和底色'
-      : brightness < 120
-        ? '适合按钮底色或强调块'
-        : '适合标签、边框或辅助色';
-
-    advice.textContent = `建议：${textColor} · ${tone} · ${usage}`;
   }
 
   getBrightness(r, g, b) {

@@ -86,11 +86,11 @@
           </div>
         </div>
       </div>
+      <div class="color-status" id="colorStatus">还没有选中颜色</div>
       <button id="saveColor" class="pixel-button secondary" disabled>
         <span class="button-icon">+</span>
         <span class="button-text">保存到色卡</span>
       </button>
-      <div class="color-advice" id="colorAdvice">取色后显示颜色建议</div>
     </section>
 
     <section class="palette-section">
@@ -99,9 +99,11 @@
           <button class="mini-btn" id="editNameBtn" title="重命名">改名</button>
           <span class="palette-meta" id="paletteMeta">创建于 6/9 · 0/20 色</span>
         </div>
-        <div class="palette-controls">
+        <div class="palette-controls primary-tools">
           <button class="pixel-button small" id="addColor">添加</button>
           <button class="pixel-button small" id="sortColors">排序: 时间</button>
+        </div>
+        <div class="palette-controls manage-tools">
           <button class="pixel-button small" id="importPalette">导入</button>
           <button class="pixel-button small" id="openExportMenu">导出</button>
           <button class="pixel-button small danger" id="clearPalette">清空</button>
@@ -186,6 +188,32 @@
         <button class="export-option" data-format="json">JSON</button>
         <button class="export-option" data-format="tailwind">Tailwind</button>
         <button class="export-option" data-format="png">PNG</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="add-color-overlay" id="addColorOverlay" hidden>
+    <section class="add-color-dialog" role="dialog" aria-modal="true" aria-labelledby="addColorTitle">
+      <header class="add-color-header">
+        <div>
+          <span class="eyebrow">PIXEL ADD</span>
+          <h2 id="addColorTitle">添加颜色</h2>
+        </div>
+        <button class="icon-btn" id="closeAddColor" title="关闭">×</button>
+      </header>
+      <div class="add-color-body">
+        <div class="add-color-preview" id="addColorPreview">
+          <div class="pixel-grid"></div>
+        </div>
+        <div class="add-color-form">
+          <label for="manualColorInput">HEX</label>
+          <input type="text" id="manualColorInput" placeholder="#FF5733" autocomplete="off">
+          <span class="add-color-hint" id="manualColorHint">请输入 6 位 HEX</span>
+        </div>
+      </div>
+      <div class="add-color-actions">
+        <button class="export-option" id="confirmAddColor">添加</button>
+        <button class="export-option" id="cancelAddColor">取消</button>
       </div>
     </section>
   </div>
