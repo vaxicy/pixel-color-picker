@@ -26,9 +26,10 @@ class PixelColorPicker {
 
   async loadData() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['palettes', 'currentPaletteId', 'palette', 'settings', 'colorHistory'], (result) => {
+      chrome.storage.sync.get(['palettes', 'currentPaletteId', 'palette', 'settings', 'colorHistory', 'lastPickedColor'], (result) => {
         this.settings = result.settings || {};
         this.colorHistory = Array.isArray(result.colorHistory) ? result.colorHistory : [];
+        this.currentColor = this.normalizeStoredColor(result.lastPickedColor);
         if (this.settings.maxColorsPerPalette != null) {
           this.maxColorsPerPalette = this.settings.maxColorsPerPalette;
         }
@@ -445,6 +446,9 @@ class PixelColorPicker {
     });
     document.getElementById('savePopupSettings').addEventListener('click', () => this.savePopupSettings());
     document.getElementById('resetPopupSettings').addEventListener('click', () => this.resetPopupSettings());
+    document.getElementById('exportAllData').addEventListener('click', () => this.exportAllData());
+    document.getElementById('importAllData').addEventListener('click', () => this.importAllData());
+    document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
     document.getElementById('decreaseMaxColors').addEventListener('click', () => this.changeMaxColors(-1));
     document.getElementById('increaseMaxColors').addEventListener('click', () => this.changeMaxColors(1));
     document.getElementById('popupMaxColors').addEventListener('change', () => {
@@ -524,6 +528,24 @@ class PixelColorPicker {
     this.updateCurrentFormatDisplay();
     this.updateCurrentColorStatus(color);
     this.renderColorGrid();
+    this.saveLastPickedColor(color);
+  }
+
+  saveLastPickedColor(color) {
+    if (!color?.hex) return Promise.resolve();
+    return new Promise((resolve) => {
+      chrome.storage.sync.set({
+        lastPickedColor: {
+          r: color.r,
+          g: color.g,
+          b: color.b,
+          hex: color.hex,
+          hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
+          note: color.note || '',
+          createdAt: color.createdAt || new Date().toISOString()
+        }
+      }, resolve);
+    });
   }
 
   async saveCurrentColor() {
@@ -782,6 +804,177 @@ class PixelColorPicker {
     this.refreshCurrentView();
     this.closeSettingsDialog();
     this.showNotification('设置已重置');
+  }
+
+  async exportAllData() {
+    const data = await new Promise((resolve) => {
+      chrome.storage.sync.get(null, resolve);
+    });
+
+    const backup = {
+      app: 'pixel-color-picker',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data
+    };
+
+    this.downloadFile(
+      JSON.stringify(backup, null, 2),
+      `pixel-color-picker-backup-${this.getDateStamp()}.json`,
+      'application/json'
+    );
+    this.showNotification('备份已导出');
+  }
+
+  importAllData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+
+    input.onchange = async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await this.readFileAsText(file);
+        const parsed = JSON.parse(text);
+        const data = parsed?.app === 'pixel-color-picker' && parsed?.data ? parsed.data : parsed;
+        const normalized = this.normalizeBackupData(data);
+
+        const result = await this.openPixelDialog({
+          eyebrow: 'PIXEL IMPORT',
+          title: '导入备份',
+          message: `将导入 ${normalized.palettes.length} 个色卡、${normalized.colorHistory.length} 条历史，并覆盖当前数据。`,
+          actions: [
+            { id: 'confirm', label: '导入', tone: 'primary' },
+            { id: 'cancel', label: '取消' }
+          ]
+        });
+        if (result.action !== 'confirm') return;
+
+        await new Promise((resolve) => {
+          chrome.storage.sync.clear(resolve);
+        });
+        await new Promise((resolve) => {
+          chrome.storage.sync.set(normalized, resolve);
+        });
+        await this.loadData();
+        this.closeSettingsDialog();
+        this.showListView();
+        this.showNotification('备份已导入');
+      } catch (error) {
+        console.error('[Pixel Color Picker] Backup import failed:', error);
+        this.showNotification('导入失败：备份格式不正确');
+      }
+    };
+
+    input.click();
+  }
+
+  async clearAllData() {
+    const result = await this.openPixelDialog({
+      eyebrow: 'PIXEL RESET',
+      title: '清空全部数据',
+      message: '确定要清空所有色卡、历史和设置吗？建议先导出备份。',
+      actions: [
+        { id: 'confirm', label: '清空', tone: 'danger' },
+        { id: 'cancel', label: '取消' }
+      ]
+    });
+    if (result.action !== 'confirm') return;
+
+    await new Promise((resolve) => {
+      chrome.storage.sync.clear(resolve);
+    });
+
+    this.settings = {};
+    this.colorHistory = [];
+    this.currentColor = null;
+    this.maxColorsPerPalette = 20;
+    await this.loadData();
+    this.closeSettingsDialog();
+    this.showListView();
+    this.showNotification('已清空并重建默认色卡');
+  }
+
+  normalizeBackupData(data) {
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid backup');
+    }
+
+    const settings = {
+      defaultFormat: 'hex',
+      pickAction: 'save',
+      autoSave: true,
+      maxColorsPerPalette: 20,
+      headerColor: '#ff6b9d',
+      buttonColor: '#ff6b9d',
+      ...(data.settings || {})
+    };
+    settings.defaultFormat = ['hex', 'rgb', 'hsl'].includes(settings.defaultFormat) ? settings.defaultFormat : 'hex';
+    settings.pickAction = ['save', 'preview', 'copy'].includes(settings.pickAction) ? settings.pickAction : 'save';
+    settings.maxColorsPerPalette = Math.max(1, Math.min(100, parseInt(settings.maxColorsPerPalette, 10) || 20));
+
+    const palettes = Array.isArray(data.palettes) ? data.palettes.map((palette, paletteIndex) => {
+      const colors = Array.isArray(palette.colors) ? palette.colors.map((color, colorIndex) => {
+        const parsed = this.parseSRGBHex(color?.hex || '');
+        if (!parsed) return null;
+        return {
+          ...parsed,
+          id: Number(color.id) || Date.now() + paletteIndex * 1000 + colorIndex,
+          note: typeof color.note === 'string' ? color.note : '',
+          createdAt: color.createdAt || new Date().toISOString()
+        };
+      }).filter(Boolean) : [];
+
+      return {
+        id: Number(palette.id) || Date.now() + paletteIndex,
+        name: typeof palette.name === 'string' && palette.name.trim() ? palette.name.trim() : `导入色卡 ${paletteIndex + 1}`,
+        colors,
+        maxColors: Math.max(colors.length, Math.min(100, parseInt(palette.maxColors, 10) || settings.maxColorsPerPalette)),
+        createdAt: palette.createdAt || new Date().toISOString(),
+        lastOpenedAt: palette.lastOpenedAt || ''
+      };
+    }).filter((palette) => palette.name) : [];
+
+    if (palettes.length === 0) {
+      palettes.push({
+        id: Date.now(),
+        name: '默认色卡',
+        colors: [],
+        maxColors: settings.maxColorsPerPalette,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    const colorHistory = Array.isArray(data.colorHistory) ? data.colorHistory.map((color, index) => {
+      const parsed = this.parseSRGBHex(color?.hex || '');
+      if (!parsed) return null;
+      return {
+        ...parsed,
+        id: Number(color.id) || Date.now() + index,
+        note: typeof color.note === 'string' ? color.note : '',
+        createdAt: color.createdAt || new Date().toISOString()
+      };
+    }).filter(Boolean).slice(0, 30) : [];
+
+    const currentPaletteId = palettes.some((palette) => palette.id === data.currentPaletteId)
+      ? data.currentPaletteId
+      : palettes[0].id;
+
+    return {
+      palettes,
+      currentPaletteId,
+      settings,
+      colorHistory,
+      lastPickedColor: this.normalizeStoredColor(data.lastPickedColor)
+    };
+  }
+
+  getDateStamp() {
+    const date = new Date();
+    const pad = (number) => String(number).padStart(2, '0');
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
   }
 
   refreshCurrentView() {
@@ -1647,6 +1840,17 @@ class PixelColorPicker {
     const g = parseInt(match[2], 16);
     const b = parseInt(match[3], 16);
     return { r, g, b, hex: hex.toUpperCase(), hsl: this.rgbToHsl(r, g, b) };
+  }
+
+  normalizeStoredColor(color) {
+    if (!color?.hex) return null;
+    const parsed = this.parseSRGBHex(color.hex);
+    if (!parsed) return null;
+    return {
+      ...parsed,
+      note: typeof color.note === 'string' ? color.note : '',
+      createdAt: color.createdAt || new Date().toISOString()
+    };
   }
 
   rgbToHsl(r, g, b) {

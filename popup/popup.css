@@ -170,10 +170,14 @@ body::-webkit-scrollbar-thumb,
 .sort-btn,
 .add-btn,
 .copy-btn {
+  display: inline-grid;
+  place-items: center;
   border: 2px solid var(--border);
   background: #fff;
   color: var(--text);
   cursor: pointer;
+  line-height: 1;
+  text-align: center;
   box-shadow: 2px 2px 0 rgba(63,52,64,0.18);
   transition: transform 0.08s, box-shadow 0.08s, background 0.08s;
 }
@@ -305,12 +309,41 @@ body::-webkit-scrollbar-thumb,
 }
 
 .button-icon {
+  display: grid;
+  place-items: center;
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
+  line-height: 1;
 }
 
 .button-text {
   line-height: 1;
+}
+
+.icon-btn,
+.mini-btn.icon-mini,
+.footer-btn,
+.add-btn,
+.copy-btn,
+.format-tab,
+.stepper-btn,
+.history-add,
+.history-copy,
+.card-delete-btn {
+  font-variant-numeric: tabular-nums;
+}
+
+.icon-btn,
+.footer-btn,
+.copy-btn,
+.mini-btn.icon-mini,
+.add-btn,
+.card-delete-btn,
+.history-add,
+.history-copy,
+.stepper-btn {
+  align-items: center;
+  justify-items: center;
 }
 
 .palette-section,
@@ -1543,6 +1576,46 @@ body::-webkit-scrollbar-thumb,
   gap: 3px;
 }
 
+.settings-data-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.data-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 26px);
+  gap: 5px;
+}
+
+.data-action-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid var(--border);
+  background: var(--cream);
+  color: var(--text);
+  box-shadow: 2px 2px 0 rgba(63,52,64,0.14);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.data-action-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(63,52,64,0.14);
+}
+
+.data-action-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(63,52,64,0.14);
+}
+
+.data-action-btn.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
 .stepper-btn {
   width: 24px;
   height: 24px;
@@ -1818,6 +1891,94 @@ body::-webkit-scrollbar-thumb,
 .history-add {
   background: var(--mint);
   font-size: 15px;
+}
+
+/* Button alignment pass: keep icon and text controls optically centered. */
+button,
+.icon-btn,
+.mini-btn,
+.footer-btn,
+.add-btn,
+.copy-btn,
+.format-tab,
+.stepper-btn,
+.history-add,
+.history-copy,
+.card-delete-btn,
+.pixel-dialog-button,
+.export-option {
+  line-height: 1;
+  text-align: center;
+}
+
+.icon-btn,
+.footer-btn,
+.add-btn,
+.copy-btn,
+.format-tab,
+.stepper-btn,
+.history-add,
+.history-copy,
+.card-delete-btn,
+.mini-btn.icon-mini {
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.pixel-button,
+.pixel-dialog-button,
+.export-option {
+  align-items: center;
+  justify-items: center;
+}
+
+.button-icon,
+.more-menu-item span,
+.notification-icon {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.icon-btn,
+.footer-btn,
+.copy-btn,
+.palette-search .mini-btn,
+.history-search .mini-btn {
+  font-size: 12px;
+}
+
+.back-btn {
+  font-size: 15px;
+}
+
+.palette-delete-btn,
+.card-delete-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+
+.add-btn,
+.add-color-mini,
+.history-add {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+}
+
+.tool-toggle {
+  font-size: 13px;
+}
+
+.format-tab {
+  display: grid;
+  place-items: center;
+}
+
+.export-option,
+.pixel-dialog-button {
+  display: grid;
+  place-items: center;
 }
 
 .changelog-item {
