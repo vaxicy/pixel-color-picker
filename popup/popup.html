@@ -14,7 +14,7 @@
         <span class="eyebrow">PIXEL TOOL</span>
         <h1>像素吸色器</h1>
       </div>
-      <button id="openOptions" class="icon-btn header-settings" title="设置">⚙</button>
+      <button id="openOptions" class="icon-btn header-settings" title="打开设置">⚙</button>
     </header>
 
     <section class="picker-section">
@@ -28,8 +28,7 @@
       <div class="section-header">
         <h2>我的色卡组</h2>
         <div class="header-actions">
-          <button class="sort-btn" id="sortBtn" title="切换排序">最新</button>
-          <button class="add-btn" id="newPaletteBtn" title="新建色卡组">+</button>
+          <button class="add-btn" id="newPaletteBtn" title="新建色卡">+</button>
         </div>
       </div>
       <div class="palette-card-list" id="paletteCardList">
@@ -42,7 +41,8 @@
     </section>
 
     <footer class="pixel-footer">
-      <button id="viewHistory" class="footer-btn">历史</button>
+      <button id="viewHistory" class="footer-btn" title="打开历史">◴</button>
+      <button id="openOptionsList" class="footer-btn" title="打开设置">⚙</button>
     </footer>
   </div>
 
@@ -53,64 +53,66 @@
         <span class="eyebrow">PALETTE</span>
         <h1 id="paletteName">默认色卡</h1>
       </div>
-      <button class="icon-btn palette-delete-btn" id="deletePaletteBtn" title="删除色卡组">×</button>
+      <button class="icon-btn palette-delete-btn" id="deletePaletteBtn" title="删除当前色卡">×</button>
     </header>
 
-    <section class="picker-section">
-      <button id="quickPickBtn2" class="pixel-button quick-pick">
-        <span class="button-icon">▣</span>
-        <span class="button-text">快速取色</span>
-      </button>
-    </section>
-
     <section class="current-color-section">
-      <div class="color-display">
-        <div class="color-preview" id="colorPreview">
-          <div class="pixel-grid"></div>
+      <div class="current-color-bar">
+        <div class="color-display">
+          <button class="color-preview is-empty" id="colorPreview" type="button" title="点击取色 / 复制当前颜色">
+            <div class="pixel-grid"></div>
+          </button>
+          <div class="color-info">
+            <div class="current-format-card">
+              <span class="current-format-label" id="currentFormatLabel">HEX</span>
+              <input type="text" id="currentFormatValue" placeholder="#FF6B9D" readonly>
+              <button class="copy-btn" id="copyCurrentFormat" title="复制当前格式">⧉</button>
+            </div>
+            <div class="format-tabs" aria-label="颜色格式">
+              <button type="button" class="format-tab active" data-current-format="hex">HEX</button>
+              <button type="button" class="format-tab" data-current-format="rgb">RGB</button>
+              <button type="button" class="format-tab" data-current-format="hsl">HSL</button>
+            </div>
+            <input type="hidden" id="hexValue">
+            <input type="hidden" id="rgbValue">
+            <input type="hidden" id="hslValue">
+          </div>
         </div>
-        <div class="color-info">
-          <div class="color-format">
-            <label>HEX</label>
-            <input type="text" id="hexValue" placeholder="#FF6B9D" readonly>
-            <button class="copy-btn" data-target="hexValue" title="复制">⧉</button>
-          </div>
-          <div class="color-format">
-            <label>RGB</label>
-            <input type="text" id="rgbValue" placeholder="rgb(255,107,157)" readonly>
-            <button class="copy-btn" data-target="rgbValue" title="复制">⧉</button>
-          </div>
-          <div class="color-format">
-            <label>HSL</label>
-            <input type="text" id="hslValue" placeholder="hsl(340,100%,71%)" readonly>
-            <button class="copy-btn" data-target="hslValue" title="复制">⧉</button>
-          </div>
+        <div class="current-color-actions">
+          <button id="quickPickBtn2" class="pixel-button quick-pick compact-action" title="快速取色">
+            <span class="button-icon">▣</span>
+          </button>
+          <button id="saveColor" class="pixel-button secondary compact-action" title="先取一个颜色" disabled>
+            <span class="button-icon">✓</span>
+          </button>
         </div>
       </div>
       <div class="color-status" id="colorStatus">还没有选中颜色</div>
-      <button id="saveColor" class="pixel-button secondary" disabled>
-        <span class="button-icon">+</span>
-        <span class="button-text">保存到色卡</span>
-      </button>
     </section>
 
     <section class="palette-section">
       <div class="detail-tools">
-        <div class="palette-title-row">
-          <button class="mini-btn" id="editNameBtn" title="重命名">改名</button>
+        <div class="palette-tool-head">
+          <button class="mini-btn icon-mini" id="editNameBtn" title="重命名色卡">✎</button>
           <span class="palette-meta" id="paletteMeta">创建于 6/9 · 0/20 色</span>
+          <div class="palette-actions-row">
+            <button class="mini-btn icon-mini add-color-mini" id="addColor" title="手动添加颜色">+</button>
+            <button class="mini-btn tool-toggle icon-mini" id="togglePaletteSearch" title="搜索当前色卡">⌕</button>
+            <div class="more-tool-wrap">
+              <button class="mini-btn tool-toggle icon-mini" id="togglePaletteMore" title="打开更多操作">⋯</button>
+              <div class="palette-more-menu" id="paletteMoreMenu" hidden>
+                <button class="more-menu-item" id="sortColors"><span>↕</span>排序: 时间</button>
+                <button class="more-menu-item" id="importPalette"><span>⇣</span>导入 JSON</button>
+                <button class="more-menu-item" id="openExportMenu"><span>⇡</span>导出色卡</button>
+                <button class="more-menu-item danger" id="clearPalette"><span>×</span>清空色卡</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="palette-controls primary-tools">
-          <button class="pixel-button small" id="addColor">添加</button>
-          <button class="pixel-button small" id="sortColors">排序: 时间</button>
-        </div>
-        <div class="palette-controls manage-tools">
-          <button class="pixel-button small" id="importPalette">导入</button>
-          <button class="pixel-button small" id="openExportMenu">导出</button>
-          <button class="pixel-button small danger" id="clearPalette">清空</button>
-        </div>
-        <div class="palette-search">
+        <div class="palette-search collapsed" id="paletteSearchWrap">
           <input type="search" id="paletteSearch" placeholder="搜索 HEX / 备注 / RGB / HSL">
           <button class="mini-btn" id="clearPaletteSearch" title="清空搜索">×</button>
+          <span class="palette-search-status" id="paletteSearchStatus">输入关键词搜索颜色</span>
         </div>
       </div>
 
@@ -124,8 +126,8 @@
     </section>
 
     <footer class="pixel-footer">
-      <button id="viewHistory2" class="footer-btn">历史</button>
-      <button id="openOptions2" class="footer-btn">设置</button>
+      <button id="viewHistory2" class="footer-btn" title="打开历史">◴</button>
+      <button id="openOptions2" class="footer-btn" title="打开设置">⚙</button>
     </footer>
   </div>
 
@@ -148,6 +150,11 @@
         <div class="history-actions">
           <span class="history-count" id="historyCount">0 条</span>
           <button class="mini-btn" id="clearHistory">清空</button>
+        </div>
+        <div class="history-search">
+          <input type="search" id="historySearch" placeholder="搜索 HEX / RGB / HSL">
+          <button class="mini-btn" id="clearHistorySearch" title="清空搜索">×</button>
+          <span class="history-search-status" id="historySearchStatus">输入关键词查找历史</span>
         </div>
         <div class="history-list" id="historyList">
           <div class="empty-state compact">
@@ -182,12 +189,13 @@
         </div>
         <button class="icon-btn" id="closeExport" title="关闭">×</button>
       </header>
+      <div class="export-summary" id="exportSummary">当前色卡 · 0 色</div>
       <div class="export-grid">
-        <button class="export-option" data-format="css">CSS</button>
-        <button class="export-option" data-format="scss">SCSS</button>
-        <button class="export-option" data-format="json">JSON</button>
-        <button class="export-option" data-format="tailwind">Tailwind</button>
-        <button class="export-option" data-format="png">PNG</button>
+        <button class="export-option" data-format="css"><strong>CSS</strong><small>变量格式</small></button>
+        <button class="export-option" data-format="scss"><strong>SCSS</strong><small>$ 变量</small></button>
+        <button class="export-option" data-format="json"><strong>JSON</strong><small>可再次导入</small></button>
+        <button class="export-option" data-format="tailwind"><strong>Tailwind</strong><small>配置片段</small></button>
+        <button class="export-option" data-format="png"><strong>PNG</strong><small>色卡图片</small></button>
       </div>
     </section>
   </div>
@@ -214,6 +222,119 @@
       <div class="add-color-actions">
         <button class="export-option" id="confirmAddColor">添加</button>
         <button class="export-option" id="cancelAddColor">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="pixel-dialog-overlay" id="pixelDialogOverlay" hidden>
+    <section class="pixel-dialog" role="dialog" aria-modal="true" aria-labelledby="pixelDialogTitle">
+      <header class="pixel-dialog-header">
+        <div>
+          <span class="eyebrow" id="pixelDialogEyebrow">PIXEL NOTE</span>
+          <h2 id="pixelDialogTitle">提示</h2>
+        </div>
+        <button class="icon-btn" id="pixelDialogClose" title="关闭">×</button>
+      </header>
+      <div class="pixel-dialog-body">
+        <div class="pixel-dialog-preview" id="pixelDialogPreview" hidden>
+          <div class="pixel-grid"></div>
+        </div>
+        <p class="pixel-dialog-message" id="pixelDialogMessage"></p>
+        <div class="pixel-dialog-field" id="pixelDialogField" hidden>
+          <label for="pixelDialogInput" id="pixelDialogLabel">内容</label>
+          <input type="text" id="pixelDialogInput" autocomplete="off">
+          <span class="pixel-dialog-hint" id="pixelDialogHint"></span>
+        </div>
+      </div>
+      <div class="pixel-dialog-actions" id="pixelDialogActions"></div>
+    </section>
+  </div>
+
+  <div class="settings-overlay" id="settingsOverlay" hidden>
+    <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="settings-header">
+        <div>
+          <span class="eyebrow">PIXEL SETUP</span>
+          <h2 id="settingsTitle">设置</h2>
+        </div>
+        <button class="icon-btn" id="closeSettings" title="关闭">×</button>
+      </header>
+
+      <div class="settings-list">
+        <div class="settings-group-title">行为</div>
+        <input type="checkbox" id="popupAutoSave" hidden>
+
+        <div class="settings-row">
+          <span class="settings-copy">
+            <strong>每组上限</strong>
+            <small>单个色卡最多保存多少个颜色</small>
+          </span>
+          <div class="stepper-control">
+            <button type="button" class="stepper-btn" id="decreaseMaxColors">-</button>
+            <input type="number" id="popupMaxColors" min="1" max="100" value="20">
+            <button type="button" class="stepper-btn" id="increaseMaxColors">+</button>
+          </div>
+        </div>
+
+        <div class="settings-group-title">操作</div>
+        <label class="settings-row">
+          <span class="settings-copy">
+            <strong>复制格式</strong>
+            <small>点色块和历史复制会使用它</small>
+          </span>
+          <select id="popupDefaultFormat" class="settings-select">
+            <option value="hex">HEX</option>
+            <option value="rgb">RGB</option>
+            <option value="hsl">HSL</option>
+          </select>
+        </label>
+
+        <label class="settings-row">
+          <span class="settings-copy">
+            <strong>取色后</strong>
+            <small>选择吸到颜色后的默认动作</small>
+          </span>
+          <select id="popupPickAction" class="settings-select">
+            <option value="save">保存</option>
+            <option value="preview">预览</option>
+            <option value="copy">复制</option>
+          </select>
+        </label>
+
+        <div class="settings-group-title">主题</div>
+        <label class="settings-row">
+          <span class="settings-copy">
+            <strong>标题色</strong>
+          </span>
+          <div class="color-control">
+            <input type="color" id="popupHeaderColor" value="#ff6b9d">
+            <span class="color-value" id="popupHeaderColorValue">#FF6B9D</span>
+          </div>
+        </label>
+
+        <label class="settings-row">
+          <span class="settings-copy">
+            <strong>按钮色</strong>
+          </span>
+          <div class="color-control">
+            <input type="color" id="popupButtonColor" value="#ff6b9d">
+            <span class="color-value" id="popupButtonColorValue">#FF6B9D</span>
+          </div>
+        </label>
+
+      </div>
+
+      <div class="settings-preview">
+        <div class="settings-preview-head" id="settingsPreviewHead">
+          <span>PIXEL</span>
+          <button type="button" id="settingsPreviewButton">按钮</button>
+        </div>
+        <small>先预览，保存后生效</small>
+      </div>
+
+      <div class="settings-actions">
+        <button class="pixel-dialog-button primary" id="savePopupSettings">保存</button>
+        <button class="pixel-dialog-button" id="resetPopupSettings">重置</button>
       </div>
     </section>
   </div>
