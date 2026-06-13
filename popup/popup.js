@@ -395,6 +395,7 @@ class PixelColorPicker {
       if (event.target.id === 'addColorOverlay') this.closeAddColorDialog();
     });
     document.getElementById('sortColors').addEventListener('click', () => this.cycleColorSort());
+    document.getElementById('copyPalette').addEventListener('click', () => this.copyCurrentPalette());
     document.getElementById('importPalette').addEventListener('click', () => this.importPaletteJSON());
     document.getElementById('clearPalette').addEventListener('click', () => this.clearPalette());
     document.getElementById('togglePaletteSearch').addEventListener('click', () => this.togglePaletteSearch());
@@ -506,6 +507,12 @@ class PixelColorPicker {
 
       if (pickAction === 'copy') {
         await this.copyColorValue(color);
+        return;
+      }
+
+      if (pickAction === 'copy-save') {
+        await this.copyColorValue(color, `已复制 ${this.getDefaultFormatLabel()}`);
+        await this.addColorToCurrentPalette(color, { successMessage: '已复制并保存' });
         return;
       }
 
@@ -912,7 +919,7 @@ class PixelColorPicker {
       ...(data.settings || {})
     };
     settings.defaultFormat = ['hex', 'rgb', 'hsl'].includes(settings.defaultFormat) ? settings.defaultFormat : 'hex';
-    settings.pickAction = ['save', 'preview', 'copy'].includes(settings.pickAction) ? settings.pickAction : 'save';
+    settings.pickAction = ['save', 'preview', 'copy', 'copy-save'].includes(settings.pickAction) ? settings.pickAction : 'save';
     settings.maxColorsPerPalette = Math.max(1, Math.min(100, parseInt(settings.maxColorsPerPalette, 10) || 20));
 
     const palettes = Array.isArray(data.palettes) ? data.palettes.map((palette, paletteIndex) => {
@@ -1035,8 +1042,12 @@ class PixelColorPicker {
       return false;
     }
 
-    if (palette.colors.some((item) => item.hex === color.hex)) {
-      this.showNotification('颜色已存在');
+    const duplicate = palette.colors.find((item) => item.hex === color.hex);
+    if (duplicate) {
+      this.currentColor = duplicate;
+      this.updateColorPreview(duplicate);
+      this.focusExistingColor(duplicate.id);
+      this.showNotification('颜色已存在，已定位');
       return false;
     }
 
@@ -1055,6 +1066,23 @@ class PixelColorPicker {
     this.renderDetailView();
     this.showNotification(successMessage);
     return true;
+  }
+
+  focusExistingColor(id, attempt = 0) {
+    const openSearch = Boolean(this.paletteSearchQuery);
+    const colorNode = document.querySelector(`.color-swatch[data-id="${id}"]`);
+    if (!colorNode) {
+      if (attempt > 2) return;
+      if (openSearch && attempt === 0) this.clearPaletteSearch();
+      setTimeout(() => this.focusExistingColor(id, attempt + 1), 0);
+      return;
+    }
+
+    colorNode.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    colorNode.classList.remove('is-located');
+    void colorNode.offsetWidth;
+    colorNode.classList.add('is-located');
+    setTimeout(() => colorNode.classList.remove('is-located'), 1200);
   }
 
   async addToHistory(color) {
@@ -1450,6 +1478,22 @@ class PixelColorPicker {
 
   closeExportMenu() {
     document.getElementById('exportOverlay').hidden = true;
+  }
+
+  copyCurrentPalette() {
+    const palette = this.getCurrentPalette();
+    if (!palette || palette.colors.length === 0) {
+      this.showNotification('色卡为空');
+      return;
+    }
+
+    const content = palette.colors.map((color) => this.formatColorForCopy(color)).join(', ');
+    navigator.clipboard.writeText(content).then(() => {
+      this.showNotification(`已复制 ${palette.colors.length} 个颜色`);
+    }).catch((error) => {
+      console.error('[Pixel Color Picker] Copy palette failed:', error);
+      this.showNotification('复制失败，请重试');
+    });
   }
 
   exportPalette(format) {
@@ -1939,7 +1983,7 @@ class PixelColorPicker {
 
   getPickAction() {
     const action = this.settings?.pickAction;
-    if (['save', 'preview', 'copy'].includes(action)) return action;
+    if (['save', 'preview', 'copy', 'copy-save'].includes(action)) return action;
     return this.settings?.autoSave === false ? 'preview' : 'save';
   }
 

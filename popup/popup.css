@@ -14,7 +14,9 @@ html {
   width: 304px;
   min-width: 304px;
   max-width: 304px;
+  height: auto;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 :root {
@@ -54,7 +56,7 @@ body {
   max-width: 304px;
   max-height: 560px;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 6px;
   background:
     linear-gradient(var(--bg-line) 1px, transparent 1px),
@@ -77,20 +79,17 @@ button, input {
   font: inherit;
 }
 
-body::-webkit-scrollbar,
 .palette-card-list::-webkit-scrollbar,
 .palette-grid::-webkit-scrollbar {
   width: 6px;
 }
 
-body::-webkit-scrollbar-track,
 .palette-card-list::-webkit-scrollbar-track,
 .palette-grid::-webkit-scrollbar-track {
   background: rgba(255, 241, 247, 0.9);
   border-left: 1px solid rgba(255, 170, 205, 0.45);
 }
 
-body::-webkit-scrollbar-thumb,
 .palette-card-list::-webkit-scrollbar-thumb,
 .palette-grid::-webkit-scrollbar-thumb {
   background: rgba(255, 107, 157, 0.72);
@@ -193,8 +192,8 @@ body::-webkit-scrollbar-thumb,
 }
 
 .icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 25px;
+  height: 25px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -410,11 +409,11 @@ body::-webkit-scrollbar-thumb,
 .palette-card {
   position: relative;
   display: grid;
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 78px minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 6px;
+  gap: 7px;
+  min-height: 44px;
+  padding: 5px 25px 5px 5px;
   background: #fff;
   border: 2px solid var(--border);
   box-shadow: inset 0 0 0 0 rgba(63,52,64,0);
@@ -431,7 +430,7 @@ body::-webkit-scrollbar-thumb,
 .card-preview-grid {
   display: flex;
   gap: 0;
-  height: 28px;
+  height: 26px;
   padding: 2px;
   border: 1px solid rgba(63,52,64,0.72);
   overflow: hidden;
@@ -461,7 +460,9 @@ body::-webkit-scrollbar-thumb,
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
+  padding-right: 2px;
 }
 
 .card-title-line {
@@ -497,11 +498,11 @@ body::-webkit-scrollbar-thumb,
 
 .card-delete-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 5px;
+  right: 5px;
   display: grid;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   place-items: center;
   padding: 0;
   border: 2px solid var(--border);
@@ -513,9 +514,9 @@ body::-webkit-scrollbar-thumb,
   font-size: 8px;
   line-height: 1;
   text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.08s;
+  opacity: 0.72;
+  pointer-events: auto;
+  transition: opacity 0.08s, transform 0.08s, box-shadow 0.08s;
 }
 
 .palette-card:hover .card-delete-btn {
@@ -898,6 +899,10 @@ body::-webkit-scrollbar-thumb,
   animation: swatch-copy-pop 0.65s steps(2, end);
 }
 
+.color-swatch.is-located {
+  animation: swatch-located-pop 1.1s steps(2, end);
+}
+
 @keyframes swatch-copy-pop {
   0% {
     filter: brightness(1);
@@ -910,6 +915,20 @@ body::-webkit-scrollbar-thumb,
   }
   100% {
     filter: brightness(1);
+  }
+}
+
+@keyframes swatch-located-pop {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  20%,
+  70% {
+    filter: brightness(1.12);
+    box-shadow:
+      inset 0 0 0 3px rgba(255, 240, 168, 0.95),
+      4px 4px 0 rgba(63,52,64,0.26);
   }
 }
 
@@ -1535,8 +1554,8 @@ body::-webkit-scrollbar-thumb,
 }
 
 .settings-row input[type="color"] {
-  width: 62px;
-  height: 24px;
+  width: 34px;
+  height: 22px;
   padding: 2px;
   border: 2px solid var(--border);
   background: var(--panel-warm);
@@ -1570,10 +1589,11 @@ body::-webkit-scrollbar-thumb,
 }
 
 .color-control {
-  grid-template-columns: 1fr;
-  width: 76px;
+  grid-template-columns: 34px 58px;
+  width: 98px;
+  align-items: center;
   justify-items: end;
-  gap: 3px;
+  gap: 5px;
 }
 
 .settings-data-row {
@@ -1616,6 +1636,91 @@ body::-webkit-scrollbar-thumb,
   color: #fff;
 }
 
+#closeHistory,
+#closeExport,
+#closeAddColor,
+#pixelDialogClose,
+#closeSettings,
+.palette-delete-btn,
+.card-delete-btn,
+.color-swatch .delete-btn,
+#clearPaletteSearch,
+#clearHistorySearch,
+#clearAllData {
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-size: 0 !important;
+  line-height: 1;
+  text-align: center;
+  overflow: hidden;
+}
+
+#closeHistory::before,
+#closeExport::before,
+#closeAddColor::before,
+#pixelDialogClose::before,
+#closeSettings::before,
+.palette-delete-btn::before,
+.card-delete-btn::before,
+.color-swatch .delete-btn::before,
+#clearPaletteSearch::before,
+#clearHistorySearch::before,
+#clearAllData::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(45deg);
+  transform-origin: center;
+}
+
+#closeHistory::after,
+#closeExport::after,
+#closeAddColor::after,
+#pixelDialogClose::after,
+#closeSettings::after,
+.palette-delete-btn::after,
+.card-delete-btn::after,
+.color-swatch .delete-btn::after,
+#clearPaletteSearch::after,
+#clearHistorySearch::after,
+#clearAllData::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  transform-origin: center;
+}
+
+#closeHistory,
+#closeExport,
+#closeAddColor,
+#pixelDialogClose,
+#closeSettings {
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  color: var(--danger);
+  box-shadow: 2px 2px 0 rgba(63,52,64,0.14);
+}
+
+#closeHistory:hover,
+#closeExport:hover,
+#closeAddColor:hover,
+#pixelDialogClose:hover,
+#closeSettings:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
 .stepper-btn {
   width: 24px;
   height: 24px;
@@ -1641,15 +1746,17 @@ body::-webkit-scrollbar-thumb,
 
 .color-value {
   display: block;
-  width: 76px;
+  width: 58px;
   min-width: 0;
+  max-width: 58px;
   overflow: hidden;
   color: var(--text-soft);
   font-family: 'Fusion Pixel 12px', 'Courier New', monospace;
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1.1;
   text-align: right;
   white-space: nowrap;
+  text-overflow: clip;
   letter-spacing: 0;
 }
 
@@ -1979,6 +2086,50 @@ button,
 .pixel-dialog-button {
   display: grid;
   place-items: center;
+}
+
+/* Palette cards are compact list rows; keep their delete action pinned. */
+.palette-card-list .palette-card {
+  height: 48px;
+  min-height: 48px;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 4px 25px 4px 5px;
+}
+
+.palette-card-list .card-preview-grid {
+  width: 76px;
+  height: 26px;
+}
+
+.palette-card-list .card-info {
+  min-height: 0;
+  gap: 2px;
+  justify-content: center;
+}
+
+.palette-card-list .card-name {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.palette-card-list .card-meta {
+  font-size: 9px;
+  line-height: 1;
+}
+
+.palette-card-list .palette-card > .card-delete-btn {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  transform: none;
+  opacity: 0.74;
 }
 
 .changelog-item {
