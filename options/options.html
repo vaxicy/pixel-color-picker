@@ -16,72 +16,152 @@
       </div>
     </header>
 
-    <main class="settings-grid">
-      <section class="settings-section">
-        <h2>常规设置</h2>
+    <main class="settings-layout">
+      <nav class="settings-nav" aria-label="设置分组">
+        <a href="#behavior">行为</a>
+        <a href="#theme">主题</a>
+        <a href="#data">数据</a>
+        <a href="#about">关于</a>
+      </nav>
 
-        <div class="setting-item">
-          <label for="defaultFormat">默认颜色格式</label>
+      <section class="settings-panel" id="behavior">
+        <div class="section-head">
+          <span>01</span>
+          <h2>行为设置</h2>
+        </div>
+
+        <label class="setting-item">
+          <span>
+            <strong>默认复制格式</strong>
+            <small>色块和历史复制时使用</small>
+          </span>
           <select id="defaultFormat">
-            <option value="hex" selected>HEX</option>
+            <option value="hex">HEX</option>
             <option value="rgb">RGB</option>
             <option value="hsl">HSL</option>
           </select>
+        </label>
+
+        <label class="setting-item">
+          <span>
+            <strong>取色后动作</strong>
+            <small>吸到颜色后的默认行为</small>
+          </span>
+          <select id="pickAction">
+            <option value="save">保存</option>
+            <option value="preview">预览</option>
+            <option value="copy">复制</option>
+            <option value="copy-save">复制并保存</option>
+          </select>
+        </label>
+
+        <label class="setting-item compact">
+          <span>
+            <strong>自动保存</strong>
+            <small>开启后取色会直接加入当前色卡</small>
+          </span>
+          <input type="checkbox" id="autoSave">
+        </label>
+
+        <label class="setting-item">
+          <span>
+            <strong>每组上限</strong>
+            <small>单个色卡最多保存多少个颜色</small>
+          </span>
+          <input type="number" id="maxColors" min="1" max="100" value="20">
+        </label>
+      </section>
+
+      <section class="settings-panel theme-panel" id="theme">
+        <div class="section-head">
+          <span>02</span>
+          <h2>主题外观</h2>
         </div>
 
-        <div class="setting-item checkbox-row">
-          <label>
-            <input type="checkbox" id="autoSave" checked>
-            自动保存到色卡
+        <label class="setting-item">
+          <span>
+            <strong>主题预设</strong>
+            <small>选择后会自动填入颜色</small>
+          </span>
+          <select id="themePreset">
+            <option value="pink">像素粉</option>
+            <option value="green">护眼绿</option>
+            <option value="night">夜色</option>
+            <option value="purple">淡紫</option>
+            <option value="custom">自定义</option>
+          </select>
+        </label>
+
+        <div class="theme-colors">
+          <label class="color-item">
+            <span>标题色</span>
+            <input type="color" id="headerColor" value="#ff6b9d">
+            <code id="headerColorValue">#FF6B9D</code>
+          </label>
+          <label class="color-item">
+            <span>按钮色</span>
+            <input type="color" id="buttonColor" value="#ff6b9d">
+            <code id="buttonColorValue">#FF6B9D</code>
+          </label>
+          <label class="color-item">
+            <span>背景色</span>
+            <input type="color" id="bgColor" value="#fff9fc">
+            <code id="bgColorValue">#FFF9FC</code>
+          </label>
+          <label class="color-item">
+            <span>面板色</span>
+            <input type="color" id="panelColor" value="#ffffff">
+            <code id="panelColorValue">#FFFFFF</code>
           </label>
         </div>
 
-        <div class="setting-item">
-          <label for="maxColors">每组最多颜色数</label>
-          <input type="number" id="maxColors" min="1" max="100" value="20">
+        <div class="theme-preview" id="themePreview">
+          <div class="preview-window">
+            <div class="preview-head" id="previewHead">
+              <span>PIXEL TOOL</span>
+              <button type="button" id="previewButton">按钮</button>
+            </div>
+            <div class="preview-body" id="previewBody">
+              <span class="preview-swatch"></span>
+              <div>
+                <strong>默认色卡</strong>
+                <small>主题会同步到 popup</small>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="settings-section">
-        <h2>主题颜色</h2>
-
-        <div class="setting-item">
-          <label for="headerColor">标题栏颜色</label>
-          <input type="color" id="headerColor" value="#ff6b9d">
+      <section class="settings-panel" id="data">
+        <div class="section-head">
+          <span>03</span>
+          <h2>数据管理</h2>
         </div>
-
-        <div class="setting-item">
-          <label for="buttonColor">取色按钮颜色</label>
-          <input type="color" id="buttonColor" value="#ff6b9d">
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2>数据管理</h2>
-
         <div class="button-stack">
-          <button class="pixel-button" id="exportData">导出所有数据</button>
+          <button class="pixel-button" id="exportData">导出全部数据</button>
           <button class="pixel-button mint" id="importData">导入数据</button>
-          <button class="pixel-button danger" id="clearData">清除所有数据</button>
+          <button class="pixel-button danger" id="clearData">清空全部数据</button>
         </div>
       </section>
 
-      <section class="settings-section">
-        <h2>关于</h2>
-
+      <section class="settings-panel" id="about">
+        <div class="section-head">
+          <span>04</span>
+          <h2>关于</h2>
+        </div>
         <div class="about-info">
           <p>Pixel Color Picker v1.0.0</p>
           <p>小巧可爱的像素风网页吸色工具</p>
           <p>© 2026 Pixel Color Picker</p>
         </div>
-
         <button class="pixel-button secondary" id="viewHistory">查看更新日志</button>
       </section>
     </main>
 
     <footer class="pixel-footer">
       <button id="saveSettings" class="pixel-button primary">保存设置</button>
-      <button id="backToPopup" class="pixel-button light">返回</button>
+      <button id="resetSettings" class="pixel-button light">重置</button>
+      <button id="backToPopup" class="pixel-button light">关闭</button>
     </footer>
   </div>
 

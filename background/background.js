@@ -19,10 +19,15 @@ chrome.runtime.onInstalled.addListener(() => {
     if (!result.settings) {
       updates.settings = {
         defaultFormat: 'hex',
+        pickAction: 'save',
         autoSave: true,
         maxColorsPerPalette: 20,
         headerColor: '#ff6b9d',
-        buttonColor: '#ff6b9d'
+        buttonColor: '#ff6b9d',
+        bgColor: '#fff9fc',
+        panelColor: '#ffffff',
+        themePreset: 'pink',
+        themeBasePreset: 'pink'
       };
     }
 
