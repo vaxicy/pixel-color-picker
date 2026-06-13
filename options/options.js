@@ -2,6 +2,9 @@ class OptionsManager {
   constructor() {
     this.settings = {};
     this.themeBasePreset = 'pink';
+    this.colorHistory = [];
+    this.lastPickedColor = null;
+    this.activePickedTarget = '';
     this.init();
   }
 
@@ -60,6 +63,102 @@ class OptionsManager {
         textColor: '#46345c',
         textSoftColor: '#8a7a98',
         borderColor: '#46345c'
+      },
+      cream: {
+        headerColor: '#f6c65b',
+        buttonColor: '#ff9eb7',
+        bgColor: '#fffaf0',
+        panelColor: '#ffffff',
+        panelWarmColor: '#fff3cf',
+        bgDotColor: 'rgba(246, 198, 91, 0.22)',
+        bgLineColor: 'rgba(86, 65, 42, 0.05)',
+        textColor: '#4f3d2d',
+        textSoftColor: '#917f68',
+        borderColor: '#4f3d2d'
+      },
+      sea: {
+        headerColor: '#75bfe8',
+        buttonColor: '#5fc9c0',
+        bgColor: '#f2fbff',
+        panelColor: '#ffffff',
+        panelWarmColor: '#e9f7fb',
+        bgDotColor: 'rgba(117, 191, 232, 0.20)',
+        bgLineColor: 'rgba(42, 78, 96, 0.05)',
+        textColor: '#2d4653',
+        textSoftColor: '#718791',
+        borderColor: '#2d4653'
+      },
+      cherry: {
+        headerColor: '#f05f7d',
+        buttonColor: '#ff8ab0',
+        bgColor: '#fff7f8',
+        panelColor: '#ffffff',
+        panelWarmColor: '#ffe8ee',
+        bgDotColor: 'rgba(240, 95, 125, 0.19)',
+        bgLineColor: 'rgba(86, 42, 52, 0.05)',
+        textColor: '#52313a',
+        textSoftColor: '#92737b',
+        borderColor: '#52313a'
+      },
+      gameboy: {
+        headerColor: '#6f8f55',
+        buttonColor: '#4f6f3f',
+        bgColor: '#dce8c3',
+        panelColor: '#edf4d9',
+        panelWarmColor: '#d4e3b8',
+        bgDotColor: 'rgba(79, 111, 63, 0.18)',
+        bgLineColor: 'rgba(30, 54, 34, 0.08)',
+        textColor: '#263b2a',
+        textSoftColor: '#5d7255',
+        borderColor: '#263b2a'
+      },
+      cocoa: {
+        headerColor: '#c7834f',
+        buttonColor: '#e0a35f',
+        bgColor: '#fff8f0',
+        panelColor: '#fffdf9',
+        panelWarmColor: '#f5e5d2',
+        bgDotColor: 'rgba(199, 131, 79, 0.18)',
+        bgLineColor: 'rgba(73, 48, 35, 0.05)',
+        textColor: '#4b3529',
+        textSoftColor: '#8b7566',
+        borderColor: '#4b3529'
+      },
+      mintshake: {
+        headerColor: '#76d9bd',
+        buttonColor: '#ffd86f',
+        bgColor: '#f4fffb',
+        panelColor: '#ffffff',
+        panelWarmColor: '#e7fbf4',
+        bgDotColor: 'rgba(118, 217, 189, 0.22)',
+        bgLineColor: 'rgba(48, 92, 79, 0.05)',
+        textColor: '#31483f',
+        textSoftColor: '#729084',
+        borderColor: '#31483f'
+      },
+      grape: {
+        headerColor: '#ad7cff',
+        buttonColor: '#7f8cff',
+        bgColor: '#faf7ff',
+        panelColor: '#ffffff',
+        panelWarmColor: '#efe9ff',
+        bgDotColor: 'rgba(173, 124, 255, 0.20)',
+        bgLineColor: 'rgba(62, 51, 94, 0.05)',
+        textColor: '#42345f',
+        textSoftColor: '#82769b',
+        borderColor: '#42345f'
+      },
+      mist: {
+        headerColor: '#c78ca0',
+        buttonColor: '#d7a4b8',
+        bgColor: '#faf8fa',
+        panelColor: '#ffffff',
+        panelWarmColor: '#f3edf1',
+        bgDotColor: 'rgba(199, 140, 160, 0.16)',
+        bgLineColor: 'rgba(65, 58, 64, 0.05)',
+        textColor: '#454046',
+        textSoftColor: '#858087',
+        borderColor: '#454046'
       }
     };
   }
@@ -81,11 +180,13 @@ class OptionsManager {
 
   async loadSettings() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['settings'], (result) => {
+      chrome.storage.sync.get(['settings', 'colorHistory', 'lastPickedColor'], (result) => {
         this.settings = {
           ...this.getDefaultSettings(),
           ...(result.settings || {})
         };
+        this.colorHistory = Array.isArray(result.colorHistory) ? result.colorHistory : [];
+        this.lastPickedColor = result.lastPickedColor || null;
         this.themeBasePreset = this.settings.themeBasePreset || 'pink';
         resolve();
       });
@@ -129,6 +230,7 @@ class OptionsManager {
     document.getElementById('panelColor').value = theme.panelColor;
 
     this.syncColorLabels();
+    this.renderThemeColorHistory();
     this.applyTheme();
   }
 
@@ -136,6 +238,19 @@ class OptionsManager {
     document.getElementById('saveSettings').addEventListener('click', () => this.handleSave());
     document.getElementById('resetSettings').addEventListener('click', () => this.handleReset());
     document.getElementById('backToPopup').addEventListener('click', () => window.close());
+    document.getElementById('useLastPicked').addEventListener('click', () => this.useLastPickedForTheme());
+    document.getElementById('closePickedTarget').addEventListener('click', () => this.closePickedTargetPanel());
+    document.getElementById('pickedTargetPanel').addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    document.querySelectorAll('.use-picked-btn').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.openPickedTargetPanel(button.dataset.targetColor);
+      });
+    });
 
     document.getElementById('themePreset').addEventListener('change', () => this.applyThemePresetToInputs());
     ['headerColor', 'buttonColor', 'bgColor', 'panelColor'].forEach((id) => {
@@ -196,6 +311,173 @@ class OptionsManager {
     ['headerColor', 'buttonColor', 'bgColor', 'panelColor'].forEach((id) => {
       document.getElementById(`${id}Value`).textContent = document.getElementById(id).value.toUpperCase();
     });
+  }
+
+  renderThemeColorHistory() {
+    const list = document.getElementById('themeColorHistory');
+    if (!list) return;
+
+    const recent = this.getRecentThemeSourceColors();
+    if (recent.length === 0) {
+      list.innerHTML = '<span class="picked-empty">还没有取色历史</span>';
+      return;
+    }
+
+    list.innerHTML = recent.map((color) => `
+      <button type="button"
+              class="picked-color"
+              data-hex="${color.hex}"
+              style="background:${color.hex}"
+              title="用 ${color.hex} 生成主题"></button>
+    `).join('');
+
+    list.querySelectorAll('.picked-color').forEach((button) => {
+      button.addEventListener('click', () => this.generateThemeFromHex(button.dataset.hex));
+    });
+  }
+
+  getRecentThemeSourceColors() {
+    const colors = [];
+    if (this.lastPickedColor?.hex) colors.push(this.lastPickedColor);
+    this.colorHistory.forEach((color) => {
+      if (color?.hex && !colors.some((item) => item.hex === color.hex)) colors.push(color);
+    });
+    return colors.slice(0, 6);
+  }
+
+  openPickedTargetPanel(targetId) {
+    if (!['headerColor', 'buttonColor', 'bgColor', 'panelColor'].includes(targetId)) return;
+    const panel = document.getElementById('pickedTargetPanel');
+    if (this.activePickedTarget === targetId && panel && !panel.hidden) {
+      this.closePickedTargetPanel();
+      return;
+    }
+
+    this.closePickedTargetPanel();
+
+    this.activePickedTarget = targetId;
+    const title = document.getElementById('pickedTargetTitle');
+    const input = document.getElementById(targetId);
+    const item = input?.closest('.color-item');
+    const trigger = document.querySelector(`.use-picked-btn[data-target-color="${targetId}"]`);
+    const labels = {
+      headerColor: '选择标题色',
+      buttonColor: '选择按钮色',
+      bgColor: '选择背景色',
+      panelColor: '选择面板色'
+    };
+    if (!panel || !item) return;
+
+    title.textContent = labels[targetId];
+    item.classList.add('is-picking');
+    trigger?.classList.add('is-active');
+    item.appendChild(panel);
+    this.renderTargetColorHistory();
+    panel.hidden = false;
+  }
+
+  closePickedTargetPanel() {
+    this.activePickedTarget = '';
+    document.querySelectorAll('.color-item.is-picking').forEach((item) => item.classList.remove('is-picking'));
+    document.querySelectorAll('.use-picked-btn.is-active').forEach((button) => button.classList.remove('is-active'));
+    const panel = document.getElementById('pickedTargetPanel');
+    if (panel) panel.hidden = true;
+  }
+
+  renderTargetColorHistory() {
+    const list = document.getElementById('targetColorHistory');
+    if (!list) return;
+    const recent = this.getRecentThemeSourceColors();
+    if (recent.length === 0) {
+      list.innerHTML = '<span class="picked-empty">还没有取色历史</span>';
+      return;
+    }
+
+    list.innerHTML = recent.map((color) => `
+      <button type="button"
+              class="picked-color"
+              data-hex="${color.hex}"
+              style="background:${color.hex}"
+              title="使用 ${color.hex}"></button>
+    `).join('');
+
+    list.querySelectorAll('.picked-color').forEach((button) => {
+      button.addEventListener('click', () => this.applyPickedColorToTarget(button.dataset.hex));
+    });
+  }
+
+  applyPickedColorToTarget(hex) {
+    if (!this.activePickedTarget) return;
+    const input = document.getElementById(this.activePickedTarget);
+    if (!input) return;
+    input.value = hex.toUpperCase();
+    document.getElementById('themePreset').value = 'custom';
+    this.syncColorLabels();
+    this.applyThemeFromInputs();
+    this.closePickedTargetPanel();
+    this.showNotification(`已填入 ${hex.toUpperCase()}`);
+  }
+
+  useLastPickedForTheme() {
+    const hex = this.lastPickedColor?.hex || this.colorHistory[0]?.hex;
+    if (!hex) {
+      this.showNotification('还没有可用的取色记录');
+      return;
+    }
+    this.generateThemeFromHex(hex);
+  }
+
+  generateThemeFromHex(hex) {
+    const rgb = this.hexToRgb(hex);
+    if (!rgb) return;
+
+    const header = this.rgbToHex(rgb.r, rgb.g, rgb.b);
+    const button = this.rgbToHex(
+      this.mixChannel(rgb.r, 255, 0.22),
+      this.mixChannel(rgb.g, 255, 0.22),
+      this.mixChannel(rgb.b, 255, 0.22)
+    );
+    const bg = this.rgbToHex(
+      this.mixChannel(rgb.r, 255, 0.92),
+      this.mixChannel(rgb.g, 255, 0.92),
+      this.mixChannel(rgb.b, 255, 0.92)
+    );
+    const panel = this.rgbToHex(
+      this.mixChannel(rgb.r, 255, 0.97),
+      this.mixChannel(rgb.g, 255, 0.97),
+      this.mixChannel(rgb.b, 255, 0.97)
+    );
+
+    document.getElementById('themePreset').value = 'custom';
+    this.themeBasePreset = 'pink';
+    document.getElementById('headerColor').value = header;
+    document.getElementById('buttonColor').value = button;
+    document.getElementById('bgColor').value = bg;
+    document.getElementById('panelColor').value = panel;
+    this.syncColorLabels();
+    this.applyThemeFromInputs();
+    this.showNotification(`已用 ${header} 生成主题`);
+  }
+
+  hexToRgb(hex) {
+    const match = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!match) return null;
+    const value = match[1];
+    return {
+      r: parseInt(value.slice(0, 2), 16),
+      g: parseInt(value.slice(2, 4), 16),
+      b: parseInt(value.slice(4, 6), 16)
+    };
+  }
+
+  mixChannel(from, to, amount) {
+    return Math.round(from + (to - from) * amount);
+  }
+
+  rgbToHex(r, g, b) {
+    return `#${[r, g, b].map((value) => {
+      return Math.max(0, Math.min(255, value)).toString(16).padStart(2, '0');
+    }).join('')}`.toUpperCase();
   }
 
   applyThemeFromInputs() {

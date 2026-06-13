@@ -84,10 +84,18 @@
             <small>选择后会自动填入颜色</small>
           </span>
           <select id="themePreset">
-            <option value="pink">像素粉</option>
-            <option value="green">护眼绿</option>
-            <option value="night">夜色</option>
-            <option value="purple">淡紫</option>
+            <option value="pink">莓果像素</option>
+            <option value="green">森绿软糖</option>
+            <option value="night">月夜霓虹</option>
+            <option value="purple">薰衣草云</option>
+            <option value="cream">奶油布丁</option>
+            <option value="sea">海盐气泡</option>
+            <option value="cherry">樱桃软糖</option>
+            <option value="gameboy">绿屏掌机</option>
+            <option value="cocoa">焦糖可可</option>
+            <option value="mintshake">薄荷奶昔</option>
+            <option value="grape">葡萄汽水</option>
+            <option value="mist">雾粉灰调</option>
             <option value="custom">自定义</option>
           </select>
         </label>
@@ -97,22 +105,46 @@
             <span>标题色</span>
             <input type="color" id="headerColor" value="#ff6b9d">
             <code id="headerColorValue">#FF6B9D</code>
+            <button type="button" class="use-picked-btn" data-target-color="headerColor" title="用取色填入" aria-label="用取色填入标题色"></button>
           </label>
           <label class="color-item">
             <span>按钮色</span>
             <input type="color" id="buttonColor" value="#ff6b9d">
             <code id="buttonColorValue">#FF6B9D</code>
+            <button type="button" class="use-picked-btn" data-target-color="buttonColor" title="用取色填入" aria-label="用取色填入按钮色"></button>
           </label>
           <label class="color-item">
             <span>背景色</span>
             <input type="color" id="bgColor" value="#fff9fc">
             <code id="bgColorValue">#FFF9FC</code>
+            <button type="button" class="use-picked-btn" data-target-color="bgColor" title="用取色填入" aria-label="用取色填入背景色"></button>
           </label>
           <label class="color-item">
             <span>面板色</span>
             <input type="color" id="panelColor" value="#ffffff">
             <code id="panelColorValue">#FFFFFF</code>
+            <button type="button" class="use-picked-btn" data-target-color="panelColor" title="用取色填入" aria-label="用取色填入面板色"></button>
           </label>
+        </div>
+
+        <div class="picked-target-panel" id="pickedTargetPanel" hidden>
+          <div class="picked-target-head">
+            <strong id="pickedTargetTitle">选择颜色</strong>
+            <button type="button" id="closePickedTarget">×</button>
+          </div>
+          <div class="picked-theme-list" id="targetColorHistory">
+            <span class="picked-empty">还没有取色历史</span>
+          </div>
+        </div>
+
+        <div class="picked-theme-panel">
+          <div class="picked-theme-head">
+            <strong>用取色生成主题</strong>
+            <button type="button" id="useLastPicked">使用最近取色</button>
+          </div>
+          <div class="picked-theme-list" id="themeColorHistory">
+            <span class="picked-empty">还没有取色历史</span>
+          </div>
         </div>
 
         <div class="theme-preview" id="themePreview">

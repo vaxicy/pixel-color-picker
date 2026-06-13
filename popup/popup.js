@@ -1231,6 +1231,102 @@ class PixelColorPicker {
         textColor: '#46345c',
         textSoftColor: '#8a7a98',
         borderColor: '#46345c'
+      },
+      cream: {
+        headerColor: '#f6c65b',
+        buttonColor: '#ff9eb7',
+        bgColor: '#fffaf0',
+        panelColor: '#ffffff',
+        panelWarmColor: '#fff3cf',
+        bgDotColor: 'rgba(246, 198, 91, 0.22)',
+        bgLineColor: 'rgba(86, 65, 42, 0.05)',
+        textColor: '#4f3d2d',
+        textSoftColor: '#917f68',
+        borderColor: '#4f3d2d'
+      },
+      sea: {
+        headerColor: '#75bfe8',
+        buttonColor: '#5fc9c0',
+        bgColor: '#f2fbff',
+        panelColor: '#ffffff',
+        panelWarmColor: '#e9f7fb',
+        bgDotColor: 'rgba(117, 191, 232, 0.20)',
+        bgLineColor: 'rgba(42, 78, 96, 0.05)',
+        textColor: '#2d4653',
+        textSoftColor: '#718791',
+        borderColor: '#2d4653'
+      },
+      cherry: {
+        headerColor: '#f05f7d',
+        buttonColor: '#ff8ab0',
+        bgColor: '#fff7f8',
+        panelColor: '#ffffff',
+        panelWarmColor: '#ffe8ee',
+        bgDotColor: 'rgba(240, 95, 125, 0.19)',
+        bgLineColor: 'rgba(86, 42, 52, 0.05)',
+        textColor: '#52313a',
+        textSoftColor: '#92737b',
+        borderColor: '#52313a'
+      },
+      gameboy: {
+        headerColor: '#6f8f55',
+        buttonColor: '#4f6f3f',
+        bgColor: '#dce8c3',
+        panelColor: '#edf4d9',
+        panelWarmColor: '#d4e3b8',
+        bgDotColor: 'rgba(79, 111, 63, 0.18)',
+        bgLineColor: 'rgba(30, 54, 34, 0.08)',
+        textColor: '#263b2a',
+        textSoftColor: '#5d7255',
+        borderColor: '#263b2a'
+      },
+      cocoa: {
+        headerColor: '#c7834f',
+        buttonColor: '#e0a35f',
+        bgColor: '#fff8f0',
+        panelColor: '#fffdf9',
+        panelWarmColor: '#f5e5d2',
+        bgDotColor: 'rgba(199, 131, 79, 0.18)',
+        bgLineColor: 'rgba(73, 48, 35, 0.05)',
+        textColor: '#4b3529',
+        textSoftColor: '#8b7566',
+        borderColor: '#4b3529'
+      },
+      mintshake: {
+        headerColor: '#76d9bd',
+        buttonColor: '#ffd86f',
+        bgColor: '#f4fffb',
+        panelColor: '#ffffff',
+        panelWarmColor: '#e7fbf4',
+        bgDotColor: 'rgba(118, 217, 189, 0.22)',
+        bgLineColor: 'rgba(48, 92, 79, 0.05)',
+        textColor: '#31483f',
+        textSoftColor: '#729084',
+        borderColor: '#31483f'
+      },
+      grape: {
+        headerColor: '#ad7cff',
+        buttonColor: '#7f8cff',
+        bgColor: '#faf7ff',
+        panelColor: '#ffffff',
+        panelWarmColor: '#efe9ff',
+        bgDotColor: 'rgba(173, 124, 255, 0.20)',
+        bgLineColor: 'rgba(62, 51, 94, 0.05)',
+        textColor: '#42345f',
+        textSoftColor: '#82769b',
+        borderColor: '#42345f'
+      },
+      mist: {
+        headerColor: '#c78ca0',
+        buttonColor: '#d7a4b8',
+        bgColor: '#faf8fa',
+        panelColor: '#ffffff',
+        panelWarmColor: '#f3edf1',
+        bgDotColor: 'rgba(199, 140, 160, 0.16)',
+        bgLineColor: 'rgba(65, 58, 64, 0.05)',
+        textColor: '#454046',
+        textSoftColor: '#858087',
+        borderColor: '#454046'
       }
     };
   }
