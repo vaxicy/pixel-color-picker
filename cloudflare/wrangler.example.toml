@@ -1,0 +1,19 @@
+name = "pixel-color-picker-pro"
+main = "worker.js"
+compatibility_date = "2026-06-14"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pixel_color_picker_pro"
+database_id = "replace-with-your-d1-database-id"
+
+[vars]
+PAYPAL_ENV = "live"
+PRODUCT_NAME = "Pixel Color Picker Pro"
+PRODUCT_PRICE = "9.99"
+PRODUCT_CURRENCY = "USD"
+MAIL_FROM = "Pixel Color Picker <pro@example.com>"

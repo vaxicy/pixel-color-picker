@@ -1,5 +1,22 @@
 # 开发待办事项
 
+## 当前上线策略
+
+- [x] 免费版先上架 Chrome Web Store
+- [x] 保留 Pro 入口和功能限制提示
+- [ ] 完成商店截图和隐私披露
+- [ ] 使用 `scripts/package-release.ps1` 生成商店上传包
+- [ ] 上架后再接入 PayPal 企业账号和服务端授权
+
+## 付费功能路线
+
+- [x] 免费版最多 5 个色卡
+- [x] Pro 主题和自定义主题入口
+- [ ] PayPal Checkout 或 Subscriptions 页面
+- [ ] 服务端 webhook 验证
+- [ ] License/entitlement 查询接口
+- [ ] 扩展内许可证激活和刷新
+
 ## 🐛 已知问题
 
 - [ ] 取色精度不够准确（需要使用截图 API）

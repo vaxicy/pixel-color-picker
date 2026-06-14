@@ -1,0 +1,3 @@
+dist/
+cloudflare/wrangler.toml
+cloudflare/.dev.vars

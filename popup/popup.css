@@ -2470,6 +2470,51 @@ button, input {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.pro-status-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  background: rgba(255, 240, 168, 0.34);
+}
+
+.pro-upgrade-btn {
+  width: auto;
+  min-width: 54px;
+  padding: 0 8px;
+  background: var(--cream);
+}
+
+.pro-upgrade-btn:disabled {
+  background: rgba(105,217,191,0.42);
+  color: var(--text-soft);
+  cursor: default;
+}
+
+.pro-detail-panel {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pro-detail-panel div {
+  display: grid;
+  gap: 3px;
+  padding: 6px;
+  background: rgba(255,255,255,0.68);
+  border: 2px solid rgba(63,52,64,0.32);
+}
+
+.pro-detail-panel strong {
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1;
+  font-weight: normal;
+}
+
+.pro-detail-panel span {
+  color: var(--text-soft);
+  font-size: 9px;
+  line-height: 1.2;
+}
+
 .data-actions {
   display: grid;
   grid-template-columns: repeat(3, 26px);
@@ -3061,4 +3106,33 @@ button,
   color: var(--text);
   font-size: 11px;
   line-height: 1.35;
+}
+
+.popup-pro-activation {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  background: #fffdf4;
+  border: 2px solid rgba(63,52,64,0.28);
+}
+
+.popup-pro-activation label {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.popup-pro-activation input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 2px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.pro-activate-btn {
+  width: 100%;
 }
