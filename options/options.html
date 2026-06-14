@@ -20,6 +20,7 @@
       <nav class="settings-nav" aria-label="设置分组">
         <a href="#behavior">行为</a>
         <a href="#theme">主题</a>
+        <a href="#language">语言</a>
         <a href="#data">数据</a>
         <a href="#about">关于</a>
       </nav>
@@ -78,29 +79,37 @@
           <h2>主题外观</h2>
         </div>
 
-        <label class="setting-item">
-          <span>
-            <strong>主题预设</strong>
-            <small>选择后会自动填入颜色</small>
-          </span>
-          <select id="themePreset">
-            <option value="pink">莓果像素</option>
-            <option value="green">森绿软糖</option>
-            <option value="night">月夜霓虹</option>
-            <option value="purple">薰衣草云</option>
-            <option value="cream">奶油布丁</option>
-            <option value="sea">海盐气泡</option>
-            <option value="cherry">樱桃软糖</option>
-            <option value="gameboy">绿屏掌机</option>
-            <option value="cocoa">焦糖可可</option>
-            <option value="mintshake">薄荷奶昔</option>
-            <option value="grape">葡萄汽水</option>
-            <option value="mist">雾粉灰调</option>
-            <option value="custom">自定义</option>
-          </select>
-        </label>
+        <div class="theme-block theme-preset-block">
+          <label class="setting-item">
+            <span>
+              <strong>主题预设</strong>
+              <small>选择后自动填入颜色</small>
+            </span>
+            <select id="themePreset">
+              <option value="pink">莓果像素</option>
+              <option value="green">森绿软糖</option>
+              <option value="night">月夜霓虹</option>
+              <option value="purple">薰衣草云</option>
+              <option value="cream">奶油布丁</option>
+              <option value="sea">海盐气泡</option>
+              <option value="cherry">樱桃软糖</option>
+              <option value="gameboy">绿屏掌机</option>
+              <option value="cocoa">焦糖可可</option>
+              <option value="mintshake">薄荷奶昔</option>
+              <option value="grape">葡萄汽水</option>
+              <option value="mist">雾粉灰调</option>
+              <option value="custom">自定义</option>
+            </select>
+          </label>
+        </div>
 
-        <div class="theme-colors">
+        <div class="theme-block theme-custom-block">
+          <div class="theme-block-head">
+            <strong>自定义颜色</strong>
+            <small>可手动选择，也可用取色记录填入</small>
+          </div>
+
+          <div class="theme-colors">
           <label class="color-item">
             <span>标题色</span>
             <input type="color" id="headerColor" value="#ff6b9d">
@@ -125,48 +134,76 @@
             <code id="panelColorValue">#FFFFFF</code>
             <button type="button" class="use-picked-btn" data-target-color="panelColor" title="用取色填入" aria-label="用取色填入面板色"></button>
           </label>
-        </div>
+          </div>
 
-        <div class="picked-target-panel" id="pickedTargetPanel" hidden>
-          <div class="picked-target-head">
-            <strong id="pickedTargetTitle">选择颜色</strong>
-            <button type="button" id="closePickedTarget">×</button>
-          </div>
-          <div class="picked-theme-list" id="targetColorHistory">
-            <span class="picked-empty">还没有取色历史</span>
-          </div>
-        </div>
-
-        <div class="picked-theme-panel">
-          <div class="picked-theme-head">
-            <strong>用取色生成主题</strong>
-            <button type="button" id="useLastPicked">使用最近取色</button>
-          </div>
-          <div class="picked-theme-list" id="themeColorHistory">
-            <span class="picked-empty">还没有取色历史</span>
-          </div>
-        </div>
-
-        <div class="theme-preview" id="themePreview">
-          <div class="preview-window">
-            <div class="preview-head" id="previewHead">
-              <span>PIXEL TOOL</span>
-              <button type="button" id="previewButton">按钮</button>
+          <div class="picked-target-panel" id="pickedTargetPanel" hidden>
+            <div class="picked-target-head">
+              <strong id="pickedTargetTitle">选择颜色</strong>
+              <button type="button" id="closePickedTarget">×</button>
             </div>
-            <div class="preview-body" id="previewBody">
-              <span class="preview-swatch"></span>
-              <div>
-                <strong>默认色卡</strong>
-                <small>主题会同步到 popup</small>
+            <div class="picked-theme-list" id="targetColorHistory">
+              <span class="picked-empty">还没有取色历史</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-block theme-picked-block">
+          <div class="picked-theme-panel">
+            <div class="picked-theme-head">
+              <strong>用取色生成主题</strong>
+              <button type="button" id="useLastPicked">使用最近取色</button>
+            </div>
+            <div class="picked-theme-list" id="themeColorHistory">
+              <span class="picked-empty">还没有取色历史</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-block theme-preview-block">
+          <div class="theme-block-head">
+            <strong>实时预览</strong>
+            <small>保存后同步到 popup</small>
+          </div>
+
+          <div class="theme-preview" id="themePreview">
+            <div class="preview-window">
+              <div class="preview-head" id="previewHead">
+                <span>PIXEL TOOL</span>
+                <button type="button" id="previewButton">按钮</button>
+              </div>
+              <div class="preview-body" id="previewBody">
+                <span class="preview-swatch"></span>
+                <div>
+                  <strong>默认色卡</strong>
+                  <small>主题会同步到 popup</small>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="settings-panel" id="data">
+      <section class="settings-panel" id="language">
         <div class="section-head">
           <span>03</span>
+          <h2>语言设置</h2>
+        </div>
+
+        <label class="setting-item">
+          <span>
+            <strong>界面语言</strong>
+            <small>后续会同步到 popup 和设置页</small>
+          </span>
+          <select id="languageSelect">
+            <option value="zh-CN">简体中文</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="settings-panel" id="data">
+        <div class="section-head">
+          <span>04</span>
           <h2>数据管理</h2>
         </div>
         <div class="button-stack">
@@ -178,7 +215,7 @@
 
       <section class="settings-panel" id="about">
         <div class="section-head">
-          <span>04</span>
+          <span>05</span>
           <h2>关于</h2>
         </div>
         <div class="about-info">
@@ -197,6 +234,7 @@
     </footer>
   </div>
 
+  <script src="../shared/i18n.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

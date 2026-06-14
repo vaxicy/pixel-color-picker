@@ -169,6 +169,7 @@ class OptionsManager {
       pickAction: 'save',
       autoSave: true,
       maxColorsPerPalette: 20,
+      language: 'zh-CN',
       themePreset: 'pink',
       themeBasePreset: 'pink',
       headerColor: '#ff6b9d',
@@ -223,6 +224,7 @@ class OptionsManager {
     document.getElementById('pickAction').value = this.settings.pickAction;
     document.getElementById('autoSave').checked = this.settings.autoSave !== false;
     document.getElementById('maxColors').value = this.settings.maxColorsPerPalette || 20;
+    document.getElementById('languageSelect').value = this.settings.language || 'zh-CN';
     document.getElementById('themePreset').value = theme.themePreset;
     document.getElementById('headerColor').value = theme.headerColor;
     document.getElementById('buttonColor').value = theme.buttonColor;
@@ -232,6 +234,7 @@ class OptionsManager {
     this.syncColorLabels();
     this.renderThemeColorHistory();
     this.applyTheme();
+    this.applyI18n();
   }
 
   bindEvents() {
@@ -263,8 +266,14 @@ class OptionsManager {
       });
     });
 
-    ['defaultFormat', 'pickAction', 'autoSave', 'maxColors'].forEach((id) => {
-      document.getElementById(id).addEventListener('change', () => this.collectSettingsFromInputs());
+    ['defaultFormat', 'pickAction', 'autoSave', 'maxColors', 'languageSelect'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', async () => {
+        this.collectSettingsFromInputs();
+        if (id === 'languageSelect') {
+          this.applyI18n();
+          await this.saveSettings();
+        }
+      });
     });
 
     document.getElementById('exportData').addEventListener('click', () => this.exportData());
@@ -281,6 +290,7 @@ class OptionsManager {
       pickAction: document.getElementById('pickAction').value,
       autoSave: document.getElementById('autoSave').checked,
       maxColorsPerPalette: Math.max(1, Math.min(100, maxVal)),
+      language: document.getElementById('languageSelect').value,
       themePreset: document.getElementById('themePreset').value,
       themeBasePreset: this.themeBasePreset || 'pink',
       headerColor: document.getElementById('headerColor').value,
@@ -288,6 +298,109 @@ class OptionsManager {
       bgColor: document.getElementById('bgColor').value,
       panelColor: document.getElementById('panelColor').value
     };
+  }
+
+  getLanguage() {
+    return window.PixelI18n?.normalize(this.settings.language || 'zh-CN') || 'zh-CN';
+  }
+
+  t(key) {
+    return window.PixelI18n?.t(this.getLanguage(), key) || key;
+  }
+
+  applyI18n() {
+    if (!window.PixelI18n) return;
+    const language = this.getLanguage();
+    document.documentElement.lang = language;
+    document.title = `${this.t('setup')} - Pixel Color Picker`;
+    window.PixelI18n.applyMap(document, language, {
+      text: {
+        '.pixel-header h1': 'appSettings',
+        '.settings-nav a[href="#behavior"]': 'behavior',
+        '.settings-nav a[href="#theme"]': 'theme',
+        '.settings-nav a[href="#language"]': 'language',
+        '.settings-nav a[href="#data"]': 'data',
+        '.settings-nav a[href="#about"]': 'about',
+        '#behavior .section-head h2': 'behaviorSettings',
+        '#theme .section-head h2': 'themeAppearance',
+        '#language .section-head h2': 'languageSettings',
+        '#data .section-head h2': 'dataManagement',
+        '#about .section-head h2': 'about',
+        '#behavior .setting-item:nth-of-type(1) strong': 'defaultCopyFormat',
+        '#behavior .setting-item:nth-of-type(1) small': 'defaultCopyFormatHint',
+        '#behavior .setting-item:nth-of-type(2) strong': 'afterPickAction',
+        '#behavior .setting-item:nth-of-type(2) small': 'afterPickActionHint',
+        '#behavior .setting-item:nth-of-type(3) strong': 'autoSave',
+        '#behavior .setting-item:nth-of-type(3) small': 'autoSaveHint',
+        '#behavior .setting-item:nth-of-type(4) strong': 'paletteLimit',
+        '#behavior .setting-item:nth-of-type(4) small': 'paletteLimitHint',
+        '.theme-preset-block strong': 'themePreset',
+        '.theme-preset-block small': 'themePresetHint',
+        '.theme-custom-block .theme-block-head strong': 'customColors',
+        '.theme-custom-block .theme-block-head small': 'customColorsHint',
+        '.color-item:nth-of-type(1) > span': 'headerColor',
+        '.color-item:nth-of-type(2) > span': 'buttonColor',
+        '.color-item:nth-of-type(3) > span': 'bgColor',
+        '.color-item:nth-of-type(4) > span': 'panelColor',
+        '#pickedTargetTitle': 'chooseColor',
+        '#targetColorHistory .picked-empty': 'noPickedHistory',
+        '.picked-theme-head strong': 'generateThemeFromPicked',
+        '#useLastPicked': 'useRecentPicked',
+        '#themeColorHistory .picked-empty': 'noPickedHistory',
+        '.theme-preview-block .theme-block-head strong': 'livePreview',
+        '.theme-preview-block .theme-block-head small': 'saveSyncPopup',
+        '#previewButton': 'buttonColor',
+        '.preview-body strong': 'defaultPalette',
+        '.preview-body small': 'themeSyncPopup',
+        '#language .setting-item strong': 'uiLanguage',
+        '#language .setting-item small': 'languageHint',
+        '#exportData': 'exportAllData',
+        '#importData': 'importData',
+        '#clearData': 'clearAllData',
+        '.about-info p:nth-child(2)': 'cuteToolDesc',
+        '.about-info p:nth-child(3)': 'copyright',
+        '#viewHistory': 'viewChangelog',
+        '#saveSettings': 'saveSettings',
+        '#resetSettings': 'reset',
+        '#backToPopup': 'close'
+      },
+      title: {
+        '.use-picked-btn': 'usePickedFill'
+      },
+      aria: {
+        '.settings-nav': 'settingsGroup',
+        '.use-picked-btn': 'usePickedFill'
+      }
+    });
+    document.querySelector('#pickAction option[value="save"]').textContent = this.t('save');
+    document.querySelector('#pickAction option[value="preview"]').textContent = this.t('preview');
+    document.querySelector('#pickAction option[value="copy"]').textContent = this.t('copy');
+    document.querySelector('#pickAction option[value="copy-save"]').textContent = this.t('copySave');
+    this.updateThemePresetLabels('themePreset');
+  }
+
+  updateThemePresetLabels(selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    const labels = {
+      pink: 'themePink',
+      green: 'themeGreen',
+      night: 'themeNight',
+      purple: 'themePurple',
+      cream: 'themeCream',
+      sea: 'themeSea',
+      cherry: 'themeCherry',
+      gameboy: 'themeGameboy',
+      cocoa: 'themeCocoa',
+      mintshake: 'themeMintshake',
+      grape: 'themeGrape',
+      mist: 'themeMist',
+      custom: 'themeCustom'
+    };
+    Object.entries(labels).forEach(([value, key]) => {
+      const option = select.querySelector(`option[value="${value}"]`);
+      if (option) option.textContent = this.t(key);
+    });
   }
 
   applyThemePresetToInputs() {
@@ -319,7 +432,7 @@ class OptionsManager {
 
     const recent = this.getRecentThemeSourceColors();
     if (recent.length === 0) {
-      list.innerHTML = '<span class="picked-empty">还没有取色历史</span>';
+      list.innerHTML = `<span class="picked-empty">${this.t('noPickedHistory')}</span>`;
       return;
     }
 
@@ -361,10 +474,10 @@ class OptionsManager {
     const item = input?.closest('.color-item');
     const trigger = document.querySelector(`.use-picked-btn[data-target-color="${targetId}"]`);
     const labels = {
-      headerColor: '选择标题色',
-      buttonColor: '选择按钮色',
-      bgColor: '选择背景色',
-      panelColor: '选择面板色'
+      headerColor: `${this.t('chooseColor')}: ${this.t('headerColor')}`,
+      buttonColor: `${this.t('chooseColor')}: ${this.t('buttonColor')}`,
+      bgColor: `${this.t('chooseColor')}: ${this.t('bgColor')}`,
+      panelColor: `${this.t('chooseColor')}: ${this.t('panelColor')}`
     };
     if (!panel || !item) return;
 
@@ -389,7 +502,7 @@ class OptionsManager {
     if (!list) return;
     const recent = this.getRecentThemeSourceColors();
     if (recent.length === 0) {
-      list.innerHTML = '<span class="picked-empty">还没有取色历史</span>';
+      list.innerHTML = `<span class="picked-empty">${this.t('noPickedHistory')}</span>`;
       return;
     }
 
@@ -415,13 +528,13 @@ class OptionsManager {
     this.syncColorLabels();
     this.applyThemeFromInputs();
     this.closePickedTargetPanel();
-    this.showNotification(`已填入 ${hex.toUpperCase()}`);
+    this.showNotification(this.getLanguage() === 'en' ? `Filled ${hex.toUpperCase()}` : `已填入 ${hex.toUpperCase()}`);
   }
 
   useLastPickedForTheme() {
     const hex = this.lastPickedColor?.hex || this.colorHistory[0]?.hex;
     if (!hex) {
-      this.showNotification('还没有可用的取色记录');
+      this.showNotification(this.t('noPickedHistory'));
       return;
     }
     this.generateThemeFromHex(hex);
@@ -456,7 +569,7 @@ class OptionsManager {
     document.getElementById('panelColor').value = panel;
     this.syncColorLabels();
     this.applyThemeFromInputs();
-    this.showNotification(`已用 ${header} 生成主题`);
+    this.showNotification(this.getLanguage() === 'en' ? `Theme generated from ${header}` : `已用 ${header} 生成主题`);
   }
 
   hexToRgb(hex) {
@@ -489,7 +602,8 @@ class OptionsManager {
     this.collectSettingsFromInputs();
     await this.saveSettings();
     this.applyTheme();
-    this.showNotification('设置已保存');
+    this.applyI18n();
+    this.showNotification(this.t('settingsSaved'));
   }
 
   async handleReset() {
@@ -497,7 +611,7 @@ class OptionsManager {
     this.themeBasePreset = 'pink';
     this.updateUI();
     await this.saveSettings();
-    this.showNotification('设置已重置');
+    this.showNotification(this.t('settingsReset'));
   }
 
   async exportData() {
