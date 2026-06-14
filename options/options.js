@@ -441,7 +441,7 @@ class OptionsManager {
               class="picked-color"
               data-hex="${color.hex}"
               style="background:${color.hex}"
-              title="用 ${color.hex} 生成主题"></button>
+              title="${this.getLanguage() === 'en' ? `Generate theme from ${color.hex}` : `用 ${color.hex} 生成主题`}"></button>
     `).join('');
 
     list.querySelectorAll('.picked-color').forEach((button) => {
@@ -511,7 +511,7 @@ class OptionsManager {
               class="picked-color"
               data-hex="${color.hex}"
               style="background:${color.hex}"
-              title="使用 ${color.hex}"></button>
+              title="${this.getLanguage() === 'en' ? `Use ${color.hex}` : `使用 ${color.hex}`}"></button>
     `).join('');
 
     list.querySelectorAll('.picked-color').forEach((button) => {
@@ -626,7 +626,7 @@ class OptionsManager {
     link.download = 'pixel-color-picker-backup.json';
     link.click();
     URL.revokeObjectURL(url);
-    this.showNotification('数据已导出');
+    this.showNotification(this.t('dataExported'));
   }
 
   importData() {
@@ -647,9 +647,9 @@ class OptionsManager {
           });
           await this.loadSettings();
           this.updateUI();
-          this.showNotification('数据已导入');
+          this.showNotification(this.t('dataImported'));
         } catch (error) {
-          this.showNotification('导入失败：文件格式错误');
+          this.showNotification(this.t('importFailed'));
         }
       };
       reader.readAsText(file);
@@ -659,23 +659,31 @@ class OptionsManager {
   }
 
   async clearData() {
-    if (!confirm('确定要清空所有数据吗？这个操作不可恢复。')) return;
+    if (!confirm(this.t('clearDataConfirm'))) return;
 
     await new Promise((resolve) => {
       chrome.storage.sync.clear(resolve);
     });
     await this.loadSettings();
     this.updateUI();
-    this.showNotification('所有数据已清空');
+    this.showNotification(this.t('allDataCleared'));
   }
 
   viewHistory() {
-    alert(`Pixel Color Picker 更新日志
+    const message = this.getLanguage() === 'en'
+      ? `Pixel Color Picker Changelog
+
+v1.0.0
+- Pixel-style popup
+- Palette management, history, import, and export
+- Theme presets and custom themes`
+      : `Pixel Color Picker 更新日志
 
 v1.0.0
 - 像素风 popup
 - 色卡管理、历史记录、导入导出
-- 主题预设与自定义主题`);
+- 主题预设与自定义主题`;
+    alert(message);
   }
 
   showNotification(message) {

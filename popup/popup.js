@@ -19,6 +19,7 @@ class PixelColorPicker {
     this.paletteFilter = 'all';
     this.swatchLabelMode = 'note';
     this.themeBasePreset = 'pink';
+    this.pickConfirmTimer = null;
 
     this.init();
   }
@@ -482,7 +483,7 @@ class PixelColorPicker {
     if (addButton) {
       addButton.classList.toggle('is-full', isFull);
       addButton.classList.toggle('is-warn', isNearFull);
-      addButton.title = isFull ? `色卡已满 ${count}/${max}` : '手动添加颜色';
+      addButton.title = isFull ? `${this.t('colorFull')} ${count}/${max}` : this.t('addColorManual');
     }
   }
 
@@ -504,11 +505,11 @@ class PixelColorPicker {
                 type="button"
                 data-id="${color.id}"
                 style="background:${color.hex}"
-                title="恢复 ${color.hex}"></button>
+                title="${this.getLanguage() === 'en' ? 'Restore' : '恢复'} ${color.hex}"></button>
         <button class="recent-remove"
                 type="button"
                 data-id="${color.id}"
-                title="删除这条最近颜色">×</button>
+                title="${this.getLanguage() === 'en' ? 'Delete this recent color' : '删除这条最近颜色'}">×</button>
       </span>
     `).join('');
 
@@ -521,6 +522,96 @@ class PixelColorPicker {
         this.deleteRecentColor(Number(button.dataset.id));
       });
     });
+  }
+
+  showPickConfirmBar(color, {
+    mode = 'preview',
+    paletteId = null,
+    colorId = null,
+    paletteName = '',
+    format = this.getDefaultFormatLabel()
+  } = {}) {
+    if (!color?.hex) return;
+
+    const isSaved = mode === 'saved' || mode === 'copy-save';
+    const label = color.note || this.getAutoColorName(color) || color.hex;
+    const messageMap = {
+      preview: this.t('pickConfirmPreview'),
+      copy: this.getLanguage() === 'en' ? `Copied ${format}` : `已复制 ${format}`,
+      saved: this.getLanguage() === 'en'
+        ? `Saved to ${paletteName || this.t('unnamedPalette')}`
+        : `已保存到 ${paletteName || this.t('unnamedPalette')}`,
+      'copy-save': this.getLanguage() === 'en'
+        ? `Copied and saved to ${paletteName || this.t('unnamedPalette')}`
+        : `已复制并保存到 ${paletteName || this.t('unnamedPalette')}`
+    };
+    const message = messageMap[mode] || this.t('saved');
+    const detailVisible = document.getElementById('detailView')?.style.display !== 'none';
+    const host = detailVisible
+      ? document.querySelector('#detailView .current-color-section')
+      : document.querySelector('#listView .picker-section');
+    if (!host) return;
+
+    document.querySelectorAll('.pick-confirm-bar').forEach((node) => node.remove());
+    window.clearTimeout(this.pickConfirmTimer);
+
+    const bar = document.createElement('div');
+    bar.className = `pick-confirm-bar is-${mode}`;
+    bar.innerHTML = `
+      <span class="pick-confirm-swatch" style="background:${this.escapeHtml(color.hex)}"></span>
+      <span class="pick-confirm-copy">
+        <strong>${this.escapeHtml(label)}</strong>
+        <small>${this.escapeHtml(color.hex)} · ${this.escapeHtml(message)}</small>
+      </span>
+      ${isSaved && paletteId && colorId ? `<button type="button" class="pick-confirm-action" data-pick-action="undo">${this.t('undo')}</button>` : ''}
+      <button type="button" class="pick-confirm-close" data-pick-action="close" title="${this.t('close')}">×</button>
+    `;
+
+    if (detailVisible) {
+      const status = document.getElementById('colorStatus');
+      if (status?.parentElement === host) status.insertAdjacentElement('afterend', bar);
+      else host.appendChild(bar);
+    } else {
+      host.insertAdjacentElement('afterend', bar);
+    }
+
+    bar.querySelectorAll('[data-pick-action]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const action = button.dataset.pickAction;
+        if (action === 'undo') {
+          this.undoPickConfirmSave({ paletteId, colorId });
+          return;
+        }
+        this.hidePickConfirmBar();
+      });
+    });
+
+    this.pickConfirmTimer = window.setTimeout(() => this.hidePickConfirmBar(), 5000);
+  }
+
+  hidePickConfirmBar() {
+    window.clearTimeout(this.pickConfirmTimer);
+    this.pickConfirmTimer = null;
+    document.querySelectorAll('.pick-confirm-bar').forEach((node) => node.remove());
+  }
+
+  async undoPickConfirmSave({ paletteId, colorId }) {
+    const palette = this.palettes.find((item) => String(item.id) === String(paletteId));
+    if (!palette) {
+      this.hidePickConfirmBar();
+      return;
+    }
+    const before = palette.colors.length;
+    palette.colors = palette.colors.filter((color) => String(color.id) !== String(colorId));
+    if (palette.colors.length === before) {
+      this.hidePickConfirmBar();
+      return;
+    }
+    await this.saveData();
+    this.hidePickConfirmBar();
+    if (document.getElementById('detailView')?.style.display !== 'none') this.renderDetailView();
+    else this.renderListView();
+    this.showNotification(this.t('pickUndoSaved'));
   }
 
   renderColorGrid() {
@@ -650,10 +741,10 @@ class PixelColorPicker {
     const count = this.batchSelectedIds.size;
     return `
       <div class="batch-toolbar">
-        <span class="batch-count">${count}/${total} 已选</span>
-        <button type="button" class="batch-action" data-batch-action="copy" ${count === 0 ? 'disabled' : ''}>复制</button>
-        <button type="button" class="batch-action danger" data-batch-action="delete" ${count === 0 ? 'disabled' : ''}>删除</button>
-        <button type="button" class="batch-action" data-batch-action="cancel">取消</button>
+        <span class="batch-count">${count}/${total} ${this.getLanguage() === 'en' ? 'selected' : '已选'}</span>
+        <button type="button" class="batch-action" data-batch-action="copy" ${count === 0 ? 'disabled' : ''}>${this.t('copy')}</button>
+        <button type="button" class="batch-action danger" data-batch-action="delete" ${count === 0 ? 'disabled' : ''}>${this.t('delete')}</button>
+        <button type="button" class="batch-action" data-batch-action="cancel">${this.t('cancel')}</button>
       </div>
     `;
   }
@@ -714,7 +805,7 @@ class PixelColorPicker {
     const colors = this.getBatchSelectedColors();
     if (colors.length === 0) return;
     const text = colors.map((color) => color.hex).join('\n');
-    await this.copyTextValue(text, `已复制 ${colors.length} 个颜色`);
+    await this.copyTextValue(text, this.getLanguage() === 'en' ? `Copied ${colors.length} colors` : `已复制 ${colors.length} 个颜色`);
   }
 
   async deleteBatchSelectedColors() {
@@ -724,11 +815,11 @@ class PixelColorPicker {
 
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL BATCH',
-      title: '批量删除',
-      message: `确定删除选中的 ${colors.length} 个颜色吗？`,
+      title: this.getLanguage() === 'en' ? 'Batch delete' : '批量删除',
+      message: this.getLanguage() === 'en' ? `Delete ${colors.length} selected colors?` : `确定删除选中的 ${colors.length} 个颜色吗？`,
       actions: [
-        { id: 'confirm', label: '删除', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('delete'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
@@ -739,7 +830,7 @@ class PixelColorPicker {
     this.batchMode = false;
     await this.saveData();
     this.renderDetailView();
-    this.showNotification(`已删除 ${colors.length} 个颜色`);
+    this.showNotification(this.getLanguage() === 'en' ? `Deleted ${colors.length} colors` : `已删除 ${colors.length} 个颜色`);
   }
 
   bindEvents() {
@@ -875,7 +966,7 @@ class PixelColorPicker {
     button.className = 'mini-btn tool-toggle icon-mini';
     button.id = 'toggleBatchMode';
     button.type = 'button';
-    button.title = '批量选择';
+    button.title = this.getLanguage() === 'en' ? 'Batch select' : '批量选择';
     button.textContent = '☑';
     button.addEventListener('click', () => this.toggleBatchMode());
     searchButton?.parentElement?.insertBefore(button, searchButton);
@@ -902,7 +993,7 @@ class PixelColorPicker {
 
   async quickPick() {
     if (!window.EyeDropper) {
-      this.showNotification('当前浏览器不支持取色，请使用 Chrome 95+');
+      this.showNotification(this.t('browserNoEyedropper'));
       return;
     }
 
@@ -911,7 +1002,7 @@ class PixelColorPicker {
       const result = await eyeDropper.open();
       const color = this.parseSRGBHex(result.sRGBHex);
       if (!color) {
-        this.showNotification('取色失败');
+        this.showNotification(this.t('pickFailed'));
         return;
       }
 
@@ -921,26 +1012,46 @@ class PixelColorPicker {
 
       const pickAction = this.getPickAction();
       if (pickAction === 'preview') {
-        this.showNotification('已取色，可手动保存');
+        this.showPickConfirmBar(color, { mode: 'preview' });
+        this.showNotification(this.t('pickedManualSave'));
         return;
       }
 
       if (pickAction === 'copy') {
         await this.copyColorValue(color);
+        this.showPickConfirmBar(color, { mode: 'copy' });
         return;
       }
 
       if (pickAction === 'copy-save') {
-        await this.copyColorValue(color, `已复制 ${this.getDefaultFormatLabel()}`);
-        await this.addColorToCurrentPalette(color, { successMessage: '已复制并保存' });
+        await this.copyColorValue(color, this.getLanguage() === 'en' ? `Copied ${this.getDefaultFormatLabel()}` : `已复制 ${this.getDefaultFormatLabel()}`);
+        const palette = this.getCurrentPalette();
+        const savedColor = await this.addColorToCurrentPalette(color, { successMessage: this.t('copiedAndSaved') });
+        if (savedColor) {
+          this.showPickConfirmBar(savedColor, {
+            mode: 'copy-save',
+            paletteId: palette?.id,
+            colorId: savedColor.id,
+            paletteName: palette?.name
+          });
+        }
         return;
       }
 
-      await this.addColorToCurrentPalette(color, { successMessage: '已保存' });
+      const palette = this.getCurrentPalette();
+      const savedColor = await this.addColorToCurrentPalette(color, { successMessage: this.t('saved') });
+      if (savedColor) {
+        this.showPickConfirmBar(savedColor, {
+          mode: 'saved',
+          paletteId: palette?.id,
+          colorId: savedColor.id,
+          paletteName: palette?.name
+        });
+      }
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error('[Pixel Color Picker] Quick pick error:', error);
-        this.showNotification('快速取色失败，请重试');
+        this.showNotification(this.t('quickPickFailed'));
       }
     }
   }
@@ -981,33 +1092,35 @@ class PixelColorPicker {
     const palette = this.getCurrentPalette();
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL SAVE',
-      title: '保存颜色',
-      message: `${color.hex} 保存到哪个色卡？`,
+      title: this.getLanguage() === 'en' ? 'Save color' : '保存颜色',
+      message: this.getLanguage() === 'en' ? `Save ${color.hex} to which palette?` : `${color.hex} 保存到哪个色卡？`,
       previewColor: color.hex,
       detailHtml: this.getSaveTargetDetailHtml(color),
       actions: [
-        { id: 'new-palette', label: '+ 新色卡', tone: 'primary' },
-        { id: 'cancel', label: '取消' }
+        { id: 'new-palette', label: `+ ${this.t('newPalette')}`, tone: 'primary' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
 
     if (result.action === 'new-palette') {
       await this.createPalette();
-      await this.addColorToCurrentPalette(color, { successMessage: '已保存到新色卡' });
+      await this.addColorToCurrentPalette(color, { successMessage: this.t('savedToNewPalette') });
       return;
     }
 
     if (result.action !== 'save-target') return;
     const target = this.palettes.find((item) => String(item.id) === String(result.value));
     if (!target) return;
-    await this.addColorToPalette(color, target, { successMessage: `已保存到 ${target.name || '色卡'}` });
+    await this.addColorToPalette(color, target, {
+      successMessage: this.getLanguage() === 'en' ? `Saved to ${target.name || 'palette'}` : `已保存到 ${target.name || '色卡'}`
+    });
     if (palette && target.id !== palette.id) {
       this.currentPaletteId = target.id;
       await this.saveData();
       this.showDetailView(target.id);
     }
     return;
-    await this.addColorToCurrentPalette(this.currentColor, { successMessage: '已保存' });
+    await this.addColorToCurrentPalette(this.currentColor, { successMessage: this.t('saved') });
   }
 
   setCurrentDisplayFormat(format) {
@@ -1039,7 +1152,7 @@ class PixelColorPicker {
         button.textContent = '⧉';
         button.classList.remove('copied');
       }, 1200);
-      this.showNotification(`已复制 ${(this.currentDisplayFormat || 'hex').toUpperCase()}`);
+      this.showNotification(this.getLanguage() === 'en' ? `Copied ${(this.currentDisplayFormat || 'hex').toUpperCase()}` : `已复制 ${(this.currentDisplayFormat || 'hex').toUpperCase()}`);
     });
   }
 
@@ -1048,7 +1161,7 @@ class PixelColorPicker {
       this.quickPick();
       return;
     }
-    this.copyColorValue(this.currentColor, `已复制 ${this.getDefaultFormatLabel()}`);
+    this.copyColorValue(this.currentColor, this.getLanguage() === 'en' ? `Copied ${this.getDefaultFormatLabel()}` : `已复制 ${this.getDefaultFormatLabel()}`);
   }
 
   async openCurrentColorDetails() {
@@ -1062,26 +1175,28 @@ class PixelColorPicker {
     const paletteColor = palette?.colors?.find((item) => item.hex === color.hex);
     const inPalette = Boolean(paletteColor);
     const brightness = this.getBrightness(color.r, color.g, color.b);
-    const textAdvice = brightness > 150 ? '适合深色文字' : '适合浅色文字';
-    let tone = '中间色';
-    if (brightness >= 200) tone = '浅色';
-    else if (brightness <= 90) tone = '深色';
+    const textAdvice = brightness > 150 ? this.t('suitableDarkText') : this.t('suitableLightText');
+    let tone = this.t('midTone');
+    if (brightness >= 200) tone = this.t('lightTone');
+    else if (brightness <= 90) tone = this.t('darkTone');
     const rgb = this.formatColorForCopy(color, 'rgb');
     const hsl = this.formatColorForCopy(color, 'hsl');
     const allFormats = `HEX ${color.hex}\nRGB ${rgb}\nHSL ${hsl}`;
     const note = paletteColor?.note || color.note || '';
-    const status = inPalette ? `已在 ${palette?.name || '当前色卡'}` : '尚未保存到当前色卡';
+    const status = inPalette
+      ? (this.getLanguage() === 'en' ? `In ${palette?.name || 'current palette'}` : `已在 ${palette?.name || '当前色卡'}`)
+      : this.t('notSavedToPalette');
     const actions = [
       { id: 'copy-hex', label: 'HEX', tone: 'primary' },
       { id: 'copy-rgb', label: 'RGB' },
       { id: 'copy-hsl', label: 'HSL' },
-      { id: 'copy-all', label: '全部' },
+      { id: 'copy-all', label: this.getLanguage() === 'en' ? 'All' : '全部' },
       inPalette
-        ? { id: 'note', label: '备注' }
-        : { id: 'save', label: '保存', tone: 'primary' },
+        ? { id: 'note', label: this.t('note') }
+        : { id: 'save', label: this.t('save'), tone: 'primary' },
       inPalette
-        ? { id: 'delete', label: '删除', tone: 'danger' }
-        : { id: 'close', label: '关闭' }
+        ? { id: 'delete', label: this.t('delete'), tone: 'danger' }
+        : { id: 'close', label: this.t('close') }
     ];
 
     const result = await this.openPixelDialog({
@@ -1094,13 +1209,13 @@ class PixelColorPicker {
           <div class="color-detail-row"><span>HEX</span><code>${this.escapeHtml(color.hex)}</code></div>
           <div class="color-detail-row"><span>RGB</span><code>${this.escapeHtml(rgb)}</code></div>
           <div class="color-detail-row"><span>HSL</span><code>${this.escapeHtml(hsl)}</code></div>
-          <div class="color-detail-row"><span>亮度</span><code>${Math.round(brightness)} · ${tone}</code></div>
+          <div class="color-detail-row"><span>${this.getLanguage() === 'en' ? 'Brightness' : '亮度'}</span><code>${Math.round(brightness)} · ${tone}</code></div>
           <div class="color-text-preview">
-            <span style="background:${color.hex};color:#1f1b22">深色字</span>
-            <span style="background:${color.hex};color:#ffffff">浅色字</span>
+            <span style="background:${color.hex};color:#1f1b22">${this.getLanguage() === 'en' ? 'Dark text' : '深色字'}</span>
+            <span style="background:${color.hex};color:#ffffff">${this.getLanguage() === 'en' ? 'Light text' : '浅色字'}</span>
           </div>
           <div class="color-detail-note ${note ? '' : 'empty'}">
-            ${note ? this.escapeHtml(note) : '暂无备注'}
+            ${note ? this.escapeHtml(note) : this.t('noNote')}
           </div>
         </div>
       `,
@@ -1109,16 +1224,16 @@ class PixelColorPicker {
 
     switch (result.action) {
       case 'copy-hex':
-        await this.copyTextValue(color.hex, '已复制 HEX');
+        await this.copyTextValue(color.hex, this.t('copiedHex'));
         break;
       case 'copy-rgb':
-        await this.copyTextValue(rgb, '已复制 RGB');
+        await this.copyTextValue(rgb, this.t('copiedRgb'));
         break;
       case 'copy-hsl':
-        await this.copyTextValue(hsl, '已复制 HSL');
+        await this.copyTextValue(hsl, this.t('copiedHsl'));
         break;
       case 'copy-all':
-        await this.copyTextValue(allFormats, '已复制全部格式');
+        await this.copyTextValue(allFormats, this.t('copiedAllFormats'));
         break;
       case 'save':
         await this.saveCurrentColor();
@@ -1138,7 +1253,7 @@ class PixelColorPicker {
     const palette = this.getCurrentPalette();
     const max = palette?.maxColors || this.maxColorsPerPalette;
     if (palette && palette.colors.length >= max) {
-      this.showNotification(`色卡已满 ${max}/${max}`);
+      this.showNotification(`${this.t('colorFull')} ${max}/${max}`);
       return;
     }
 
@@ -1156,34 +1271,36 @@ class PixelColorPicker {
 
   openPixelDialog({
     eyebrow = 'PIXEL NOTE',
-    title = '提示',
+    title = this.t('prompt'),
     message = '',
     input = null,
     previewColor = '',
     detailHtml = '',
     inputTemplates = [],
     actions = [
-      { id: 'confirm', label: '确定', tone: 'primary' },
-      { id: 'cancel', label: '取消' }
+      { id: 'confirm', label: this.t('confirm'), tone: 'primary' },
+      { id: 'cancel', label: this.t('cancel') }
     ],
     validate = null
   } = {}) {
     if (input && inputTemplates.length === 0 && eyebrow === 'PIXEL NOTE') {
-      inputTemplates = ['主色', '背景', '文字', '边框', '按钮'];
+      inputTemplates = this.getLanguage() === 'en'
+        ? ['Primary', 'Background', 'Text', 'Border', 'Button']
+        : ['主色', '背景', '文字', '边框', '按钮'];
     }
     if (input && eyebrow === 'PIXEL NOTE') {
-      title = '颜色名称';
-      message = '只编辑下面的名称 / 备注，色号本身不会改变。';
+      title = this.getLanguage() === 'en' ? 'Color name' : '颜色名称';
+      message = this.getLanguage() === 'en' ? 'Only edit the name / note below. The color value will not change.' : '只编辑下面的名称 / 备注，色号本身不会改变。';
       input = {
         ...input,
-        label: '名称 / 备注',
-        placeholder: '例如：主按钮 / 背景色',
-        hint: '留空并保存会清空名称 / 备注'
+        label: this.getLanguage() === 'en' ? 'Name / note' : '名称 / 备注',
+        placeholder: this.t('notePlaceholder'),
+        hint: this.getLanguage() === 'en' ? 'Leave empty and save to clear name / note' : '留空并保存会清空名称 / 备注'
       };
       if (!detailHtml && previewColor) {
         detailHtml = `
           <div class="note-edit-info">
-            <span>色号</span>
+            <span>${this.getLanguage() === 'en' ? 'Color' : '色号'}</span>
             <strong>${this.escapeHtml(previewColor)}</strong>
           </div>
         `;
@@ -1215,7 +1332,7 @@ class PixelColorPicker {
     hint.className = 'pixel-dialog-hint';
     dialogInput.value = input?.value || '';
     dialogInput.placeholder = input?.placeholder || '';
-    document.getElementById('pixelDialogLabel').textContent = input?.label || '内容';
+    document.getElementById('pixelDialogLabel').textContent = input?.label || this.t('content');
     field.querySelector('.note-template-bar')?.remove();
     if (input && inputTemplates.length > 0) {
       const templateBar = document.createElement('div');
@@ -1657,7 +1774,7 @@ class PixelColorPicker {
       `pixel-color-picker-backup-${this.getDateStamp()}.json`,
       'application/json'
     );
-    this.showNotification('备份已导出');
+    this.showNotification(this.t('backupExported'));
   }
 
   importAllData() {
@@ -1677,11 +1794,13 @@ class PixelColorPicker {
 
         const result = await this.openPixelDialog({
           eyebrow: 'PIXEL IMPORT',
-          title: '导入备份',
-          message: `将导入 ${normalized.palettes.length} 个色卡、${normalized.colorHistory.length} 条历史，并覆盖当前数据。`,
+          title: this.t('importBackup'),
+          message: this.getLanguage() === 'en'
+            ? `Import ${normalized.palettes.length} palettes and ${normalized.colorHistory.length} history items, replacing current data.`
+            : `将导入 ${normalized.palettes.length} 个色卡、${normalized.colorHistory.length} 条历史，并覆盖当前数据。`,
           actions: [
-            { id: 'confirm', label: '导入', tone: 'primary' },
-            { id: 'cancel', label: '取消' }
+            { id: 'confirm', label: this.t('import'), tone: 'primary' },
+            { id: 'cancel', label: this.t('cancel') }
           ]
         });
         if (result.action !== 'confirm') return;
@@ -1695,10 +1814,10 @@ class PixelColorPicker {
         await this.loadData();
         this.closeSettingsDialog();
         this.showListView();
-        this.showNotification('备份已导入');
+        this.showNotification(this.t('backupImported'));
       } catch (error) {
         console.error('[Pixel Color Picker] Backup import failed:', error);
-        this.showNotification('导入失败：备份格式不正确');
+        this.showNotification(this.t('backupImportFailed'));
       }
     };
 
@@ -1708,11 +1827,11 @@ class PixelColorPicker {
   async clearAllData() {
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL RESET',
-      title: '清空全部数据',
-      message: '确定要清空所有色卡、历史和设置吗？建议先导出备份。',
+      title: this.t('clearDataTitle'),
+      message: this.t('clearDataMessage'),
       actions: [
-        { id: 'confirm', label: '清空', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('clear'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
@@ -1763,7 +1882,9 @@ class PixelColorPicker {
 
       return {
         id: Number(palette.id) || Date.now() + paletteIndex,
-        name: typeof palette.name === 'string' && palette.name.trim() ? palette.name.trim() : `导入色卡 ${paletteIndex + 1}`,
+        name: typeof palette.name === 'string' && palette.name.trim()
+          ? palette.name.trim()
+          : (this.getLanguage() === 'en' ? `Imported palette ${paletteIndex + 1}` : `导入色卡 ${paletteIndex + 1}`),
         colors,
         maxColors: Math.max(colors.length, Math.min(100, parseInt(palette.maxColors, 10) || settings.maxColorsPerPalette)),
         createdAt: palette.createdAt || new Date().toISOString(),
@@ -1830,19 +1951,19 @@ class PixelColorPicker {
     preview.style.backgroundColor = '#ffffff';
 
     if (!raw) {
-      hint.textContent = '请输入 6 位 HEX';
+      hint.textContent = this.t('inputHex');
       return null;
     }
 
     const color = this.parseSRGBHex(raw.startsWith('#') ? raw : `#${raw}`);
     if (!color) {
-      hint.textContent = '格式不正确，例如 #FF5733';
+      hint.textContent = this.t('enterHexInvalid');
       hint.classList.add('error');
       return null;
     }
 
     preview.style.backgroundColor = color.hex;
-    hint.textContent = `${color.hex} 可以添加`;
+    hint.textContent = `${color.hex} ${this.t('canAdd')}`;
     hint.classList.add('ok');
     return color;
   }
@@ -1855,7 +1976,7 @@ class PixelColorPicker {
     this.currentColor = color;
     this.updateColorPreview(color);
     await this.addToHistory(color);
-    const added = await this.addColorToCurrentPalette(color, { successMessage: '已添加颜色' });
+    const added = await this.addColorToCurrentPalette(color, { successMessage: this.t('addedColor') });
     if (added) this.closeAddColorDialog();
   }
 
@@ -1867,7 +1988,7 @@ class PixelColorPicker {
       const isFull = count >= max;
       const exists = palette.colors.some((item) => item.hex === color.hex);
       const disabled = isFull;
-      const state = exists ? '已存在' : isFull ? '已满' : `${count}/${max}`;
+      const state = exists ? this.t('exists') : isFull ? this.t('full') : `${count}/${max}`;
       const stateClass = exists ? 'exists' : isFull ? 'full' : 'available';
       const classes = [
         'save-target-item',
@@ -1884,7 +2005,7 @@ class PixelColorPicker {
           data-dialog-value="${palette.id}"
           ${disabled ? 'disabled aria-disabled="true"' : ''}
         >
-          <span class="save-target-name">${this.escapeHtml(palette.name || '未命名色卡')}</span>
+          <span class="save-target-name">${this.escapeHtml(palette.name || this.t('unnamedPalette'))}</span>
           <span class="save-target-meta">${state}</span>
         </button>
       `;
@@ -1893,12 +2014,12 @@ class PixelColorPicker {
     return `<div class="save-target-list">${items}</div>`;
   }
 
-  async addColorToPalette(color, palette, { successMessage = '已保存' } = {}) {
+  async addColorToPalette(color, palette, { successMessage = this.t('saved') } = {}) {
     if (!palette) return false;
 
     const max = palette.maxColors || this.maxColorsPerPalette;
     if (palette.colors.length >= max) {
-      this.showNotification(`色卡已满 ${max}/${max}`);
+      this.showNotification(`${this.t('colorFull')} ${max}/${max}`);
       return false;
     }
 
@@ -1908,51 +2029,54 @@ class PixelColorPicker {
       this.currentColor = duplicate;
       this.updateColorPreview(duplicate);
       this.focusExistingColor(duplicate.id);
-      this.showNotification('颜色已存在，已定位');
+      this.showNotification(this.t('colorExistsLocated'));
       return false;
     }
 
-    palette.colors.push({
+    const savedColor = {
       r: color.r,
       g: color.g,
       b: color.b,
       hex: color.hex,
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
       id: Date.now(),
-      note: color.note || '',
+      note: this.getColorNoteForSave(color),
       createdAt: new Date().toISOString()
-    });
+    };
+    palette.colors.push(savedColor);
 
     await this.saveData();
     if (palette.id === this.currentPaletteId) this.renderDetailView();
     this.showNotification(successMessage);
-    return true;
+    return savedColor;
   }
 
-  async handleDuplicateColor(color, palette, duplicate, { successMessage = '已保存' } = {}) {
+  async handleDuplicateColor(color, palette, duplicate, { successMessage = this.t('saved') } = {}) {
     const isCurrentPalette = palette.id === this.currentPaletteId;
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL SAME',
-      title: '颜色已存在',
-      message: `${color.hex} 已在「${palette.name || '色卡'}」里。`,
+      title: this.t('duplicateColor'),
+      message: this.getLanguage() === 'en'
+        ? `${color.hex} is already in "${palette.name || 'palette'}".`
+        : `${color.hex} 已在「${palette.name || '色卡'}」里。`,
       previewColor: color.hex,
       detailHtml: `
         <div class="duplicate-color-panel">
-          <div class="duplicate-color-row"><span>色卡</span><strong>${this.escapeHtml(palette.name || '未命名色卡')}</strong></div>
-          <div class="duplicate-color-row"><span>备注</span><strong>${this.escapeHtml(duplicate.note || '暂无备注')}</strong></div>
+          <div class="duplicate-color-row"><span>${this.t('palettes')}</span><strong>${this.escapeHtml(palette.name || this.t('unnamedPalette'))}</strong></div>
+          <div class="duplicate-color-row"><span>${this.t('note')}</span><strong>${this.escapeHtml(duplicate.note || this.t('noNote'))}</strong></div>
         </div>
       `,
       actions: [
-        { id: 'view', label: '查看', tone: 'primary' },
-        { id: 'note', label: '备注' },
-        { id: 'copy', label: '复制' },
-        { id: 'force', label: '另存' },
-        { id: 'cancel', label: '取消' }
+        { id: 'view', label: this.t('view'), tone: 'primary' },
+        { id: 'note', label: this.t('note') },
+        { id: 'copy', label: this.t('copy') },
+        { id: 'force', label: this.t('saveAsAnother') },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
 
     if (result.action === 'copy') {
-      await this.copyTextValue(color.hex, '已复制 HEX');
+      await this.copyTextValue(color.hex, this.t('copiedHex'));
       return false;
     }
 
@@ -1971,43 +2095,46 @@ class PixelColorPicker {
     }
 
     if (result.action === 'force') {
-      return this.addDuplicateColorToPalette(color, palette, { successMessage: '已另存颜色' });
+      return this.addDuplicateColorToPalette(color, palette, {
+        successMessage: this.getLanguage() === 'en' ? 'Saved another color' : '已另存颜色'
+      });
     }
 
     return false;
   }
 
-  async addDuplicateColorToPalette(color, palette, { successMessage = '已另存颜色' } = {}) {
+  async addDuplicateColorToPalette(color, palette, { successMessage = this.getLanguage() === 'en' ? 'Saved another color' : '已另存颜色' } = {}) {
     const max = palette.maxColors || this.maxColorsPerPalette;
     if (palette.colors.length >= max) {
-      this.showNotification(`色卡已满 ${max}/${max}`);
+      this.showNotification(`${this.t('colorFull')} ${max}/${max}`);
       return false;
     }
 
-    palette.colors.push({
+    const savedColor = {
       r: color.r,
       g: color.g,
       b: color.b,
       hex: color.hex,
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
       id: Date.now(),
-      note: color.note || '',
+      note: this.getColorNoteForSave(color),
       createdAt: new Date().toISOString()
-    });
+    };
+    palette.colors.push(savedColor);
 
     await this.saveData();
     if (palette.id === this.currentPaletteId) this.renderDetailView();
     this.showNotification(successMessage);
-    return true;
+    return savedColor;
   }
 
-  async addColorToCurrentPalette(color, { successMessage = '已保存' } = {}) {
+  async addColorToCurrentPalette(color, { successMessage = this.t('saved') } = {}) {
     const palette = this.getCurrentPalette();
     if (!palette) return false;
 
     const max = palette.maxColors || this.maxColorsPerPalette;
     if (palette.colors.length >= max) {
-      this.showNotification(`色卡已满 ${max}/${max}`);
+      this.showNotification(`${this.t('colorFull')} ${max}/${max}`);
       return false;
     }
 
@@ -2017,25 +2144,26 @@ class PixelColorPicker {
       this.currentColor = duplicate;
       this.updateColorPreview(duplicate);
       this.focusExistingColor(duplicate.id);
-      this.showNotification('颜色已存在，已定位');
+      this.showNotification(this.t('colorExistsLocated'));
       return false;
     }
 
-    palette.colors.push({
+    const savedColor = {
       r: color.r,
       g: color.g,
       b: color.b,
       hex: color.hex,
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
       id: Date.now(),
-      note: color.note || '',
+      note: this.getColorNoteForSave(color),
       createdAt: new Date().toISOString()
-    });
+    };
+    palette.colors.push(savedColor);
 
     await this.saveData();
     this.renderDetailView();
     this.showNotification(successMessage);
-    return true;
+    return savedColor;
   }
 
   focusExistingColor(id, attempt = 0) {
@@ -2211,7 +2339,7 @@ class PixelColorPicker {
     this.updateColorPreview(this.currentColor);
     this.showDetailView(this.currentPaletteId);
     this.closeHistoryDialog();
-    this.showNotification('已恢复颜色');
+    this.showNotification(this.t('restoredColor'));
   }
 
   selectRecentColor(id) {
@@ -2225,7 +2353,7 @@ class PixelColorPicker {
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b)
     };
     this.updateColorPreview(this.currentColor);
-    this.showNotification('已恢复最近颜色');
+    this.showNotification(this.t('restoredRecentColor'));
   }
 
   copyHistoryColor(id, button) {
@@ -2237,14 +2365,14 @@ class PixelColorPicker {
       setTimeout(() => {
         button.textContent = '⧉';
       }, 1200);
-      this.showNotification(`已复制 ${this.getDefaultFormatLabel()}`);
+      this.showNotification(this.getLanguage() === 'en' ? `Copied ${this.getDefaultFormatLabel()}` : `已复制 ${this.getDefaultFormatLabel()}`);
     });
   }
 
   async addHistoryColorToPalette(id) {
     const color = this.colorHistory.find((item) => item.id === id);
     if (!color) return;
-    const added = await this.addColorToCurrentPalette(color, { successMessage: '已加入色卡' });
+    const added = await this.addColorToCurrentPalette(color, { successMessage: this.t('addedToPalette') });
     if (added) this.renderHistoryList();
   }
 
@@ -2252,11 +2380,13 @@ class PixelColorPicker {
     if (this.colorHistory.length === 0) return;
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL CLEAR',
-      title: '清空历史',
-      message: `确定要清空 ${this.colorHistory.length} 条取色历史吗？这个操作不会影响当前色卡。`,
+      title: this.t('clearHistory'),
+      message: this.getLanguage() === 'en'
+        ? `Clear ${this.colorHistory.length} color history items? This will not affect the current palette.`
+        : `确定要清空 ${this.colorHistory.length} 条取色历史吗？这个操作不会影响当前色卡。`,
       actions: [
-        { id: 'confirm', label: '清空', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('clear'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
@@ -2264,7 +2394,7 @@ class PixelColorPicker {
     await this.saveHistory();
     this.renderRecentStrip();
     this.renderHistoryList();
-    this.showNotification('已清空历史');
+    this.showNotification(this.t('historyCleared'));
   }
 
   formatHistoryTime(value) {
@@ -2279,7 +2409,7 @@ class PixelColorPicker {
     palette.colors = palette.colors.filter((color) => color.id !== id);
     await this.saveData();
     this.renderDetailView();
-    this.showNotification('已删除颜色');
+    this.showNotification(this.t('deleted'));
   }
 
   async deleteCurrentColor() {
@@ -2287,18 +2417,18 @@ class PixelColorPicker {
     if (!palette || !this.currentColor) return;
     const color = palette.colors.find((item) => item.hex === this.currentColor.hex);
     if (!color) {
-      this.showNotification('当前色卡没有这个颜色');
+      this.showNotification(this.t('deleteCurrentColor'));
       return;
     }
 
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL DELETE',
-      title: '删除颜色',
-      message: `确定要从当前色卡删除 ${color.hex} 吗？`,
+      title: this.t('deleteColor'),
+      message: this.getLanguage() === 'en' ? `Delete ${color.hex} from the current palette?` : `确定要从当前色卡删除 ${color.hex} 吗？`,
       previewColor: color.hex,
       actions: [
-        { id: 'confirm', label: '删除', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('delete'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
@@ -2312,7 +2442,7 @@ class PixelColorPicker {
     await this.saveHistory();
     this.renderRecentStrip();
     this.renderHistoryList();
-    this.showNotification('已删除最近颜色');
+    this.showNotification(this.t('recentColorDeleted'));
   }
 
   clearPaletteSearch() {
@@ -2440,10 +2570,10 @@ class PixelColorPicker {
     const paletteColor = palette?.colors?.find((item) => item.hex === color.hex);
     const note = color.note || paletteColor?.note || '';
     const brightness = this.getBrightness(color.r, color.g, color.b);
-    const textColor = brightness > 150 ? '适合深色文字' : '适合浅色文字';
-    let tone = '中间色';
-    if (brightness >= 200) tone = '浅色';
-    else if (brightness <= 90) tone = '深色';
+    const textColor = brightness > 150 ? this.t('suitableDarkText') : this.t('suitableLightText');
+    let tone = this.t('midTone');
+    if (brightness >= 200) tone = this.t('lightTone');
+    else if (brightness <= 90) tone = this.t('darkTone');
     const saveButton = document.getElementById('saveColor');
     const deleteButton = document.getElementById('deleteCurrentColor');
     if (saveButton) {
@@ -2451,10 +2581,10 @@ class PixelColorPicker {
       const isFull = Boolean(palette && palette.colors.length >= max);
       saveButton.disabled = inPalette || isFull;
       saveButton.title = inPalette
-        ? '当前色卡已有这个颜色'
+        ? this.t('duplicateColor')
         : isFull
-          ? `色卡已满 ${max}/${max}`
-          : '保存到色卡';
+          ? `${this.t('colorFull')} ${max}/${max}`
+          : this.t('saveCurrentColor');
     }
     if (saveButton) {
       const canSaveAnywhere = this.palettes.some((item) => {
@@ -2462,19 +2592,23 @@ class PixelColorPicker {
         return item.colors.length < targetMax;
       });
       saveButton.disabled = !canSaveAnywhere;
-      saveButton.title = canSaveAnywhere ? '选择色卡保存' : '没有可保存的色卡';
+      saveButton.title = canSaveAnywhere
+        ? (this.getLanguage() === 'en' ? 'Choose a palette to save' : '选择色卡保存')
+        : (this.getLanguage() === 'en' ? 'No palette can save this color' : '没有可保存的色卡');
     }
     if (deleteButton) {
       deleteButton.disabled = !inPalette;
-      deleteButton.title = inPalette ? '从当前色卡删除这个颜色' : '当前色卡没有这个颜色';
+      deleteButton.title = inPalette
+        ? (this.getLanguage() === 'en' ? 'Delete this color from current palette' : '从当前色卡删除这个颜色')
+        : this.t('deleteCurrentColor');
     }
     const max = palette?.maxColors || this.maxColorsPerPalette;
     const isFull = Boolean(palette && palette.colors.length >= max);
     const source = inPalette
-      ? `已在 ${palette?.name || '当前色卡'}`
+      ? (this.getLanguage() === 'en' ? `In ${palette?.name || 'current palette'}` : `已在 ${palette?.name || '当前色卡'}`)
       : isFull
-        ? `色卡已满 ${max}/${max}`
-        : '可保存到当前色卡';
+        ? `${this.t('colorFull')} ${max}/${max}`
+        : this.t('canSaveToPalette');
     status.textContent = [source, note, textColor, tone].filter(Boolean).join(' · ');
     status.classList.toggle('saved', inPalette);
     status.classList.toggle('warning', !inPalette && isFull);
@@ -2488,19 +2622,19 @@ class PixelColorPicker {
 
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL NOTE',
-      title: '颜色备注',
-      message: `${color.hex} 的小标签`,
+      title: this.t('colorNote'),
+      message: this.getLanguage() === 'en' ? `Small label for ${color.hex}` : `${color.hex} 的小标签`,
       previewColor: color.hex,
       input: {
-        label: '备注',
+        label: this.t('note'),
         value: color.note || '',
-        placeholder: '例如：主按钮 / 背景色',
-        hint: '留空并保存会清空备注'
+        placeholder: this.t('notePlaceholder'),
+        hint: this.t('noteHint')
       },
       actions: [
-        { id: 'confirm', label: '保存', tone: 'primary' },
-        { id: 'clear', label: '清空' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('save'), tone: 'primary' },
+        { id: 'clear', label: this.t('clear') },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action === 'cancel') return;
@@ -2508,7 +2642,7 @@ class PixelColorPicker {
     color.note = result.action === 'clear' ? '' : result.value.trim();
     await this.saveData();
     this.renderDetailView();
-    this.showNotification(color.note ? '备注已保存' : '备注已清空');
+    this.showNotification(color.note ? this.t('noteSaved') : this.t('noteCleared'));
   }
 
   async cycleColorSort() {
@@ -2546,17 +2680,17 @@ class PixelColorPicker {
 
     await this.saveData();
     this.renderDetailView();
-    this.showNotification(`已按${this.getColorSortLabel()}排序`);
+    this.showNotification(this.getLanguage() === 'en' ? `Sorted by ${this.getColorSortLabel()}` : `已按${this.getColorSortLabel()}排序`);
   }
 
   openExportMenu() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
     const summary = document.getElementById('exportSummary');
-    if (summary) summary.textContent = `${palette.name} · ${palette.colors.length} 色`;
+    if (summary) summary.textContent = `${palette.name} · ${palette.colors.length} ${this.getLanguage() === 'en' ? 'colors' : '色'}`;
     document.getElementById('exportOverlay').hidden = false;
   }
 
@@ -2567,7 +2701,7 @@ class PixelColorPicker {
   async copyCurrentPalette() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -2576,34 +2710,36 @@ class PixelColorPicker {
     const content = values.join(', ');
     const previewValues = values.slice(0, 5);
     const overflowText = values.length > previewValues.length
-      ? `<span class="copy-preview-more">另有 ${values.length - previewValues.length} 个颜色</span>`
+      ? `<span class="copy-preview-more">${this.getLanguage() === 'en' ? `${values.length - previewValues.length} more colors` : `另有 ${values.length - previewValues.length} 个颜色`}</span>`
       : '';
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL COPY',
-      title: '复制色卡',
-      message: `将按 ${formatLabel} 格式复制「${palette.name}」里的 ${palette.colors.length} 个颜色。`,
+      title: this.t('copyPalette'),
+      message: this.getLanguage() === 'en'
+        ? `Copy ${palette.colors.length} colors from "${palette.name}" as ${formatLabel}.`
+        : `将按 ${formatLabel} 格式复制「${palette.name}」里的 ${palette.colors.length} 个颜色。`,
       detailHtml: `
         <div class="copy-preview">
           <div class="copy-preview-head">
             <span>${formatLabel}</span>
-            <span>${palette.colors.length} 色</span>
+            <span>${palette.colors.length} ${this.getLanguage() === 'en' ? 'colors' : '色'}</span>
           </div>
           <code>${this.escapeHtml(previewValues.join(', '))}</code>
           ${overflowText}
         </div>
       `,
       actions: [
-        { id: 'confirm', label: '复制', tone: 'primary' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('copy'), tone: 'primary' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
 
     navigator.clipboard.writeText(content).then(() => {
-      this.showNotification(`已复制 ${palette.colors.length} 个颜色`);
+      this.showNotification(this.getLanguage() === 'en' ? `Copied ${palette.colors.length} colors` : `已复制 ${palette.colors.length} 个颜色`);
     }).catch((error) => {
       console.error('[Pixel Color Picker] Copy palette failed:', error);
-      this.showNotification('复制失败，请重试');
+      this.showNotification(this.t('copyFailed'));
     });
   }
 
@@ -2639,11 +2775,11 @@ class PixelColorPicker {
 
   getColorSortLabel() {
     return {
-      time: '时间',
-      hue: '色相',
-      brightness: '明度',
+      time: this.getLanguage() === 'en' ? 'Time' : '时间',
+      hue: this.getLanguage() === 'en' ? 'Hue' : '色相',
+      brightness: this.getLanguage() === 'en' ? 'Brightness' : '明度',
       hex: 'HEX'
-    }[this.colorSortMode] || '时间';
+    }[this.colorSortMode] || (this.getLanguage() === 'en' ? 'Time' : '时间');
   }
 
   async clearPalette() {
@@ -2651,18 +2787,20 @@ class PixelColorPicker {
     if (!palette || palette.colors.length === 0) return;
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL CLEAR',
-      title: '清空色卡',
-      message: `确定要清空「${palette.name}」里的 ${palette.colors.length} 个颜色吗？`,
+      title: this.getLanguage() === 'en' ? 'Clear palette' : '清空色卡',
+      message: this.getLanguage() === 'en'
+        ? `Clear ${palette.colors.length} colors from "${palette.name}"?`
+        : `确定要清空「${palette.name}」里的 ${palette.colors.length} 个颜色吗？`,
       actions: [
-        { id: 'confirm', label: '清空', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('clear'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
     palette.colors = [];
     await this.saveData();
     this.renderDetailView();
-    this.showNotification('已清空色卡');
+    this.showNotification(this.getLanguage() === 'en' ? 'Palette cleared' : '已清空色卡');
   }
 
   async createPalette() {
@@ -2700,17 +2838,19 @@ class PixelColorPicker {
 
   async deletePalette(id) {
     if (this.palettes.length <= 1) {
-      this.showNotification('至少保留一个色卡组');
+      this.showNotification(this.t('keepOnePalette'));
       return;
     }
     const palette = this.palettes.find((item) => item.id === id);
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL DELETE',
-      title: '删除色卡',
-      message: `确定要删除「${palette?.name || '这个色卡'}」吗？里面的颜色也会一起删除。`,
+      title: this.t('deletePaletteTitle'),
+      message: this.getLanguage() === 'en'
+        ? `Delete "${palette?.name || 'this palette'}" and all colors inside?`
+        : `确定要删除「${palette?.name || '这个色卡'}」吗？里面的颜色也会一起删除。`,
       actions: [
-        { id: 'confirm', label: '删除', tone: 'danger' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('delete'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
       ]
     });
     if (result.action !== 'confirm') return;
@@ -2722,7 +2862,7 @@ class PixelColorPicker {
 
     await this.saveData();
     this.showListView();
-    this.showNotification('已删除色卡');
+    this.showNotification(this.t('paletteDeleted'));
   }
 
   async deleteCurrentPalette() {
@@ -2734,25 +2874,25 @@ class PixelColorPicker {
     if (!palette) return;
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL RENAME',
-      title: '重命名色卡',
-      message: '换一个更好认的名字。',
+      title: this.t('renamePaletteTitle'),
+      message: this.t('renamePaletteMessage'),
       input: {
-        label: '名称',
+        label: this.t('paletteName'),
         value: palette.name,
-        placeholder: '色卡名称',
-        hint: '名称不能为空'
+        placeholder: this.t('paletteNamePlaceholder'),
+        hint: this.t('paletteNameRequired')
       },
       actions: [
-        { id: 'confirm', label: '保存', tone: 'primary' },
-        { id: 'cancel', label: '取消' }
+        { id: 'confirm', label: this.t('save'), tone: 'primary' },
+        { id: 'cancel', label: this.t('cancel') }
       ],
-      validate: (value) => value.trim() ? '' : '请输入色卡名称'
+      validate: (value) => value.trim() ? '' : this.t('enterPaletteName')
     });
     if (result.action !== 'confirm') return;
     palette.name = result.value.trim();
     await this.saveData();
     this.renderDetailView();
-    this.showNotification('已重命名');
+    this.showNotification(this.t('renamed'));
   }
 
   cycleSort() {
@@ -2765,7 +2905,7 @@ class PixelColorPicker {
   exportCSS() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -2780,13 +2920,13 @@ class PixelColorPicker {
     css += '}\n';
 
     this.downloadFile(css, 'palette.css', 'text/css');
-    this.showNotification('CSS 已导出');
+    this.showNotification(this.t('cssExported'));
   }
 
   exportSCSS() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -2800,13 +2940,13 @@ class PixelColorPicker {
     });
 
     this.downloadFile(scss, 'palette.scss', 'text/x-scss');
-    this.showNotification('SCSS 已导出');
+    this.showNotification(this.t('scssExported'));
   }
 
   exportJSON() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -2823,13 +2963,13 @@ class PixelColorPicker {
     };
 
     this.downloadFile(JSON.stringify(data, null, 2), 'palette.json', 'application/json');
-    this.showNotification('JSON 已导出');
+    this.showNotification(this.t('jsonExported'));
   }
 
   exportTailwind() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -2843,7 +2983,7 @@ class PixelColorPicker {
     code += '}\n';
 
     this.downloadFile(code, 'tailwind-colors.js', 'text/javascript');
-    this.showNotification('Tailwind 已导出');
+    this.showNotification(this.t('tailwindExported'));
   }
 
   importPaletteJSON() {
@@ -2861,18 +3001,20 @@ class PixelColorPicker {
         const imported = this.normalizeImportedPalette(data, file.name);
 
         if (imported.colors.length === 0) {
-          this.showNotification('没有可导入的颜色');
+          this.showNotification(this.t('noImportableColors'));
           return;
         }
 
         const result = await this.openPixelDialog({
           eyebrow: 'PIXEL IMPORT',
-          title: '导入色卡',
-          message: `从 ${file.name} 读取到「${imported.name}」。`,
+          title: this.t('importPalette'),
+          message: this.getLanguage() === 'en'
+            ? `Read "${imported.name}" from ${file.name}.`
+            : `从 ${file.name} 读取到「${imported.name}」。`,
           detailHtml: this.getImportPreviewHtml(imported),
           actions: [
-            { id: 'confirm', label: '导入', tone: 'primary' },
-            { id: 'cancel', label: '取消' }
+            { id: 'confirm', label: this.t('import'), tone: 'primary' },
+            { id: 'cancel', label: this.t('cancel') }
           ]
         });
         if (result.action !== 'confirm') return;
@@ -2890,10 +3032,10 @@ class PixelColorPicker {
         this.currentPaletteId = palette.id;
         await this.saveData();
         this.showDetailView(palette.id);
-        this.showNotification(`已导入并打开 ${palette.name}`);
+        this.showNotification(this.getLanguage() === 'en' ? `Imported and opened ${palette.name}` : `已导入并打开 ${palette.name}`);
       } catch (error) {
         console.error('[Pixel Color Picker] Import failed:', error);
-        this.showNotification('导入失败：JSON 格式错误');
+        this.showNotification(this.t('jsonImportFailed'));
       }
     };
 
@@ -2961,14 +3103,14 @@ class PixelColorPicker {
       <span class="import-preview-swatch" style="background:${color.hex}" title="${color.hex}"></span>
     `).join('');
     const moreText = imported.colors.length > 5
-      ? `<span class="import-preview-more">另有 ${imported.colors.length - 5} 色</span>`
+      ? `<span class="import-preview-more">${this.getLanguage() === 'en' ? `${imported.colors.length - 5} more colors` : `另有 ${imported.colors.length - 5} 色`}</span>`
       : '';
 
     return `
       <div class="import-preview">
-        <div class="import-preview-row"><span>可导入</span><strong>${imported.colors.length} 色</strong></div>
-        <div class="import-preview-row"><span>原始</span><strong>${imported.rawCount} 项</strong></div>
-        <div class="import-preview-row"><span>忽略</span><strong>${imported.duplicateCount} 重复 · ${imported.invalidCount} 无效</strong></div>
+        <div class="import-preview-row"><span>${this.getLanguage() === 'en' ? 'Importable' : '可导入'}</span><strong>${imported.colors.length} ${this.getLanguage() === 'en' ? 'colors' : '色'}</strong></div>
+        <div class="import-preview-row"><span>${this.getLanguage() === 'en' ? 'Raw' : '原始'}</span><strong>${imported.rawCount} ${this.getLanguage() === 'en' ? 'items' : '项'}</strong></div>
+        <div class="import-preview-row"><span>${this.getLanguage() === 'en' ? 'Ignored' : '忽略'}</span><strong>${imported.duplicateCount} ${this.getLanguage() === 'en' ? 'duplicate' : '重复'} · ${imported.invalidCount} ${this.getLanguage() === 'en' ? 'invalid' : '无效'}</strong></div>
         <div class="import-preview-swatches">${swatches}${moreText}</div>
       </div>
     `;
@@ -2976,15 +3118,17 @@ class PixelColorPicker {
 
   getImportedPaletteName(data, filename) {
     const rawName = typeof data?.name === 'string' ? data.name.trim() : '';
-    if (rawName) return `${rawName} 导入`;
+    if (rawName) return this.getLanguage() === 'en' ? `${rawName} Import` : `${rawName} 导入`;
     const fileBase = String(filename || '').replace(/\.json$/i, '').trim();
-    return fileBase ? `${fileBase} 导入` : '导入色卡';
+    return fileBase
+      ? (this.getLanguage() === 'en' ? `${fileBase} Import` : `${fileBase} 导入`)
+      : this.t('importPalette');
   }
 
   exportPNG() {
     const palette = this.getCurrentPalette();
     if (!palette || palette.colors.length === 0) {
-      this.showNotification('色卡为空');
+      this.showNotification(this.t('emptyPalette'));
       return;
     }
 
@@ -3016,9 +3160,9 @@ class PixelColorPicker {
     chrome.downloads.download({ url: dataUrl, filename: 'palette.png', saveAs: true }, () => {
       if (chrome.runtime.lastError) {
         console.error('[exportPNG] download failed:', chrome.runtime.lastError);
-        this.showNotification('导出失败，请重试');
+        this.showNotification(this.t('exportFailed'));
       } else {
-        this.showNotification('PNG 已导出');
+        this.showNotification(this.t('pngExported'));
       }
     });
   }
@@ -3089,7 +3233,7 @@ class PixelColorPicker {
         button.textContent = '⧉';
         button.classList.remove('copied');
       }, 1500);
-      this.showNotification('已复制');
+      this.showNotification(this.t('copied'));
     });
   }
 
@@ -3101,18 +3245,18 @@ class PixelColorPicker {
       setTimeout(() => {
         swatch.classList.remove('copied');
       }, 650);
-      this.showNotification(`已复制 ${this.getDefaultFormatLabel()}`);
+      this.showNotification(this.getLanguage() === 'en' ? `Copied ${this.getDefaultFormatLabel()}` : `已复制 ${this.getDefaultFormatLabel()}`);
     });
   }
 
   copyColorValue(color, message = null) {
     if (!color?.hex) return Promise.resolve();
     return navigator.clipboard.writeText(this.formatColorForCopy(color)).then(() => {
-      this.showNotification(message || `已取色并复制 ${this.getDefaultFormatLabel()}`);
+      this.showNotification(message || (this.getLanguage() === 'en' ? `Picked and copied ${this.getDefaultFormatLabel()}` : `已取色并复制 ${this.getDefaultFormatLabel()}`));
     });
   }
 
-  copyTextValue(text, message = '已复制') {
+  copyTextValue(text, message = this.t('copied')) {
     if (!text) return Promise.resolve();
     return navigator.clipboard.writeText(text).then(() => {
       this.showNotification(message);
@@ -3163,6 +3307,84 @@ class PixelColorPicker {
     else if (max === g) hue = (b - r) / diff + 2;
     else hue = (r - g) / diff + 4;
     return Math.round(hue * 60 + (hue < 0 ? 360 : 0));
+  }
+
+  getSaturation(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const lightness = (max + min) / 2;
+    const diff = max - min;
+    if (diff === 0) return 0;
+    return Math.round((diff / (1 - Math.abs(2 * lightness - 1))) * 100);
+  }
+
+  getAutoColorName(color) {
+    if (!color || color.r == null || color.g == null || color.b == null) return '';
+
+    const language = this.getLanguage();
+    const isEnglish = language === 'en';
+    const hue = this.getHue(color.r, color.g, color.b);
+    const brightness = this.getBrightness(color.r, color.g, color.b);
+    const saturation = this.getSaturation(color.r, color.g, color.b);
+
+    if (saturation < 10) {
+      if (brightness >= 235) return isEnglish ? 'White' : '\u767d\u8272';
+      if (brightness <= 35) return isEnglish ? 'Black' : '\u9ed1\u8272';
+      if (brightness >= 175) return isEnglish ? 'Light Gray' : '\u6d45\u7070';
+      if (brightness <= 85) return isEnglish ? 'Dark Gray' : '\u6df1\u7070';
+      return isEnglish ? 'Gray' : '\u7070\u8272';
+    }
+
+    const family = this.getAutoColorFamily(hue, isEnglish);
+    const tone = this.getAutoColorTone(brightness, saturation, isEnglish);
+
+    if (isEnglish) return tone ? `${tone} ${family}` : family;
+    return `${tone}${family}`;
+  }
+
+  getAutoColorFamily(hue, isEnglish) {
+    const families = isEnglish
+      ? [
+        [15, 'Red'],
+        [45, 'Orange'],
+        [70, 'Yellow'],
+        [95, 'Lime'],
+        [155, 'Green'],
+        [190, 'Cyan'],
+        [245, 'Blue'],
+        [285, 'Purple'],
+        [330, 'Pink'],
+        [361, 'Red']
+      ]
+      : [
+        [15, '\u7ea2\u8272'],
+        [45, '\u6a59\u8272'],
+        [70, '\u9ec4\u8272'],
+        [95, '\u9ec4\u7eff\u8272'],
+        [155, '\u7eff\u8272'],
+        [190, '\u9752\u8272'],
+        [245, '\u84dd\u8272'],
+        [285, '\u7d2b\u8272'],
+        [330, '\u7c89\u8272'],
+        [361, '\u7ea2\u8272']
+      ];
+    return families.find(([limit]) => hue < limit)?.[1] || families[families.length - 1][1];
+  }
+
+  getAutoColorTone(brightness, saturation, isEnglish) {
+    if (brightness >= 210) return isEnglish ? 'Light' : '\u6d45';
+    if (brightness <= 70) return isEnglish ? 'Dark' : '\u6df1';
+    if (saturation >= 70 && brightness >= 150) return isEnglish ? 'Bright' : '\u4eae';
+    if (saturation <= 28) return isEnglish ? 'Soft' : '\u67d4';
+    return '';
+  }
+
+  getColorNoteForSave(color) {
+    const note = String(color?.note || '').trim();
+    return note || this.getAutoColorName(color);
   }
 
   getCssVariableName(note, index) {
@@ -3223,8 +3445,8 @@ class PixelColorPicker {
   }
 
   getNotificationTone(message) {
-    if (/失败|错误|不支持|已满/.test(message)) return 'danger';
-    if (/为空|已存在|至少|没有可导入/.test(message)) return 'warning';
+    if (/失败|错误|不支持|已满|failed|invalid|not support|full/i.test(message)) return 'danger';
+    if (/为空|已存在|至少|没有可导入|empty|exists|at least|no importable/i.test(message)) return 'warning';
     return 'success';
   }
 
