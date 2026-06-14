@@ -268,6 +268,40 @@ async function licenseStatus(request, env) {
   });
 }
 
+async function createManualLicense(request, env) {
+  const body = await readJson(request);
+  const adminKey = String(body.adminKey || '').trim();
+  if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const email = normalizeEmail(body.email);
+  if (!isEmail(email)) {
+    return json({ error: 'A valid email is required' }, { status: 400 });
+  }
+
+  const note = String(body.note || 'manual-wechat').trim().slice(0, 120);
+  const licenseKey = generateLicenseKey();
+  const now = new Date().toISOString();
+  const orderId = `manual-${Date.now()}`;
+
+  await env.DB.prepare(`
+    INSERT INTO licenses
+      (license_key, email, status, paypal_order_id, paypal_capture_id, created_at)
+    VALUES (?, ?, 'active', ?, ?, ?)
+  `).bind(licenseKey, email, orderId, note, now).run();
+
+  const emailResult = await sendLicenseEmail(env, email, licenseKey);
+
+  return json({
+    ok: true,
+    email,
+    licenseKey,
+    emailSent: emailResult.sent,
+    emailError: emailResult.error || ''
+  });
+}
+
 async function sendLicenseEmail(env, email, licenseKey) {
   if (!env.RESEND_API_KEY) {
     return { sent: false, error: 'RESEND_API_KEY is not configured' };
@@ -330,6 +364,9 @@ export default {
       }
       if (url.pathname === '/api/license/status' && request.method === 'GET') {
         return licenseStatus(request, env);
+      }
+      if (url.pathname === '/api/license/manual' && request.method === 'POST') {
+        return createManualLicense(request, env);
       }
 
       return env.ASSETS.fetch(request);

@@ -351,7 +351,7 @@ class OptionsManager {
   }
 
   openUpgradePage() {
-    const url = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const url = this.getUpgradeUrl();
     if (!url) {
       this.showNotification(this.t('purchaseUrlMissing'));
       return;
@@ -361,6 +361,12 @@ class OptionsManager {
 
   getLicenseApiBase() {
     return (this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev').replace(/\/+$/, '');
+  }
+
+  getUpgradeUrl() {
+    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const separator = rawUrl.includes('?') ? '&' : '?';
+    return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
   }
 
   updateProStatus() {

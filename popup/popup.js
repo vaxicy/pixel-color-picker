@@ -206,7 +206,7 @@ class PixelColorPicker {
     });
 
     if (result.action !== 'upgrade') return;
-    const url = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const url = this.getUpgradeUrl();
     if (!url) {
       this.showNotification(this.t('purchaseUrlMissing'));
       return;
@@ -216,6 +216,12 @@ class PixelColorPicker {
 
   getLicenseApiBase() {
     return (this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev').replace(/\/+$/, '');
+  }
+
+  getUpgradeUrl() {
+    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const separator = rawUrl.includes('?') ? '&' : '?';
+    return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
   }
 
   applyI18n() {
