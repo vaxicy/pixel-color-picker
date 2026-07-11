@@ -51,8 +51,6 @@
   <main>
     <h1 id="title">Completing payment...</h1>
     <p id="message">Please keep this page open while PayPal confirms your order.</p>
-    <code id="license" hidden></code>
-    <p class="hint" id="hint" hidden></p>
   </main>
 
   <script>
@@ -82,16 +80,10 @@
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to capture the order');
 
-        title.textContent = 'Pro license created';
+        title.textContent = 'Payment received';
         message.textContent = data.emailSent
-          ? `We sent your license to ${data.email}. You can also copy it here:`
-          : `License created for ${data.email}, but email was not sent: ${data.emailError || 'unknown email error'}. Copy and save it here:`;
-        license.hidden = false;
-        license.textContent = data.licenseKey;
-        hint.hidden = false;
-        hint.textContent = data.emailSent
-          ? 'If the email is not in your inbox, please check your Spam or Junk folder. Copy and save this license key before closing this page.'
-          : 'Copy and save this license key before closing this page.';
+          ? `We sent a confirmation to ${data.email}. Now open the extension, go to PRO, enter this email, and click Unlock Pro.`
+          : `Payment received for ${data.email}. Open the extension, go to PRO, enter this email, and click Unlock Pro.`;
       } catch (error) {
         fail(error.message);
       }

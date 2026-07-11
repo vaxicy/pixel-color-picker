@@ -7,6 +7,7 @@ class OptionsManager {
     this.activePickedTarget = '';
     this.freePaletteLimit = 5;
     this.freeThemePresets = ['pink', 'green', 'night', 'purple'];
+    this.freeProUntil = new Date('2026-07-25T23:59:59').getTime();
     this.init();
   }
 
@@ -265,7 +266,7 @@ class OptionsManager {
     document.getElementById('resetSettings').addEventListener('click', () => this.handleReset());
     document.getElementById('backToPopup').addEventListener('click', () => window.close());
     document.getElementById('upgradePro')?.addEventListener('click', () => this.openUpgradePage());
-    document.getElementById('activateLicense')?.addEventListener('click', () => this.activateLicense());
+    document.getElementById('unlockPro')?.addEventListener('click', () => this.unlockByEmail());
     document.getElementById('useLastPicked').addEventListener('click', () => this.useLastPickedForTheme());
     document.getElementById('closePickedTarget').addEventListener('click', () => this.closePickedTargetPanel());
     document.getElementById('pickedTargetPanel').addEventListener('click', (event) => {
@@ -339,7 +340,17 @@ class OptionsManager {
   }
 
   isPro() {
-    return this.settings?.licenseStatus === 'pro';
+    return this.settings?.licenseStatus === 'pro' || Date.now() <= this.freeProUntil;
+  }
+
+  isFreeProPeriod() {
+    return Date.now() <= this.freeProUntil;
+  }
+
+  getFreeProRemaining() {
+    const ms = Math.max(0, this.freeProUntil - Date.now());
+    const totalHours = Math.floor(ms / (60 * 60 * 1000));
+    return { days: Math.floor(totalHours / 24), hours: totalHours % 24 };
   }
 
   isFreeThemePreset(preset) {
@@ -364,7 +375,7 @@ class OptionsManager {
   }
 
   getUpgradeUrl() {
-    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/v2-upgrade`;
     const separator = rawUrl.includes('?') ? '&' : '?';
     return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
   }
@@ -373,15 +384,69 @@ class OptionsManager {
     const title = document.getElementById('proStatusTitle');
     const hint = document.getElementById('proStatusHint');
     const button = document.getElementById('upgradePro');
-    if (title) title.textContent = this.isPro() ? this.t('proVersion') : this.t('freeVersion');
+    const freePeriod = this.isFreeProPeriod();
+    if (title) {
+      title.textContent = freePeriod
+        ? this.t('limitedFree')
+        : (this.isPro() ? this.t('proVersion') : this.t('freeVersion'));
+    }
     if (hint) {
-      hint.textContent = this.isPro()
-        ? `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`
-        : this.t('freePaletteLimit');
+      if (freePeriod) {
+        const { days, hours } = this.getFreeProRemaining();
+        hint.textContent = this.t('limitedFreeCountdown').replace('{d}', days).replace('{h}', hours);
+      } else if (this.isPro()) {
+        hint.textContent = `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`;
+      } else {
+        hint.textContent = this.t('freePaletteLimit');
+      }
     }
     if (button) {
-      button.textContent = this.isPro() ? this.t('pro') : this.t('upgradePro');
-      button.disabled = this.isPro();
+      // 限时免费期间隐藏购买入口，结束后（未解锁时）显示
+      button.style.display = (freePeriod || this.isPro()) ? 'none' : '';
+    }
+    const unlockCard = document.getElementById('proUnlockCard');
+    if (unlockCard) {
+      unlockCard.style.display = (!freePeriod && !this.isPro()) ? '' : 'none';
+    }
+  }
+
+  async unlockByEmail() {
+    const input = document.getElementById('paymentEmail');
+    const button = document.getElementById('unlockPro');
+    const email = String(input?.value || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.showNotification(this.t('paymentEmailRequired'));
+      return;
+    }
+
+    const originalText = button?.textContent || this.t('unlockPro');
+    if (button) {
+      button.disabled = true;
+      button.textContent = this.t('unlockingPro');
+    }
+
+    try {
+      const response = await fetch(`${this.getLicenseApiBase()}/api/license/status?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
+        throw new Error(data.error || this.t('unlockNotFound'));
+      }
+
+      this.settings = {
+        ...this.settings,
+        licenseStatus: 'pro',
+        licenseEmail: data.licenseEmail || email
+      };
+      await this.saveSettings();
+      this.updateUI();
+      this.showNotification(this.t('proUnlocked'));
+    } catch (error) {
+      this.showNotification(error.message || this.t('unlockFailed'));
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     }
   }
 
@@ -402,9 +467,6 @@ class OptionsManager {
         '#behavior .section-head h2': 'behaviorSettings',
         '#theme .section-head h2': 'themeAppearance',
         '#pro .section-head h2': 'pro',
-        '#licenseKeyLabel': 'licenseKey',
-        '#licenseKeyHint': 'licenseKeyHint',
-        '#activateLicense': 'activatePro',
         '#language .section-head h2': 'languageSettings',
         '#data .section-head h2': 'dataManagement',
         '#about .section-head h2': 'about',
@@ -444,13 +506,16 @@ class OptionsManager {
         '#viewHistory': 'viewChangelog',
         '#saveSettings': 'saveSettings',
         '#resetSettings': 'reset',
-        '#backToPopup': 'close'
+        '#backToPopup': 'close',
+        '#paymentEmailLabel': 'paymentEmail',
+        '#paymentEmailHint': 'paymentEmailHint',
+        '#unlockPro': 'unlockPro'
       },
       title: {
         '.use-picked-btn': 'usePickedFill'
       },
       placeholder: {
-        '#licenseKeyInput': 'licenseKeyPlaceholder'
+        '#paymentEmail': 'paymentEmailPlaceholder'
       },
       aria: {
         '.settings-nav': 'settingsGroup',
@@ -463,60 +528,7 @@ class OptionsManager {
     document.querySelector('#pickAction option[value="copy-save"]').textContent = this.t('copySave');
     this.updateThemePresetLabels('themePreset');
     this.updateProStatus();
-    this.updateLicenseInput();
     this.updateSectionNumbers();
-  }
-
-  updateLicenseInput() {
-    const input = document.getElementById('licenseKeyInput');
-    if (input && document.activeElement !== input) {
-      input.value = this.settings.licenseKey || '';
-    }
-  }
-
-  async activateLicense() {
-    const button = document.getElementById('activateLicense');
-    const input = document.getElementById('licenseKeyInput');
-    const licenseKey = String(input?.value || '').trim().toUpperCase();
-    if (!licenseKey) {
-      this.showNotification(this.t('licenseKeyRequired'));
-      return;
-    }
-
-    const originalText = button?.textContent || this.t('activatePro');
-    if (button) {
-      button.disabled = true;
-      button.textContent = this.t('activatingLicense');
-    }
-
-    try {
-      const response = await fetch(`${this.getLicenseApiBase()}/api/license/activate`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ licenseKey })
-      });
-      const data = await response.json();
-      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
-        throw new Error(data.error || this.t('licenseInvalid'));
-      }
-
-      this.settings = {
-        ...this.settings,
-        licenseStatus: 'pro',
-        licenseEmail: data.licenseEmail || '',
-        licenseKey: data.licenseKey || licenseKey
-      };
-      await this.saveSettings();
-      this.updateUI();
-      this.showNotification(this.t('licenseActivated'));
-    } catch (error) {
-      this.showNotification(error.message || this.t('licenseActivationFailed'));
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = originalText;
-      }
-    }
   }
 
   updateSectionNumbers() {

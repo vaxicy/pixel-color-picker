@@ -132,23 +132,25 @@ After the Cloudflare Worker URL is deployed, set the extension purchase URL to:
 https://pixel-color-picker-pro.<your-account>.workers.dev/upgrade.html
 ```
 
-## Manual WeChat License Delivery
+## Internal Manual License Delivery
 
-For manual WeChat payments, create an admin key once:
+The public checkout page only shows PayPal so customers get automatic license delivery. Keep this internal fallback for admin-issued licenses, refunds, test purchases, or one-off support cases.
+
+Create an admin key once:
 
 ```powershell
 npx wrangler secret put ADMIN_KEY
 npx wrangler deploy
 ```
 
-After a buyer emails the payment screenshot, generate and email a license:
+Generate and email a license:
 
 ```powershell
 cd C:\Users\16704\Desktop\color-picker\cloudflare
-.\manual-license.ps1 -Email buyer@example.com -Note "wechat-39"
+.\manual-license.ps1 -Email buyer@example.com -Note "manual-support"
 ```
 
-The script returns the license key and whether the email was sent. If email delivery fails, copy the license key from the terminal and send it manually.
+The script returns the license key and whether the email was sent. If email delivery fails, copy the license key from the terminal and send it manually. Do not link this manual flow from customer-facing pages unless a fully automated payment method is added later.
 
 ## Important Safety Notes
 

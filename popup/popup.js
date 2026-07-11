@@ -22,6 +22,7 @@ class PixelColorPicker {
     this.pickConfirmTimer = null;
     this.freePaletteLimit = 5;
     this.freeThemePresets = ['pink', 'green', 'night', 'purple'];
+    this.freeProUntil = new Date('2026-07-25T23:59:59').getTime();
 
     this.init();
   }
@@ -173,7 +174,17 @@ class PixelColorPicker {
   }
 
   isPro() {
-    return this.settings?.licenseStatus === 'pro';
+    return this.settings?.licenseStatus === 'pro' || Date.now() <= this.freeProUntil;
+  }
+
+  isFreeProPeriod() {
+    return Date.now() <= this.freeProUntil;
+  }
+
+  getFreeProRemaining() {
+    const ms = Math.max(0, this.freeProUntil - Date.now());
+    const totalHours = Math.floor(ms / (60 * 60 * 1000));
+    return { days: Math.floor(totalHours / 24), hours: totalHours % 24 };
   }
 
   getLicenseLabel() {
@@ -219,7 +230,7 @@ class PixelColorPicker {
   }
 
   getUpgradeUrl() {
-    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/upgrade.html`;
+    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/v2-upgrade`;
     const separator = rawUrl.includes('?') ? '&' : '?';
     return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
   }
@@ -267,13 +278,14 @@ class PixelColorPicker {
         '#pixelDialogTitle': 'prompt',
         '#pixelDialogLabel': 'content',
         '#settingsTitle': 'setup',
-        '.popup-pro-activation label': 'licenseKey',
-        '#popupActivateLicense': 'activatePro',
         '.settings-list .settings-group-title:nth-of-type(1)': 'behavior',
         '#popupMaxColors': 'paletteLimit',
         '#savePopupSettings': 'save',
         '#resetPopupSettings': 'reset',
         '#settingsPreviewButton': 'buttonColor',
+        '#popupPaymentEmailLabel': 'paymentEmail',
+        '#popupPaymentEmailHint': 'paymentEmailHint',
+        '#popupUnlockPro': 'unlockPro',
         '.settings-preview > small': 'previewBeforeSave'
       },
       title: {
@@ -312,7 +324,7 @@ class PixelColorPicker {
       placeholder: {
         '#paletteSearch': 'searchPalettePlaceholder',
         '#historySearch': 'searchHistoryPlaceholder',
-        '#popupLicenseKeyInput': 'licenseKeyPlaceholder'
+        '#popupPaymentEmail': 'paymentEmailPlaceholder'
       }
     });
 
@@ -348,15 +360,7 @@ class PixelColorPicker {
       if (groupTitles[index]) groupTitles[index].textContent = this.t(key);
     });
     this.updatePopupProStatus();
-    this.updatePopupLicenseInput();
     this.updatePaletteFilterLabels();
-  }
-
-  updatePopupLicenseInput() {
-    const input = document.getElementById('popupLicenseKeyInput');
-    if (input && document.activeElement !== input) {
-      input.value = this.settings.licenseKey || '';
-    }
   }
 
   updateThemePresetLabels(selectId) {
@@ -391,15 +395,74 @@ class PixelColorPicker {
     const title = document.getElementById('popupProStatusTitle');
     const hint = document.getElementById('popupProStatusHint');
     const button = document.getElementById('popupUpgradePro');
-    if (title) title.textContent = this.getLicenseLabel();
+    const freePeriod = this.isFreeProPeriod();
+    if (title) {
+      title.textContent = freePeriod
+        ? this.t('limitedFree')
+        : (this.isPro() ? this.t('proVersion') : this.t('freeVersion'));
+    }
     if (hint) {
-      hint.textContent = this.isPro()
-        ? `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`
-        : this.t('freePaletteLimit');
+      if (freePeriod) {
+        const { days, hours } = this.getFreeProRemaining();
+        hint.textContent = this.t('limitedFreeCountdown').replace('{d}', days).replace('{h}', hours);
+      } else if (this.isPro()) {
+        hint.textContent = `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`;
+      } else {
+        hint.textContent = this.t('freePaletteLimit');
+      }
     }
     if (button) {
-      button.textContent = this.isPro() ? this.t('pro') : this.t('upgradePro');
-      button.disabled = this.isPro();
+      // 限时免费期间隐藏购买入口，结束后（未解锁时）显示
+      button.style.display = (freePeriod || this.isPro()) ? 'none' : '';
+    }
+    const unlockRow = document.getElementById('popupProUnlockRow');
+    if (unlockRow) {
+      unlockRow.style.display = (!freePeriod && !this.isPro()) ? '' : 'none';
+    }
+  }
+
+  async unlockByEmail() {
+    const input = document.getElementById('popupPaymentEmail');
+    const button = document.getElementById('popupUnlockPro');
+    const email = String(input?.value || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.showNotification(this.t('paymentEmailRequired'));
+      return;
+    }
+
+    const originalText = button?.textContent || this.t('unlockPro');
+    if (button) {
+      button.disabled = true;
+      button.textContent = this.t('unlockingPro');
+    }
+
+    try {
+      const response = await fetch(`${this.getLicenseApiBase()}/api/license/status?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
+        throw new Error(data.error || this.t('unlockNotFound'));
+      }
+
+      this.settings = {
+        ...this.settings,
+        licenseStatus: 'pro',
+        licenseEmail: data.licenseEmail || email
+      };
+      await new Promise((resolve) => {
+        chrome.storage.sync.set({ settings: this.settings }, resolve);
+      });
+
+      this.updatePopupProStatus();
+      this.updateThemePresetLabels('popupThemePreset');
+      this.applyI18n();
+      this.showNotification(this.t('proUnlocked'));
+    } catch (error) {
+      this.showNotification(error.message || this.t('unlockFailed'));
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     }
   }
 
@@ -1012,7 +1075,7 @@ class PixelColorPicker {
     document.getElementById('savePopupSettings').addEventListener('click', () => this.savePopupSettings());
     document.getElementById('resetPopupSettings').addEventListener('click', () => this.resetPopupSettings());
     document.getElementById('popupUpgradePro')?.addEventListener('click', () => this.showProUpgradeDialog());
-    document.getElementById('popupActivateLicense')?.addEventListener('click', () => this.activateLicenseFromPopup());
+    document.getElementById('popupUnlockPro')?.addEventListener('click', () => this.unlockByEmail());
     document.getElementById('exportAllData').addEventListener('click', () => this.exportAllData());
     document.getElementById('importAllData').addEventListener('click', () => this.importAllData());
     document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
@@ -1538,7 +1601,6 @@ class PixelColorPicker {
     this.syncSettingsColorLabels();
     this.updatePopupProStatus();
     this.updateThemePresetLabels('popupThemePreset');
-    this.updatePopupLicenseInput();
     this.updateSettingsPreview();
     this.applyI18n();
     document.getElementById('settingsOverlay').hidden = false;
@@ -1797,58 +1859,6 @@ class PixelColorPicker {
     document.getElementById('popupBgColor').value = colors.bgColor;
     document.getElementById('popupPanelColor').value = colors.panelColor;
     this.syncSettingsColorLabels();
-  }
-
-  async activateLicenseFromPopup() {
-    const input = document.getElementById('popupLicenseKeyInput');
-    const button = document.getElementById('popupActivateLicense');
-    const licenseKey = String(input?.value || '').trim().toUpperCase();
-    if (!licenseKey) {
-      this.showNotification(this.t('licenseKeyRequired'));
-      return;
-    }
-
-    const originalText = button?.textContent || this.t('activatePro');
-    if (button) {
-      button.disabled = true;
-      button.textContent = this.t('activatingLicense');
-    }
-
-    try {
-      const response = await fetch(`${this.getLicenseApiBase()}/api/license/activate`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ licenseKey })
-      });
-      const data = await response.json();
-      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
-        throw new Error(data.error || this.t('licenseInvalid'));
-      }
-
-      this.settings = {
-        ...this.settings,
-        licenseStatus: 'pro',
-        licenseEmail: data.licenseEmail || '',
-        licenseKey: data.licenseKey || licenseKey
-      };
-
-      await new Promise((resolve) => {
-        chrome.storage.sync.set({ settings: this.settings }, resolve);
-      });
-
-      this.updatePopupProStatus();
-      this.updatePopupLicenseInput();
-      this.updateThemePresetLabels('popupThemePreset');
-      this.applyI18n();
-      this.showNotification(this.t('licenseActivated'));
-    } catch (error) {
-      this.showNotification(error.message || this.t('licenseActivationFailed'));
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = originalText;
-      }
-    }
   }
 
   async savePopupSettings() {

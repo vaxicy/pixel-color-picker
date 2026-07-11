@@ -94,60 +94,12 @@
       line-height: 1.7;
     }
 
-    .method-picker {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .method-choice {
-      display: grid;
-      gap: 8px;
-      min-height: 108px;
-      padding: 16px;
-      border: 2px solid var(--line);
-      background: var(--panel);
-      color: var(--ink);
-      text-align: left;
-      cursor: pointer;
-      box-shadow: 3px 3px 0 rgba(51, 45, 54, 0.12);
-    }
-
-    .method-choice.is-active {
-      background: var(--cream);
-      box-shadow: inset 3px 3px 0 rgba(51, 45, 54, 0.10);
-    }
-
-    .method-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .method-price {
-      width: fit-content;
-      padding: 5px 8px;
-      border: 2px solid var(--line);
-      background: white;
-      font-weight: 700;
-    }
-
-    .method-desc {
-      color: var(--soft);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
     .payment-panel {
-      display: none;
+      display: grid;
       gap: 14px;
       padding: 18px;
       border: 2px solid var(--line);
       background: var(--panel);
-    }
-
-    .payment-panel.is-active {
-      display: grid;
     }
 
     .panel-head {
@@ -172,31 +124,10 @@
       font-weight: 700;
     }
 
-    .panel-copy,
-    .manual-note {
+    .panel-copy {
       margin: 0;
       color: var(--soft);
       line-height: 1.65;
-    }
-
-    .wechat-content {
-      display: grid;
-      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .wechat-qr {
-      display: block;
-      width: 100%;
-      border: 2px solid var(--line);
-      background: #09c46b;
-    }
-
-    .email-link {
-      color: var(--ink);
-      font-weight: 700;
-      word-break: break-all;
     }
 
     label {
@@ -237,16 +168,20 @@
       white-space: pre-wrap;
     }
 
-    @media (max-width: 760px) {
-      .method-picker,
-      .wechat-content {
-        grid-template-columns: 1fr;
-      }
+    .limited-free-banner {
+      padding: 10px 24px;
+      background: var(--mint);
+      color: var(--ink);
+      font-weight: 700;
+      border-bottom: 3px solid var(--line);
     }
+
   </style>
 </head>
 <body>
   <main>
+    <div class="limited-free-banner" id="limitedFreeBanner" hidden></div>
+    <!-- V2-DEPLOY-2026-07-12 -->
     <header>
       <h1>Pixel Color Picker Pro</h1>
       <p data-i18n="hero">Unlock unlimited palettes, Pro themes, custom themes, and future advanced tools.</p>
@@ -262,20 +197,7 @@
         </ul>
       </div>
 
-      <div class="method-picker" aria-label="Payment method">
-        <button class="method-choice is-active" type="button" data-method="paypal">
-          <span class="method-title" data-i18n="paypalTitle">PayPal</span>
-          <span class="method-price">$9.99 USD</span>
-          <span class="method-desc" data-i18n="paypalChoice">Automatic license delivery</span>
-        </button>
-        <button class="method-choice" type="button" data-method="wechat">
-          <span class="method-title" data-i18n="wechatTitle">WeChat Pay</span>
-          <span class="method-price">¥39 CNY</span>
-          <span class="method-desc" data-i18n="wechatChoice">Manual license delivery</span>
-        </button>
-      </div>
-
-      <div class="payment-panel is-active" id="paypalPanel">
+      <div class="payment-panel" id="paypalPanel">
         <div class="panel-head">
           <h2 data-i18n="paypalPanelTitle">Pay with PayPal</h2>
           <span class="price">$9.99 USD</span>
@@ -287,25 +209,6 @@
         </label>
         <button class="primary-action" id="buy" data-i18n="paypalButton">Buy Pro with PayPal</button>
         <div class="status" id="status"></div>
-      </div>
-
-      <div class="payment-panel" id="wechatPanel">
-        <div class="panel-head">
-          <h2 data-i18n="wechatPanelTitle">WeChat manual purchase</h2>
-          <span class="price">¥39 CNY</span>
-        </div>
-        <div class="wechat-content">
-          <img class="wechat-qr" src="/wechat-pay.png" alt="WeChat payment QR code" data-i18n-alt="wechatAlt">
-          <div>
-            <p class="manual-note" data-i18n="wechatCopy">Pay with WeChat and receive your license manually after confirmation.</p>
-            <p class="manual-note">
-              <span data-i18n="wechatNote1">After payment, email</span>
-              <a class="email-link" href="mailto:13036884004@163.com">13036884004@163.com</a>
-              <span data-i18n="wechatNote2"> with your payment screenshot and license email.</span>
-            </p>
-            <p class="manual-note" data-i18n="wechatNote3">Tip: put your email in the payment note. We will send a Pro license key after confirmation.</p>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -319,23 +222,14 @@
         hero: 'Unlock unlimited palettes, Pro themes, custom themes, and future advanced tools.',
         plan: 'Lifetime Pro',
         feature1: 'One-time payment',
-        feature2: 'License key delivered by email after payment',
-        feature3: 'Activate inside the extension settings',
-        paypalTitle: 'PayPal',
-        paypalChoice: 'Automatic license delivery',
+        feature2: 'Your payment email is recorded automatically',
+        feature3: 'Enter that email in the extension PRO settings to unlock',
         paypalPanelTitle: 'Pay with PayPal',
-        paypalCopy: 'Pay with PayPal and receive your license automatically.',
+        paypalCopy: 'After payment, open the extension PRO settings, enter your payment email, and click Unlock Pro. No license code needed.',
         emailLabel: 'Email for your license',
         paypalButton: 'Buy Pro with PayPal',
-        wechatTitle: 'WeChat Pay',
-        wechatChoice: 'Manual license delivery',
-        wechatPanelTitle: 'WeChat manual purchase',
-        wechatCopy: 'Pay with WeChat and receive your license manually after confirmation.',
-        wechatAlt: 'WeChat payment QR code',
-        wechatNote1: 'After payment, email',
-        wechatNote2: ' with your payment screenshot and license email.',
-        wechatNote3: 'Tip: put your email in the payment note. We will send a Pro license key after confirmation.',
-        emailRequired: 'Enter the email address that should receive the license.',
+        emailRequired: 'Enter the email address used for payment.',
+        limitedFreeBanner: 'Limited-time free · {d} days left'
         creatingOrder: 'Creating PayPal order...',
         createFailed: 'Unable to create order',
         approvalMissing: 'PayPal approval link missing.'
@@ -344,23 +238,14 @@
         hero: '解锁无限色卡、Pro 主题、自定义主题和后续高级功能。',
         plan: '终身 Pro',
         feature1: '一次买断',
-        feature2: '付款后获得 Pro 许可证码',
-        feature3: '在扩展设置页输入许可证码激活',
-        paypalTitle: 'PayPal',
-        paypalChoice: '自动生成许可证',
+        feature2: '付款后系统会自动记录你的邮箱',
+        feature3: '在扩展的 PRO 设置里输入该邮箱即可解锁',
         paypalPanelTitle: '使用 PayPal 购买',
-        paypalCopy: '适合海外用户。付款成功后系统会自动生成许可证码。',
-        emailLabel: '接收许可证的邮箱',
+        paypalCopy: '付款成功后，在扩展的 PRO 设置里输入付款邮箱，点击「解锁 Pro」即可，无需授权码。',
+        emailLabel: '付款邮箱',
         paypalButton: '使用 PayPal 购买 Pro',
-        wechatTitle: '微信支付',
-        wechatChoice: '人工确认发码',
-        wechatPanelTitle: '中国用户微信购买',
-        wechatCopy: '微信付款为人工确认，确认后发送许可证码。',
-        wechatAlt: '微信经营收款码',
-        wechatNote1: '付款后请邮件联系',
-        wechatNote2: '，并附上付款截图和接收许可证的邮箱。',
-        wechatNote3: '建议付款备注填写邮箱。确认后会发送 Pro 许可证码，再到扩展设置页激活。',
-        emailRequired: '请输入接收许可证的邮箱。',
+        emailRequired: '请输入付款时使用的邮箱。',
+        limitedFreeBanner: '限时免费中（还剩 {d} 天）'
         creatingOrder: '正在创建 PayPal 订单...',
         createFailed: '无法创建订单',
         approvalMissing: '缺少 PayPal 付款跳转链接。'
@@ -386,23 +271,11 @@
       });
     };
 
-    const setMethod = (method) => {
-      document.querySelectorAll('.method-choice').forEach((button) => {
-        button.classList.toggle('is-active', button.dataset.method === method);
-      });
-      document.getElementById('paypalPanel').classList.toggle('is-active', method === 'paypal');
-      document.getElementById('wechatPanel').classList.toggle('is-active', method === 'wechat');
-    };
-
     const setStatus = (message) => {
       statusNode.textContent = message;
     };
 
     applyLanguage();
-
-    document.querySelectorAll('.method-choice').forEach((button) => {
-      button.addEventListener('click', () => setMethod(button.dataset.method));
-    });
 
     buyButton.addEventListener('click', async () => {
       const email = emailInput.value.trim();
@@ -436,6 +309,18 @@
         buyButton.disabled = false;
       }
     });
+
+    const limitedFreeBanner = document.getElementById('limitedFreeBanner');
+    const freeProUntil = new Date('2026-07-25T23:59:59').getTime();
+    if (limitedFreeBanner) {
+      if (Date.now() <= freeProUntil) {
+        const days = Math.max(0, Math.floor((freeProUntil - Date.now()) / 86400000));
+        limitedFreeBanner.hidden = false;
+        limitedFreeBanner.textContent = t('limitedFreeBanner').replace('{d}', days);
+      } else {
+        limitedFreeBanner.hidden = true;
+      }
+    }
   </script>
 </body>
 </html>

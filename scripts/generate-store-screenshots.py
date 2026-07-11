@@ -214,7 +214,7 @@ def screenshot_4():
     text(draw, (154, 526), "适合先体验", f=font(22, bold=True))
     rect(draw, (700, 240, 1200, 650), COLORS["white"], width=5)
     text(draw, (736, 282), "Pro 版", f=F["h2"])
-    paragraph(draw, (740, 340), "解锁无限色卡、Pro 主题、自定义主题和后续高级工具。支持 PayPal 自动发码，也支持微信人工购买。", 390, f=F["body"])
+    paragraph(draw, (740, 340), "解锁无限色卡、Pro 主题、自定义主题和后续高级工具。支持 PayPal 自动发码，付款后即可激活。", 390, f=F["body"])
     rect(draw, (740, 506, 1060, 574), COLORS["mint"], width=4)
     text(draw, (770, 526), "激活许可证", f=font(22, bold=True))
     img.save(OUT / "screenshot-04-pro.png")

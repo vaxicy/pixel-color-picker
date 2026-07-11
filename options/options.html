@@ -197,16 +197,17 @@
           <button class="pixel-button primary" id="upgradePro">PRO</button>
         </div>
 
-        <div class="pro-activation-card">
+        <div class="pro-unlock-card" id="proUnlockCard">
           <label class="setting-item">
             <span>
-              <strong id="licenseKeyLabel">许可证码</strong>
-              <small id="licenseKeyHint">付款后复制 PCP 开头的许可证码，在这里激活 Pro</small>
+              <strong id="paymentEmailLabel">付款邮箱</strong>
+              <small id="paymentEmailHint">填写你付款时使用的邮箱，点击解锁 Pro</small>
             </span>
-            <input type="text" id="licenseKeyInput" placeholder="PCP-XXXX-XXXX-XXXX-XXXX-XXXXXXXX">
+            <input type="email" id="paymentEmail" placeholder="you@example.com">
           </label>
-          <button class="pixel-button mint" id="activateLicense">激活 Pro</button>
+          <button class="pixel-button mint" id="unlockPro">解锁 Pro</button>
         </div>
+
       </section>
 
       <section class="settings-panel" id="language">

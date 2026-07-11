@@ -2,7 +2,7 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$Email,
 
-  [string]$Note = "wechat-manual",
+  [string]$Note = "manual-support",
 
   [string]$ApiBase = "https://pixel-color-picker-pro.huangzero2004.workers.dev"
 )

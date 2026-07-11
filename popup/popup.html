@@ -385,10 +385,15 @@
           <button type="button" class="data-action-btn pro-upgrade-btn" id="popupUpgradePro">PRO</button>
         </div>
 
-        <div class="pro-activation-card popup-pro-activation">
-          <label for="popupLicenseKeyInput">许可证码</label>
-          <input type="text" id="popupLicenseKeyInput" placeholder="PCP-XXXX-XXXX-XXXX-XXXX-XXXXXXXX">
-          <button type="button" class="data-action-btn pro-activate-btn" id="popupActivateLicense">激活 Pro</button>
+        <div class="settings-row pro-unlock-row" id="popupProUnlockRow">
+          <span class="settings-copy">
+            <strong id="popupPaymentEmailLabel">付款邮箱</strong>
+            <small id="popupPaymentEmailHint">填写你付款时使用的邮箱，点击解锁 Pro</small>
+          </span>
+          <div class="pro-unlock-actions">
+            <input type="email" id="popupPaymentEmail" placeholder="you@example.com">
+            <button type="button" class="data-action-btn pro-unlock-btn" id="popupUnlockPro">解锁 Pro</button>
+          </div>
         </div>
 
         <div class="settings-row settings-data-row">
