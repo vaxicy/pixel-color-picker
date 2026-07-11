@@ -160,13 +160,6 @@ function isEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function generateLicenseKey() {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  const hex = [...bytes].map((value) => value.toString(16).padStart(2, '0')).join('').toUpperCase();
-  return `PCP-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 24)}`;
-}
-
 async function ensurePendingOrdersTable(env) {
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS pending_orders (
@@ -275,7 +268,7 @@ async function captureOrder(request, env) {
     return json({ error: 'Payment captured, but no buyer email was found' }, { status: 500 });
   }
 
-  const licenseKey = generateLicenseKey();
+  const licenseId = crypto.randomUUID();
   const now = new Date().toISOString();
   const amount = capture?.amount?.value || env.PRODUCT_PRICE || '9.99';
   const currency = capture?.amount?.currency_code || env.PRODUCT_CURRENCY || 'USD';
@@ -292,16 +285,16 @@ async function captureOrder(request, env) {
     SELECT license_key FROM licenses WHERE paypal_order_id = ?
   `).bind(orderId).first();
 
-  const finalLicenseKey = existing?.license_key || licenseKey;
+  const finalLicenseId = existing?.license_key || licenseId;
   if (!existing) {
     await env.DB.prepare(`
       INSERT INTO licenses
         (license_key, email, status, paypal_order_id, paypal_capture_id, created_at)
       VALUES (?, ?, 'active', ?, ?, ?)
-    `).bind(finalLicenseKey, email, orderId, captureId, now).run();
+    `).bind(finalLicenseId, email, orderId, captureId, now).run();
   }
 
-  const emailResult = await sendLicenseEmail(env, email, finalLicenseKey);
+  const emailResult = await sendLicenseEmail(env, email);
 
   return json({
     ok: true,
@@ -312,70 +305,22 @@ async function captureOrder(request, env) {
   });
 }
 
-async function activateLicense(request, env) {
-  const body = await readJson(request);
-  const licenseKey = String(body.licenseKey || body.license_key || '').trim().toUpperCase();
-  const email = normalizeEmail(body.email);
-  if (!licenseKey) {
-    return json({ error: 'licenseKey is required' }, { status: 400 });
-  }
-
-  const row = await env.DB.prepare(`
-    SELECT license_key, email, status, activated_at FROM licenses WHERE license_key = ?
-  `).bind(licenseKey).first();
-
-  if (!row || row.status !== 'active') {
-    return json({ valid: false, licenseStatus: 'free', error: 'License not found or inactive' }, { status: 404 });
-  }
-
-  if (email && row.email !== email) {
-    return json({ valid: false, licenseStatus: 'free', error: 'Email does not match this license' }, { status: 403 });
-  }
-
-  const now = new Date().toISOString();
-  await env.DB.prepare(`
-    UPDATE licenses
-    SET activated_at = COALESCE(activated_at, ?), last_checked_at = ?
-    WHERE license_key = ?
-  `).bind(now, now, licenseKey).run();
-
-  return json({
-    valid: true,
-    licenseStatus: 'pro',
-    licenseEmail: row.email,
-    licenseKey
-  });
-}
-
 async function licenseStatus(request, env) {
   const url = new URL(request.url);
-  const licenseKey = String(url.searchParams.get('licenseKey') || '').trim().toUpperCase();
   const email = normalizeEmail(url.searchParams.get('email'));
 
-  if (!licenseKey && !email) {
-    return json({ error: 'licenseKey or email is required' }, { status: 400 });
+  if (!email) {
+    return json({ error: 'email is required' }, { status: 400 });
   }
 
   const now = new Date().toISOString();
-  let row;
-  if (licenseKey) {
-    row = await env.DB.prepare(`
-      SELECT email, status FROM licenses WHERE license_key = ?
-    `).bind(licenseKey).first();
-    if (row) {
-      await env.DB.prepare(`
-        UPDATE licenses SET last_checked_at = ? WHERE license_key = ?
-      `).bind(now, licenseKey).run();
-    }
-  } else {
-    row = await env.DB.prepare(`
-      SELECT license_key, email, status FROM licenses WHERE email = ? ORDER BY created_at DESC
-    `).bind(email).first();
-    if (row) {
-      await env.DB.prepare(`
-        UPDATE licenses SET last_checked_at = ? WHERE email = ?
-      `).bind(now, email).run();
-    }
+  const row = await env.DB.prepare(`
+    SELECT email, status FROM licenses WHERE email = ? ORDER BY created_at DESC
+  `).bind(email).first();
+  if (row) {
+    await env.DB.prepare(`
+      UPDATE licenses SET last_checked_at = ? WHERE email = ?
+    `).bind(now, email).run();
   }
 
   if (!row || row.status !== 'active') {
@@ -402,7 +347,7 @@ async function createManualLicense(request, env) {
   }
 
   const note = String(body.note || 'manual-support').trim().slice(0, 120);
-  const licenseKey = generateLicenseKey();
+  const licenseId = crypto.randomUUID();
   const now = new Date().toISOString();
   const orderId = `manual-${Date.now()}`;
 
@@ -410,20 +355,19 @@ async function createManualLicense(request, env) {
     INSERT INTO licenses
       (license_key, email, status, paypal_order_id, paypal_capture_id, created_at)
     VALUES (?, ?, 'active', ?, ?, ?)
-  `).bind(licenseKey, email, orderId, note, now).run();
+  `).bind(licenseId, email, orderId, note, now).run();
 
-  const emailResult = await sendLicenseEmail(env, email, licenseKey);
+  const emailResult = await sendLicenseEmail(env, email);
 
   return json({
     ok: true,
     email,
-    licenseKey,
     emailSent: emailResult.sent,
     emailError: emailResult.error || ''
   });
 }
 
-async function sendLicenseEmail(env, email, licenseKey) {
+async function sendLicenseEmail(env, email) {
   if (!env.RESEND_API_KEY) {
     return { sent: false, error: 'RESEND_API_KEY is not configured' };
   }
@@ -492,9 +436,6 @@ export default {
       }
       if (url.pathname === '/api/paypal/capture-order' && request.method === 'POST') {
         return captureOrder(request, env);
-      }
-      if (url.pathname === '/api/license/activate' && request.method === 'POST') {
-        return activateLicense(request, env);
       }
       if (url.pathname === '/api/license/status' && request.method === 'GET') {
         return licenseStatus(request, env);

@@ -6,8 +6,8 @@ This is the semi-automatic Pro flow:
 2. The buyer enters an email and pays with PayPal.
 3. The Cloudflare Worker captures the PayPal order.
 4. The Worker creates a license in D1.
-5. The Worker emails the license key with Resend.
-6. The buyer activates the license inside the extension.
+5. The Worker emails an unlock hint (no license code) with Resend.
+6. The buyer unlocks Pro inside the extension by entering the payment email.
 
 ## What You Need
 
@@ -83,7 +83,7 @@ npx wrangler secret put RESEND_API_KEY
 npx wrangler deploy
 ```
 
-Until email is configured, the payment success page still shows the license key directly.
+Until email is configured, the payment success page still shows an unlock hint pointing users to the extension.
 
 ## Deploy
 
@@ -95,7 +95,7 @@ npx wrangler deploy
 Your test URLs will look like:
 
 ```txt
-https://pixel-color-picker-pro.<your-account>.workers.dev/upgrade.html
+https://pixel-color-picker-pro.<your-account>.workers.dev/v2-upgrade
 https://pixel-color-picker-pro.<your-account>.workers.dev/api/health
 ```
 
@@ -116,20 +116,18 @@ The current Worker uses PayPal Orders API:
 
 Webhook handling can be added after the checkout flow is stable. The capture endpoint already creates a license after successful payment capture.
 
-## Extension Work Still Needed
+## Extension Unlock Flow
 
-The extension still needs a license activation UI:
+The extension already unlocks Pro by email:
 
-- License key input
-- Activate button
-- Request to `/api/license/activate`
-- Save `licenseStatus: "pro"` when valid
-- Save `licenseEmail` and `licenseKey`
+- The buyer opens PRO settings and enters the payment email.
+- The extension calls `GET /api/license/status?email=...`.
+- When the D1 `licenses` row for that email is `active`, it saves `licenseStatus: "pro"`.
 
-After the Cloudflare Worker URL is deployed, set the extension purchase URL to:
+Set the extension purchase URL to the Cloudflare Worker:
 
 ```txt
-https://pixel-color-picker-pro.<your-account>.workers.dev/upgrade.html
+https://pixel-color-picker-pro.<your-account>.workers.dev/v2-upgrade
 ```
 
 ## Internal Manual License Delivery
@@ -150,7 +148,7 @@ cd C:\Users\16704\Desktop\color-picker\cloudflare
 .\manual-license.ps1 -Email buyer@example.com -Note "manual-support"
 ```
 
-The script returns the license key and whether the email was sent. If email delivery fails, copy the license key from the terminal and send it manually. Do not link this manual flow from customer-facing pages unless a fully automated payment method is added later.
+The script confirms the email was recorded and whether the email was sent. If email delivery fails, tell the buyer to unlock with their email in the extension. Do not link this manual flow from customer-facing pages unless a fully automated payment method is added later.
 
 ## Important Safety Notes
 

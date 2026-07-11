@@ -15,7 +15,7 @@
 - [ ] PayPal Checkout 或 Subscriptions 页面
 - [ ] 服务端 webhook 验证
 - [ ] License/entitlement 查询接口
-- [ ] 扩展内许可证激活和刷新
+- [ ] 扩展内邮箱解锁与状态刷新
 
 ## 🐛 已知问题
 

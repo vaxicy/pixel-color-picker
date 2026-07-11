@@ -187,7 +187,6 @@ class OptionsManager {
       language: 'zh-CN',
       licenseStatus: 'free',
       licenseEmail: '',
-      licenseKey: '',
       licenseApiBase: 'https://pixel-color-picker-pro.huangzero2004.workers.dev',
       proPurchaseUrl: '',
       themePreset: 'pink',
@@ -791,13 +790,11 @@ class OptionsManager {
   async handleReset() {
     const licenseStatus = this.settings?.licenseStatus || 'free';
     const licenseEmail = this.settings?.licenseEmail || '';
-    const licenseKey = this.settings?.licenseKey || '';
     const licenseApiBase = this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev';
     const proPurchaseUrl = this.settings?.proPurchaseUrl || '';
     this.settings = this.getDefaultSettings();
     this.settings.licenseStatus = licenseStatus;
     this.settings.licenseEmail = licenseEmail;
-    this.settings.licenseKey = licenseKey;
     this.settings.licenseApiBase = licenseApiBase;
     this.settings.proPurchaseUrl = proPurchaseUrl;
     this.themeBasePreset = 'pink';

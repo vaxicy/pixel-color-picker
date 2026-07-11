@@ -41,7 +41,6 @@ class PixelColorPicker {
           language: 'zh-CN',
           licenseStatus: 'free',
           licenseEmail: '',
-          licenseKey: '',
           licenseApiBase: 'https://pixel-color-picker-pro.huangzero2004.workers.dev',
           proPurchaseUrl: '',
           ...(result.settings || {})
@@ -1909,7 +1908,6 @@ class PixelColorPicker {
     const language = this.getLanguage();
     const licenseStatus = this.settings?.licenseStatus || 'free';
     const licenseEmail = this.settings?.licenseEmail || '';
-    const licenseKey = this.settings?.licenseKey || '';
     const licenseApiBase = this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev';
     const proPurchaseUrl = this.settings?.proPurchaseUrl || '';
     this.settings = {
@@ -1920,7 +1918,6 @@ class PixelColorPicker {
       language,
       licenseStatus,
       licenseEmail,
-      licenseKey,
       licenseApiBase,
       proPurchaseUrl,
       headerColor: '#ff6b9d',
