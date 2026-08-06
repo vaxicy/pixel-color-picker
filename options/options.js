@@ -280,6 +280,7 @@ class OptionsManager {
     document.getElementById('importData').addEventListener('click', () => this.importData());
     document.getElementById('clearData').addEventListener('click', () => this.clearData());
     document.getElementById('viewHistory').addEventListener('click', () => this.viewHistory());
+    this.bindChangelogEvents();
   }
 
   collectSettingsFromInputs() {
@@ -683,20 +684,83 @@ class OptionsManager {
   }
 
   viewHistory() {
-    const message = this.getLanguage() === 'en'
-      ? `Pixel Color Picker Changelog
+    this.showChangelog();
+  }
 
-v1.0.0
-- Pixel-style popup
-- Palette management, history, import, and export
-- Theme presets and custom themes`
-      : `Pixel Color Picker 更新日志
+  getChangelogEntries() {
+    const language = this.getLanguage();
+    const entries = [
+      {
+        version: 'v1.0.0',
+        items: language === 'en'
+          ? [
+              { kind: 'feat', text: 'Pixel-style popup' },
+              { kind: 'feat', text: 'Palette management, history, import & export' },
+              { kind: 'feat', text: 'Theme presets and custom themes' }
+            ]
+          : [
+              { kind: 'feat', text: '像素风 popup' },
+              { kind: 'feat', text: '色卡管理、历史记录、导入导出' },
+              { kind: 'feat', text: '主题预设与自定义主题' }
+            ]
+      }
+    ];
 
-v1.0.0
-- 像素风 popup
-- 色卡管理、历史记录、导入导出
-- 主题预设与自定义主题`;
-    alert(message);
+    const titleMap = { feat: 'feat', fix: 'fix', new: 'new' };
+    return entries.map((entry) => ({
+      version: entry.version,
+      items: entry.items.map((item) => ({
+        kind: titleMap[item.kind] || 'feat',
+        text: item.text
+      }))
+    }));
+  }
+
+  showChangelog() {
+    const overlay = document.getElementById('changelogOverlay');
+    const body = document.getElementById('changelogBody');
+    if (!overlay || !body) return;
+
+    const entries = this.getChangelogEntries();
+    body.innerHTML = entries.map((entry) => `
+      <div class="changelog-version">
+        <div class="changelog-version-tag">${entry.version}</div>
+        <ul class="changelog-list">
+          ${entry.items.map((item) => `
+            <li class="changelog-item changelog-${item.kind}">
+              <span class="changelog-bullet"></span>${item.text}
+            </li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+
+    const subject = this.getLanguage() === 'en'
+      ? 'Pixel Color Picker Feedback'
+      : '像素吸色器 · 问题反馈';
+    const feedback = document.getElementById('feedbackMailBtn');
+    if (feedback) {
+      feedback.href = `mailto:huangzero2004@gmail.com?subject=${encodeURIComponent(subject)}`;
+    }
+
+    overlay.hidden = false;
+  }
+
+  hideChangelog() {
+    const overlay = document.getElementById('changelogOverlay');
+    if (overlay) overlay.hidden = true;
+  }
+
+  bindChangelogEvents() {
+    const overlay = document.getElementById('changelogOverlay');
+    if (!overlay) return;
+    document.getElementById('changelogClose')?.addEventListener('click', () => this.hideChangelog());
+    document.getElementById('changelogDismiss')?.addEventListener('click', () => this.hideChangelog());
+    overlay.addEventListener('click', (event) => {
+      if (event.target.id === 'changelogOverlay') this.hideChangelog();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !overlay.hidden) this.hideChangelog();
+    });
   }
 
   showNotification(message) {

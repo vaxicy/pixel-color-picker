@@ -226,7 +226,10 @@ window.PixelI18n = (() => {
       themeMintshake: '薄荷奶昔',
       themeGrape: '葡萄汽水',
       themeMist: '雾粉灰调',
-      themeCustom: '自定义'
+      themeCustom: '自定义',
+      changelogTitle: '更新日志',
+      feedbackCta: '✉ 反馈问题 / Feedback',
+      gotIt: '知道了'
     },
     en: {
       appName: 'Pixel Color Picker',
@@ -454,7 +457,10 @@ window.PixelI18n = (() => {
       themeMintshake: 'Mint Shake',
       themeGrape: 'Grape Soda',
       themeMist: 'Misty Rose',
-      themeCustom: 'Custom'
+      themeCustom: 'Custom',
+      changelogTitle: 'Changelog',
+      feedbackCta: '✉ Feedback',
+      gotIt: 'Got it'
     }
   };
 

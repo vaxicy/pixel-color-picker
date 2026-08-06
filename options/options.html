@@ -259,6 +259,21 @@
     </footer>
   </div>
 
+  <div class="pixel-dialog-overlay" id="changelogOverlay" hidden>
+    <section class="pixel-dialog changelog-dialog" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+      <header class="pixel-dialog-header">
+        <span class="pixel-dialog-eyebrow">&#9613; UPDATE LOG</span>
+        <h2 id="changelogTitle" data-i18n="changelogTitle">更新日志</h2>
+        <button class="pixel-dialog-close" id="changelogClose" type="button" aria-label="关闭">×</button>
+      </header>
+      <div class="pixel-dialog-body" id="changelogBody"></div>
+      <footer class="pixel-dialog-footer">
+        <a class="pixel-dialog-button primary feedback-mail" id="feedbackMailBtn" href="mailto:huangzero2004@gmail.com" data-i18n="feedbackCta">✉ 反馈问题 / Feedback</a>
+        <button class="pixel-dialog-button" id="changelogDismiss" type="button" data-i18n="gotIt">知道了</button>
+      </footer>
+    </section>
+  </div>
+
   <script src="../shared/i18n.js"></script>
   <script src="options.js"></script>
 </body>
