@@ -165,16 +165,6 @@ class PixelColorPicker {
     return window.PixelI18n?.t(this.getLanguage(), key) || key;
   }
 
-  openDonationDialog() {
-    const overlay = document.getElementById('donateOverlay');
-    if (overlay) overlay.hidden = false;
-  }
-
-  closeDonationDialog() {
-    const overlay = document.getElementById('donateOverlay');
-    if (overlay) overlay.hidden = true;
-  }
-
   applyI18n() {
     if (!window.PixelI18n) return;
     const language = this.getLanguage();
@@ -283,7 +273,6 @@ class PixelColorPicker {
       ['buttonColor', ''],
       ['bgColor', ''],
       ['panelColor', ''],
-      ['donate', 'donateHint'],
       ['backupManagement', 'backupHint']
     ];
     settingsRows.forEach((copy, index) => {
@@ -292,7 +281,7 @@ class PixelColorPicker {
       if (smallKey && copy.querySelector('small')) copy.querySelector('small').textContent = this.t(smallKey);
     });
     const groupTitles = document.querySelectorAll('#settingsOverlay .settings-group-title');
-    ['behavior', 'operation', 'themeAppearance', 'donate', 'data'].forEach((key, index) => {
+    ['behavior', 'operation', 'themeAppearance', 'data'].forEach((key, index) => {
       if (groupTitles[index]) groupTitles[index].textContent = this.t(key);
     });
     this.updatePaletteFilterLabels();
@@ -933,9 +922,6 @@ class PixelColorPicker {
     });
     document.getElementById('savePopupSettings').addEventListener('click', () => this.savePopupSettings());
     document.getElementById('resetPopupSettings').addEventListener('click', () => this.resetPopupSettings());
-    document.getElementById('popupOpenDonate')?.addEventListener('click', () => this.openDonationDialog());
-    document.getElementById('donateClose')?.addEventListener('click', () => this.closeDonationDialog());
-    document.getElementById('donateCancel')?.addEventListener('click', () => this.closeDonationDialog());
     document.getElementById('exportAllData').addEventListener('click', () => this.exportAllData());
     document.getElementById('importAllData').addEventListener('click', () => this.importAllData());
     document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
