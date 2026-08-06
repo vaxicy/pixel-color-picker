@@ -18,7 +18,7 @@ class OptionsManager {
   updateAppVersionLabel() {
     const el = document.getElementById('appVersionLabel');
     if (!el) return;
-    const version = (chrome.runtime?.getManifest()?.version) || '1.0.0';
+    const version = (chrome.runtime?.getManifest()?.version) || '0.0.0';
     el.textContent = `Pixel Color Picker v${version}`;
   }
 
@@ -697,7 +697,7 @@ class OptionsManager {
 
   getChangelogEntries() {
     const language = this.getLanguage();
-    const manifestVersion = (chrome.runtime.getManifest()?.version) || '1.1.1';
+    const manifestVersion = (chrome.runtime.getManifest()?.version) || '0.0.0';
     const entries = [
       {
         version: `v${manifestVersion}`,
