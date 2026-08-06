@@ -241,8 +241,6 @@ class OptionsManager {
     document.getElementById('saveSettings').addEventListener('click', () => this.handleSave());
     document.getElementById('resetSettings').addEventListener('click', () => this.handleReset());
     document.getElementById('backToPopup').addEventListener('click', () => window.close());
-    document.getElementById('optionsDonateTabWx')?.addEventListener('click', () => this.switchDonateTab('wx', 'optionsDonate'));
-    document.getElementById('optionsDonateTabPaypal')?.addEventListener('click', () => this.switchDonateTab('paypal', 'optionsDonate'));
     document.getElementById('useLastPicked').addEventListener('click', () => this.useLastPickedForTheme());
     document.getElementById('closePickedTarget').addEventListener('click', () => this.closePickedTargetPanel());
     document.getElementById('pickedTargetPanel').addEventListener('click', (event) => {
@@ -308,17 +306,6 @@ class OptionsManager {
 
   t(key) {
     return window.PixelI18n?.t(this.getLanguage(), key) || key;
-  }
-
-  switchDonateTab(tab, scope = 'optionsDonate') {
-    const tabSel = scope === 'optionsDonate' ? '#donate .donate-tab' : '#donateOverlay .donate-tab';
-    const wxSel = scope === 'optionsDonate' ? '#optionsDonatePanelWx' : '#donatePanelWx';
-    const paypalSel = scope === 'optionsDonate' ? '#optionsDonatePanelPaypal' : '#donatePanelPaypal';
-    document.querySelectorAll(tabSel).forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
-    const wxPanel = document.querySelector(wxSel);
-    const paypalPanel = document.querySelector(paypalSel);
-    if (wxPanel) wxPanel.hidden = (tab !== 'wx');
-    if (paypalPanel) paypalPanel.hidden = (tab !== 'paypal');
   }
 
   applyI18n() {

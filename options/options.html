@@ -192,20 +192,19 @@
 
         <p class="section-hint" data-i18n="donateHint">喜欢这个工具吗？欢迎打赏支持，你的支持是我持续更新的最大动力 ☕</p>
 
-        <div class="donate-tabs" role="tablist">
-          <button type="button" class="donate-tab active" id="optionsDonateTabWx" data-tab="wx" data-i18n="donateTabWx">微信赞赏</button>
-          <button type="button" class="donate-tab" id="optionsDonateTabPaypal" data-tab="paypal" data-i18n="donateTabPaypal">PayPal</button>
-        </div>
+        <div class="donate-grid">
+          <div class="donate-card">
+            <h3 class="donate-card-title" data-i18n="donateTabWx">微信赞赏</h3>
+            <img class="donate-qr" src="../images/wx-donate.png" alt="WeChat donate QR">
+            <p class="donate-thanks" data-i18n="donateWxThanks">感谢你的支持 ❤</p>
+            <p class="donate-subhint" data-i18n="donateWxScan">用微信扫一扫</p>
+          </div>
 
-        <div class="donate-panel" id="optionsDonatePanelWx">
-          <img class="donate-qr" src="../images/wx-donate.png" alt="WeChat donate QR">
-          <p class="donate-thanks" data-i18n="donateWxThanks">感谢你的支持 ❤</p>
-          <p class="donate-subhint" data-i18n="donateWxScan">用微信扫一扫</p>
-        </div>
-
-        <div class="donate-panel" id="optionsDonatePanelPaypal" hidden>
-          <p class="donate-subhint" data-i18n="donatePaypalHint">金额由你决定，点击下方按钮跳转到 PayPal 付款页</p>
-          <a class="donate-paypal-btn" id="optionsDonatePaypalBtn" href="https://www.paypal.com/ncp/payment/8SVZPZP8SULPS" target="_blank" rel="noopener" data-i18n="donatePaypalCta">前往 PayPal 打赏</a>
+          <div class="donate-card">
+            <h3 class="donate-card-title">PayPal</h3>
+            <p class="donate-subhint donate-paypal-hint" data-i18n="donatePaypalHint">金额由你决定，点击下方按钮跳转到 PayPal 付款页</p>
+            <a class="donate-paypal-btn" id="optionsDonatePaypalBtn" href="https://www.paypal.com/ncp/payment/8SVZPZP8SULPS" target="_blank" rel="noopener" data-i18n="donatePaypalCta">前往 PayPal 打赏</a>
+          </div>
         </div>
       </section>
 

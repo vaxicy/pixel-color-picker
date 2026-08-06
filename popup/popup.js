@@ -175,15 +175,6 @@ class PixelColorPicker {
     if (overlay) overlay.hidden = true;
   }
 
-  switchDonateTab(tab) {
-    const tabs = document.querySelectorAll('#donateOverlay .donate-tab');
-    tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-    const wxPanel = document.getElementById('donatePanelWx');
-    const paypalPanel = document.getElementById('donatePanelPaypal');
-    if (wxPanel) wxPanel.hidden = (tab !== 'wx');
-    if (paypalPanel) paypalPanel.hidden = (tab !== 'paypal');
-  }
-
   applyI18n() {
     if (!window.PixelI18n) return;
     const language = this.getLanguage();
@@ -945,8 +936,6 @@ class PixelColorPicker {
     document.getElementById('popupOpenDonate')?.addEventListener('click', () => this.openDonationDialog());
     document.getElementById('donateClose')?.addEventListener('click', () => this.closeDonationDialog());
     document.getElementById('donateCancel')?.addEventListener('click', () => this.closeDonationDialog());
-    document.getElementById('donateTabWx')?.addEventListener('click', () => this.switchDonateTab('wx'));
-    document.getElementById('donateTabPaypal')?.addEventListener('click', () => this.switchDonateTab('paypal'));
     document.getElementById('exportAllData').addEventListener('click', () => this.exportAllData());
     document.getElementById('importAllData').addEventListener('click', () => this.importAllData());
     document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());

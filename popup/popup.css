@@ -3122,41 +3122,42 @@ button,
   line-height: 1.5;
 }
 
-.donate-tabs {
+.donate-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 2px solid var(--border);
-  background: var(--bg);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.donate-tab {
-  padding: 8px 10px;
-  border: 0;
-  background: transparent;
-  color: var(--text-soft);
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.donate-tab + .donate-tab {
-  border-left: 2px solid var(--border);
-}
-
-.donate-tab.active {
-  background: var(--cream, #fff0a8);
-  color: var(--text);
-  font-weight: 600;
-}
-
-.donate-panel {
+.donate-card {
   display: grid;
   gap: 8px;
   place-items: center;
-  padding: 6px 0 2px;
+  padding: 12px 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(63, 52, 64, 0.2);
+  text-align: center;
   min-width: 0;
+}
+
+.donate-card-title {
+  margin: 0;
+  padding: 3px 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 2px dotted rgba(63, 52, 64, 0.18);
+  width: 100%;
+}
+
+.donate-paypal-hint {
+  margin-top: 4px;
+}
+
+@media (max-width: 340px) {
+  .donate-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .donate-qr {
