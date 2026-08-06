@@ -884,8 +884,8 @@ button {
     display: inline-block;
     padding: 2px 8px;
     margin-bottom: 8px;
-    background: var(--accent);
-    color: #fff;
+    background: var(--bg);
+    color: var(--text);
     font-weight: 700;
     font-size: 13px;
     border: 2px solid var(--border);
@@ -912,7 +912,7 @@ button {
     width: 8px;
     height: 8px;
     margin-top: 6px;
-    background: var(--accent);
+    background: var(--text);
     border: 1px solid var(--border);
   }
   .changelog-fix  .changelog-bullet { background: var(--warn, #e0a800); }
@@ -943,10 +943,8 @@ button {
     transform: translate(1px, 1px);
     box-shadow: 1px 1px 0 var(--shadow);
   }
-  .pixel-dialog-button.primary {
-    background: var(--accent);
-    color: #fff;
-  }
-  .pixel-dialog-button.feedback-mail {
+  .pixel-dialog-footer .feedback-mail {
+    background: var(--bg);
+    color: var(--text);
     margin-right: auto;
   }
