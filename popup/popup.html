@@ -261,6 +261,37 @@
     </section>
   </div>
 
+  <div class="donate-overlay" id="donateOverlay" hidden>
+    <section class="donate-dialog" role="dialog" aria-modal="true" aria-labelledby="donateTitle">
+      <header class="donate-header">
+        <div>
+          <span class="eyebrow">PIXEL TIP</span>
+          <h2 id="donateTitle" data-i18n="donate">支持作者</h2>
+        </div>
+        <button class="icon-btn" id="donateClose" title="关闭">×</button>
+      </header>
+      <div class="donate-body">
+        <p class="donate-hint" id="donateHint" data-i18n="donateHint">喜欢这个工具吗？欢迎打赏支持，你的支持是我持续更新的最大动力 ☕</p>
+        <div class="donate-tabs" role="tablist">
+          <button type="button" class="donate-tab active" id="donateTabWx" data-tab="wx" data-i18n="donateTabWx">微信赞赏</button>
+          <button type="button" class="donate-tab" id="donateTabPaypal" data-tab="paypal" data-i18n="donateTabPaypal">PayPal</button>
+        </div>
+        <div class="donate-panel" id="donatePanelWx">
+          <img class="donate-qr" src="../images/wx-donate.png" alt="WeChat donate QR" id="donateQrImg">
+          <p class="donate-thanks" data-i18n="donateWxThanks">感谢你的支持 ❤</p>
+          <p class="donate-subhint" data-i18n="donateWxScan">用微信扫一扫</p>
+        </div>
+        <div class="donate-panel" id="donatePanelPaypal" hidden>
+          <p class="donate-subhint" data-i18n="donatePaypalHint">金额由你决定，点击下方按钮跳转到 PayPal 付款页</p>
+          <a class="donate-paypal-btn" id="donatePaypalBtn" href="https://www.paypal.com/ncp/payment/8SVZPZP8SULPS" target="_blank" rel="noopener" data-i18n="donatePaypalCta">前往 PayPal 打赏</a>
+        </div>
+      </div>
+      <div class="donate-actions">
+        <button class="pixel-dialog-button" id="donateCancel" data-i18n="noThanks">不用了，谢谢</button>
+      </div>
+    </section>
+  </div>
+
   <div class="settings-overlay" id="settingsOverlay" hidden>
     <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <header class="settings-header">
@@ -376,24 +407,13 @@
           </div>
         </label>
 
-        <div class="settings-group-title">PRO</div>
+        <div class="settings-group-title" data-i18n="donate">支持作者</div>
         <div class="settings-row pro-status-row">
           <span class="settings-copy">
-            <strong id="popupProStatusTitle">Pro</strong>
-            <small id="popupProStatusHint">Free</small>
+            <strong data-i18n="donate">支持作者</strong>
+            <small data-i18n="donateHint">喜欢这个工具吗？欢迎打赏支持，你的支持是我持续更新的最大动力 ☕</small>
           </span>
-          <button type="button" class="data-action-btn pro-upgrade-btn" id="popupUpgradePro">PRO</button>
-        </div>
-
-        <div class="settings-row pro-unlock-row" id="popupProUnlockRow">
-          <span class="settings-copy">
-            <strong id="popupPaymentEmailLabel">付款邮箱</strong>
-            <small id="popupPaymentEmailHint">填写你付款时使用的邮箱，点击解锁 Pro</small>
-          </span>
-          <div class="pro-unlock-actions">
-            <input type="email" id="popupPaymentEmail" placeholder="you@example.com">
-            <button type="button" class="data-action-btn pro-unlock-btn" id="popupUnlockPro">解锁 Pro</button>
-          </div>
+          <button type="button" class="data-action-btn pro-upgrade-btn" id="popupOpenDonate" data-i18n="donateShort">打赏</button>
         </div>
 
         <div class="settings-row settings-data-row">

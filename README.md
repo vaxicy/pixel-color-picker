@@ -1,18 +1,29 @@
 # Pixel Color Picker - 像素吸色器
 
-可爱的像素风网页吸色工具 Chrome 扩展
+A pixel-art style Chrome extension for picking colors from any web page. Free forever, with optional tips.
+
+可爱的像素风网页取色工具 · 全免费 · 自由打赏
 
 ## 功能特性
 
-🎨 **网页取色** - 一键获取网页任意位置的颜色
-💾 **颜色收藏** - 保存喜欢的颜色到色卡
-🌈 **色卡管理** - 创建和管理多个色卡
-📤 **导出功能** - 导出为 CSS 变量或 PNG 图片
-🎮 **像素风格** - 复古可爱的像素风 UI 设计
+- 🎨 **网页取色** - 一键获取网页任意位置的颜色，支持 HEX/RGB/HSL
+- 💾 **颜色收藏** - 把喜欢的颜色保存到色卡
+- 🌈 **色卡管理** - 自由创建多个色卡，重命名、删除、排序
+- 🎨 **12+ 套主题** - 少女粉、森林绿、夜空黑、鸢尾紫、燕麦咖、樱桃、游戏机、可可、薄荷、葡萄、迷雾蓝、奶油白 + 自定义主题（全部免费）
+- 📤 **多格式导出** - 导出为 CSS 变量、JSON、Tailwind config、PNG 色卡图片
+- 🔍 **色卡搜索** - 快速搜索历史与色卡
+- 🌓 **深色模式** - 跟随系统自动切换
+- 🌐 **中英双语** - 完整 zh-CN / en 翻译
+- 💾 **本地存储** - 所有数据存 `chrome.storage.sync`，不上传任何服务器
+- 💝 **自由打赏** - 喜欢这个工具？微信扫码 / PayPal 跳链接打赏支持
 
 ## 安装方法
 
-### 方法一：开发者模式加载（推荐）
+### 方法一：Chrome 网上应用店
+
+[Chrome Web Store 安装链接](https://chromewebstore.google.com/detail/pixel-color-picker/...)
+
+### 方法二：开发者模式加载
 
 1. 打开 Chrome 浏览器
 2. 访问 `chrome://extensions/`
@@ -20,10 +31,6 @@
 4. 点击「加载已解压的扩展程序」
 5. 选择本项目文件夹
 6. 完成！扩展已安装到工具栏
-
-### 方法二：Chrome 网上应用店（待发布）
-
-*即将上架，敬请期待*
 
 ## 使用方法
 
@@ -34,131 +41,101 @@
 3. 使用取色吸管点击网页上任意位置
 4. 颜色会自动显示并保存到色卡
 
-### 保存颜色
+### 色卡管理
 
-1. 取色后，点击「保存到色卡」按钮
-2. 颜色会添加到下方的色卡列表中
-3. 点击色卡中的颜色可以再次查看
+- **创建色卡**：点击「+」创建新色卡
+- **重命名**：双击色卡标题
+- **删除**：右键色卡
+- **导出**：单色卡支持导出 CSS / JSON / Tailwind / PNG
 
-### 导出功能
+### 主题切换
 
-- **导出 CSS**：将色卡导出为 CSS 变量格式
-- **导出图片**：将色卡导出为 PNG 图片
+- **预设主题**：从 12+ 套主题中任选
+- **自定义主题**：在设置里调整 4 个颜色（header/button/bg/panel）→ 自动保存为你的专属主题
+- **重置**：一键恢复默认
 
 ### 设置
 
 点击弹出窗口底部的「设置」按钮，可以：
-- 设置默认颜色格式
-- 配置自动保存
-- 管理数据（导入/导出/清除）
+- 设置默认颜色格式（HEX / RGB / HSL）
+- 配置自动保存策略
+- 切换中英双语
+- 12+ 主题 + 自定义主题（全部免费）
+- 数据导入 / 导出 / 清除
+- 💝 **支持作者**：微信扫码 / PayPal 打赏（可选）
 
 ## 技术栈
 
 - **Manifest V3** - Chrome 扩展最新标准
 - **Vanilla JavaScript** - 原生 JS，无依赖
-- **Chrome Storage API** - 数据持久化
-- **Canvas API** - 图片导出功能
+- **Chrome Storage API** - 数据持久化（`chrome.storage.sync`）
+- **Canvas API** - 图片导出
 
 ## 项目结构
 
 ```
-pixel-color-picker/
-├── manifest.json          # 扩展配置
-├── popup/                 # 弹出窗口
+color-picker/
+├── manifest.json
+├── popup/                  # 弹出窗口
 │   ├── popup.html
 │   ├── popup.css
 │   └── popup.js
-├── background/            # 后台服务
+├── background/             # 后台服务
 │   └── background.js
-├── options/               # 设置页面
+├── options/                # 设置页面
 │   ├── options.html
 │   ├── options.css
 │   └── options.js
-├── lib/                   # 工具库
-│   └── color-utils.js
-├── images/                # 图标资源
-└── README.md             # 说明文档
+├── shared/                 # 共享工具
+│   └── i18n.js
+├── images/                 # 图标 + 赞赏码
+│   ├── icon-16.png
+│   ├── icon-48.png
+│   ├── icon-128.png
+│   └── wx-donate.png
+├── store-assets/           # Chrome 商店素材
+│   ├── icon.png
+│   ├── screenshots/
+│   │   ├── en/
+│   │   └── zh/
+│   └── promo/
+│       ├── 440x280.png
+│       └── 1400x560.png
+├── _locales/               # Chrome 多语言
+│   ├── en/messages.json
+│   └── zh_CN/messages.json
+├── scripts/                # 打包 + 截图脚本
+└── README.md
 ```
 
-## 待添加图标
+## 隐私
 
-扩展需要以下图标文件（放在 `images/` 文件夹）：
+本扩展 **完全本地运行**：
+- 所有色卡和设置存在 `chrome.storage.sync`，不会上传任何服务器
+- 没有远程代码、没有第三方分析、没有追踪
+- 可选打赏链接跳转到 `paypal.com` 或微信扫码 — 由用户主动触发，不收集任何信息
 
-- `icon-16.png` (16x16)
-- `icon-48.png` (48x48)
-- `icon-128.png` (128x128)
-
-### 快速生成图标
-
-使用以下 Python 脚本生成简单的像素风图标：
-
-```python
-from PIL import Image, ImageDraw
-
-def create_pixel_icon(size, filename):
-    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    
-    # 绘制一个简单的调色板图标
-    colors = ['#FF6B9D', '#C44AFF', '#4ECDC4', '#FFE66D']
-    pixel_size = size // 4
-    
-    for i, color in enumerate(colors):
-        x = (i % 2) * pixel_size
-        y = (i // 2) * pixel_size
-        draw.rectangle([x, y, x + pixel_size, y + pixel_size], 
-                      fill=color, outline='#4A4A4A', width=2)
-    
-    img.save(f'images/{filename}')
-
-create_pixel_icon(16, 'icon-16.png')
-create_pixel_icon(48, 'icon-48.png')
-create_pixel_icon(128, 'icon-128.png')
-```
-
-或者使用在线工具：
-- [Favicon.io](https://favicon.io/)
-- [Pixel Art Maker](https://pixelartmaker.com/)
-
-## 开发计划
-
-### 已完成 ✅
-
-- [x] 基本取色功能
-- [x] 颜色收藏
-- [x] 色卡管理
-- [x] 导出 CSS
-- [x] 导出 PNG
-- [x] 像素风 UI
-
-### 待开发 🚧
-
-- [ ] 改进取色精度（使用截图 API）
-- [ ] 颜色历史记录
-- [ ] 渐变生成器
-- [ ] 颜色对比度检查
-- [ ] 分享色卡链接
-- [ ] 深色模式
-- [ ] 多语言支持
-
-## 贡献指南
-
-欢迎提交 Issue 和 Pull Request！
+完整隐私政策：[https://vaxicy.github.io/pixel-color-picker-privacy/privacy-policy.html](https://vaxicy.github.io/pixel-color-picker-privacy/privacy-policy.html)
 
 ## 许可证
 
-MIT License
+Non-Commercial License · 仅供个人非商业使用
+详见 [LICENSE](LICENSE) 文件
 
-## 作者
+## 贡献
 
-Pixel Color Picker Team
+欢迎提交 Issue 和 Pull Request！
 
 ## 更新日志
+
+### v1.1.0 (2026-08-06)
+
+- 🎁 **完全免费** - 移除 Pro 付费模式，所有主题、自定义主题、无限色卡对所有用户开放
+- 💝 **新增打赏** - 微信赞赏码 / PayPal 付款链接（可选）
+- 🔒 **零远程** - 删除所有 `host_permissions`，本扩展不再向任何服务器发请求
+- 🧹 **冗余清理** - 删除 18+ Pro 相关 i18n 字段与 4 处 Pro 限制拦截
 
 ### v1.0.0 (2026-06-07)
 
 - 🎉 初始版本发布
-- ✨ 实现基本取色功能
-- 💾 支持颜色收藏
-- 📤 支持导出 CSS 和 PNG
-- 🎨 像素风 UI 设计
+- ✨ 实现基本取色 / 色卡 / 主题 / 导出 / 双语

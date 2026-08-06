@@ -20,6 +20,7 @@
       <nav class="settings-nav" aria-label="设置分组">
         <a href="#behavior">行为</a>
         <a href="#theme">主题</a>
+        <a href="#donate" data-i18n="donate">支持作者</a>
         <a href="#language">语言</a>
         <a href="#data">数据</a>
         <a href="#about">关于</a>
@@ -183,31 +184,29 @@
         </div>
       </section>
 
-      <section class="settings-panel pro-panel" id="pro">
+      <section class="settings-panel" id="donate">
         <div class="section-head">
           <span>03</span>
-          <h2>PRO</h2>
+          <h2 data-i18n="donate">支持作者</h2>
         </div>
 
-        <div class="pro-card">
-          <div>
-            <strong id="proStatusTitle">Free</strong>
-            <small id="proStatusHint">Free version supports up to 5 palettes</small>
-          </div>
-          <button class="pixel-button primary" id="upgradePro">PRO</button>
+        <p class="section-hint" data-i18n="donateHint">喜欢这个工具吗？欢迎打赏支持，你的支持是我持续更新的最大动力 ☕</p>
+
+        <div class="donate-tabs" role="tablist">
+          <button type="button" class="donate-tab active" id="optionsDonateTabWx" data-tab="wx" data-i18n="donateTabWx">微信赞赏</button>
+          <button type="button" class="donate-tab" id="optionsDonateTabPaypal" data-tab="paypal" data-i18n="donateTabPaypal">PayPal</button>
         </div>
 
-        <div class="pro-unlock-card" id="proUnlockCard">
-          <label class="setting-item">
-            <span>
-              <strong id="paymentEmailLabel">付款邮箱</strong>
-              <small id="paymentEmailHint">填写你付款时使用的邮箱，点击解锁 Pro</small>
-            </span>
-            <input type="email" id="paymentEmail" placeholder="you@example.com">
-          </label>
-          <button class="pixel-button mint" id="unlockPro">解锁 Pro</button>
+        <div class="donate-panel" id="optionsDonatePanelWx">
+          <img class="donate-qr" src="../images/wx-donate.png" alt="WeChat donate QR">
+          <p class="donate-thanks" data-i18n="donateWxThanks">感谢你的支持 ❤</p>
+          <p class="donate-subhint" data-i18n="donateWxScan">用微信扫一扫</p>
         </div>
 
+        <div class="donate-panel" id="optionsDonatePanelPaypal" hidden>
+          <p class="donate-subhint" data-i18n="donatePaypalHint">金额由你决定，点击下方按钮跳转到 PayPal 付款页</p>
+          <a class="donate-paypal-btn" id="optionsDonatePaypalBtn" href="https://www.paypal.com/ncp/payment/8SVZPZP8SULPS" target="_blank" rel="noopener" data-i18n="donatePaypalCta">前往 PayPal 打赏</a>
+        </div>
       </section>
 
       <section class="settings-panel" id="language">

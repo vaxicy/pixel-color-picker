@@ -1,0 +1,43 @@
+=== 中文详细说明 ===
+
+像素吸色器是一款可爱的 Chrome 扩展，让你一键获取网页上任意位置的颜色。
+
+🎨 主要功能
+- 一键取色：点扩展图标 → 点「快速取色」→ 在网页上点任意位置取色，支持 HEX / RGB / HSL 格式
+- 色卡管理：自由创建多个色卡，每个色卡可重命名、删除、单独导出
+- 12+ 套预设主题 + 完全自定义主题：少女粉、森林绿、夜空黑、鸢尾紫、燕麦咖、樱桃、游戏机、可可、薄荷、葡萄、迷雾蓝、奶油白，并支持自由调整 header / button / 背景 / 面板四种颜色
+- 多格式导出：CSS 变量 / JSON / Tailwind config / PNG 色卡图片
+- 搜索：色卡和历史记录都支持快速搜索
+- 深色模式：跟随系统自动切换
+- 中英双语：完整 zh-CN / en 翻译
+- 本地存储：所有数据存在 chrome.storage.sync，零远程调用
+
+💝 全免费 + 可选打赏
+本扩展完全免费，没有任何付费功能。如果你喜欢这个工具，可以选择通过微信赞赏码或 PayPal 给我打赏一杯咖啡。
+
+🔒 隐私优先
+- 零远程代码、零第三方分析、零追踪
+- 所有色卡 / 设置都存本地 chrome.storage.sync
+- 可选打赏链接跳转到 paypal.com 或微信扫码 - 由用户主动触发
+
+=== English Detailed Description ===
+
+Pixel Color Picker is a cute Chrome extension that lets you pick any color from any web page with a single click.
+
+🎨 Main features
+- One-click color picking: click the extension icon → click "Quick Pick" → click anywhere on a page. HEX / RGB / HSL formats supported
+- Palette management: create unlimited palettes, rename, delete, export individually
+- 12+ preset themes + fully custom themes: Pink, Green, Night, Iris, Oat, Cherry, Game Boy, Cocoa, Mint, Grape, Mist, Cream, plus custom header / button / background / panel colors
+- Multi-format export: CSS variables / JSON / Tailwind config / PNG palette images
+- Search: quickly find colors in your palettes and history
+- Dark mode: follows system automatically
+- Bilingual: complete zh-CN / en translations
+- Local storage: all data stored in chrome.storage.sync, zero remote calls
+
+💝 Free forever · Optional tips
+This extension is completely free with no paid features. If you enjoy using it, you can tip the developer via WeChat QR or PayPal.
+
+🔒 Privacy first
+- Zero remote code, zero third-party analytics, zero tracking
+- All palettes and settings stored locally in chrome.storage.sync
+- Optional tip links go to paypal.com or WeChat scan - triggered manually by the user

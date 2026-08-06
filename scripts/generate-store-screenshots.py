@@ -110,9 +110,9 @@ def popup_mock(draw, x, y, scale=1):
     w, h = int(360 * scale), int(520 * scale)
     rect(draw, (x + 8, y + 8, x + w + 8, y + h + 8), "#d8d1d8", outline="#d8d1d8", width=0)
     rect(draw, (x, y, x + w, y + h), COLORS["white"], width=5)
-    rect(draw, (x + 14, y + 14, x + w - 14, y + 74), COLORS["pink"], width=4)
-    text(draw, (x + 38, y + 30), "PIXEL TOOL", fill="white", f=F["pixel_small"])
-    text(draw, (x + 38, y + 50), "像素吸色器", fill="white", f=font(18, bold=True))
+    rect(draw, (x + 14, y + 14, x + w - 18, y + 80), COLORS["pink"], width=4)
+    text(draw, (x + 38, y + 28), "PIXEL TOOL", fill="white", f=F["pixel_small"])
+    text(draw, (x + 38, y + 48), "像素吸色器", fill="white", f=font(17, bold=True))
     rect(draw, (x + 28, y + 100, x + w - 28, y + 154), COLORS["mint"], width=4)
     text(draw, (x + w // 2, y + 117), "快速取色", f=font(20, bold=True), anchor="ma")
     text(draw, (x + 28, y + 186), "我的色卡组", f=font(20, bold=True))
@@ -146,10 +146,10 @@ def palette_board(draw, x, y, w, h):
 
 
 def export_card(draw, x, y, label, detail, color):
-    rect(draw, (x, y, x + 170, y + 126), COLORS["panel"], width=4)
+    rect(draw, (x, y, x + 178, y + 126), COLORS["panel"], width=4)
     rect(draw, (x + 18, y + 18, x + 68, y + 68), color, width=3)
-    text(draw, (x + 88, y + 24), label, f=font(20, bold=True))
-    paragraph(draw, (x + 88, y + 56), detail, 62, f=F["tiny"], fill=COLORS["soft"], leading=4)
+    text(draw, (x + 88, y + 24), label, f=font(18, bold=True))
+    paragraph(draw, (x + 88, y + 56), detail, 70, f=F["tiny"], fill=COLORS["soft"], leading=4)
 
 
 def screenshot_1():
@@ -159,8 +159,8 @@ def screenshot_1():
     text(draw, (520, 268), "一键吸取网页颜色", f=F["h2"])
     paragraph(draw, (522, 322), "从网页中快速获取颜色，自动保存到色卡和历史记录。适合设计师、前端开发者和内容创作者整理灵感配色。", 610, f=F["body"])
     rect(draw, (520, 452, 1138, 532), COLORS["panel"], width=4)
-    text(draw, (548, 476), "HEX", f=F["pixel_small"])
-    text(draw, (626, 468), "#FF6B9D", f=font(30, bold=True))
+    text(draw, (548, 480), "HEX", f=font(24, pixel=True))
+    text(draw, (630, 476), "#FF6B9D", f=font(28, bold=True))
     rect(draw, (548, 586, 748, 654), COLORS["mint"], width=4)
     text(draw, (580, 606), "复制颜色", f=font(22, bold=True))
     rect(draw, (780, 586, 1016, 654), COLORS["cream"], width=4)
@@ -214,9 +214,9 @@ def screenshot_4():
     text(draw, (154, 526), "适合先体验", f=font(22, bold=True))
     rect(draw, (700, 240, 1200, 650), COLORS["white"], width=5)
     text(draw, (736, 282), "Pro 版", f=F["h2"])
-    paragraph(draw, (740, 340), "解锁无限色卡、Pro 主题、自定义主题和后续高级工具。支持 PayPal 付款，付款后用邮箱在扩展内解锁。", 390, f=F["body"])
+    paragraph(draw, (740, 340), "解锁无限色卡、Pro 主题、自定义主题和后续高级工具。提供 14 天免费试用，支持 PayPal 付款，付款后用邮箱在扩展内解锁。", 390, f=F["body"])
     rect(draw, (740, 506, 1060, 574), COLORS["mint"], width=4)
-    text(draw, (770, 526), "邮箱解锁 Pro", f=font(22, bold=True))
+    text(draw, (770, 526), "14 天免费试用", f=font(22, bold=True))
     img.save(OUT / "screenshot-04-pro.png")
 
 

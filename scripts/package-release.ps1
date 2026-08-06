@@ -18,6 +18,7 @@ New-Item -ItemType Directory -Force -Path $stagingPath | Out-Null
 
 $items = @(
   "manifest.json",
+  "_locales",
   "background",
   "fonts",
   "images",

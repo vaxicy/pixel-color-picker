@@ -1,3 +1,13 @@
 dist/
+node_modules/
+.DS_Store
+*.log
+*.bak
+*.tmp
+
+# Secrets / local config
 cloudflare/wrangler.toml
 cloudflare/.dev.vars
+
+# AI working memory (must NOT enter git or vsix)
+.codebuddy/

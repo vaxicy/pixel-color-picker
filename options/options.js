@@ -5,28 +5,13 @@ class OptionsManager {
     this.colorHistory = [];
     this.lastPickedColor = null;
     this.activePickedTarget = '';
-    this.freePaletteLimit = 5;
-    this.freeThemePresets = ['pink', 'green', 'night', 'purple'];
-    this.freeProUntil = new Date('2026-07-25T23:59:59').getTime();
     this.init();
   }
 
   async init() {
     await this.loadSettings();
-    this.ensureProNav();
     this.bindEvents();
     this.updateUI();
-  }
-
-  ensureProNav() {
-    const nav = document.querySelector('.settings-nav');
-    if (!nav || nav.querySelector('a[href="#pro"]')) return;
-    const link = document.createElement('a');
-    link.href = '#pro';
-    link.textContent = 'PRO';
-    const languageLink = nav.querySelector('a[href="#language"]');
-    if (languageLink) nav.insertBefore(link, languageLink);
-    else nav.appendChild(link);
   }
 
   getThemePresets() {
@@ -185,10 +170,6 @@ class OptionsManager {
       autoSave: true,
       maxColorsPerPalette: 20,
       language: 'zh-CN',
-      licenseStatus: 'free',
-      licenseEmail: '',
-      licenseApiBase: 'https://pixel-color-picker-pro.huangzero2004.workers.dev',
-      proPurchaseUrl: '',
       themePreset: 'pink',
       themeBasePreset: 'pink',
       headerColor: '#ff6b9d',
@@ -221,10 +202,6 @@ class OptionsManager {
 
   getThemeSettings() {
     const presets = this.getThemePresets();
-    if (!this.canUseThemePreset(this.settings.themePreset)) {
-      this.settings.themePreset = 'pink';
-      this.settings.themeBasePreset = 'pink';
-    }
     const baseKey = this.settings.themePreset === 'custom'
       ? (this.settings.themeBasePreset || 'pink')
       : (presets[this.settings.themePreset] ? this.settings.themePreset : 'pink');
@@ -264,8 +241,8 @@ class OptionsManager {
     document.getElementById('saveSettings').addEventListener('click', () => this.handleSave());
     document.getElementById('resetSettings').addEventListener('click', () => this.handleReset());
     document.getElementById('backToPopup').addEventListener('click', () => window.close());
-    document.getElementById('upgradePro')?.addEventListener('click', () => this.openUpgradePage());
-    document.getElementById('unlockPro')?.addEventListener('click', () => this.unlockByEmail());
+    document.getElementById('optionsDonateTabWx')?.addEventListener('click', () => this.switchDonateTab('wx', 'optionsDonate'));
+    document.getElementById('optionsDonateTabPaypal')?.addEventListener('click', () => this.switchDonateTab('paypal', 'optionsDonate'));
     document.getElementById('useLastPicked').addEventListener('click', () => this.useLastPickedForTheme());
     document.getElementById('closePickedTarget').addEventListener('click', () => this.closePickedTargetPanel());
     document.getElementById('pickedTargetPanel').addEventListener('click', (event) => {
@@ -283,11 +260,6 @@ class OptionsManager {
     document.getElementById('themePreset').addEventListener('change', () => this.applyThemePresetToInputs());
     ['headerColor', 'buttonColor', 'bgColor', 'panelColor'].forEach((id) => {
       document.getElementById(id).addEventListener('input', () => {
-        if (!this.isPro()) {
-          this.updateUI();
-          this.showNotification(this.t('customThemeLocked'));
-          return;
-        }
         const presetSelect = document.getElementById('themePreset');
         if (presetSelect.value !== 'custom') this.themeBasePreset = presetSelect.value;
         presetSelect.value = 'custom';
@@ -338,115 +310,15 @@ class OptionsManager {
     return window.PixelI18n?.t(this.getLanguage(), key) || key;
   }
 
-  isPro() {
-    return this.settings?.licenseStatus === 'pro' || Date.now() <= this.freeProUntil;
-  }
-
-  isFreeProPeriod() {
-    return Date.now() <= this.freeProUntil;
-  }
-
-  getFreeProRemaining() {
-    const ms = Math.max(0, this.freeProUntil - Date.now());
-    const totalHours = Math.floor(ms / (60 * 60 * 1000));
-    return { days: Math.floor(totalHours / 24), hours: totalHours % 24 };
-  }
-
-  isFreeThemePreset(preset) {
-    return this.freeThemePresets.includes(preset);
-  }
-
-  canUseThemePreset(preset) {
-    return this.isPro() || this.isFreeThemePreset(preset);
-  }
-
-  openUpgradePage() {
-    const url = this.getUpgradeUrl();
-    if (!url) {
-      this.showNotification(this.t('purchaseUrlMissing'));
-      return;
-    }
-    window.open(url, '_blank');
-  }
-
-  getLicenseApiBase() {
-    return (this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev').replace(/\/+$/, '');
-  }
-
-  getUpgradeUrl() {
-    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/v2-upgrade`;
-    const separator = rawUrl.includes('?') ? '&' : '?';
-    return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
-  }
-
-  updateProStatus() {
-    const title = document.getElementById('proStatusTitle');
-    const hint = document.getElementById('proStatusHint');
-    const button = document.getElementById('upgradePro');
-    const freePeriod = this.isFreeProPeriod();
-    if (title) {
-      title.textContent = freePeriod
-        ? this.t('limitedFree')
-        : (this.isPro() ? this.t('proVersion') : this.t('freeVersion'));
-    }
-    if (hint) {
-      if (freePeriod) {
-        const { days, hours } = this.getFreeProRemaining();
-        hint.textContent = this.t('limitedFreeCountdown').replace('{d}', days).replace('{h}', hours);
-      } else if (this.isPro()) {
-        hint.textContent = `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`;
-      } else {
-        hint.textContent = this.t('freePaletteLimit');
-      }
-    }
-    if (button) {
-      // 限时免费期间隐藏购买入口，结束后（未解锁时）显示
-      button.style.display = (freePeriod || this.isPro()) ? 'none' : '';
-    }
-    const unlockCard = document.getElementById('proUnlockCard');
-    if (unlockCard) {
-      unlockCard.style.display = (!freePeriod && !this.isPro()) ? '' : 'none';
-    }
-  }
-
-  async unlockByEmail() {
-    const input = document.getElementById('paymentEmail');
-    const button = document.getElementById('unlockPro');
-    const email = String(input?.value || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.showNotification(this.t('paymentEmailRequired'));
-      return;
-    }
-
-    const originalText = button?.textContent || this.t('unlockPro');
-    if (button) {
-      button.disabled = true;
-      button.textContent = this.t('unlockingPro');
-    }
-
-    try {
-      const response = await fetch(`${this.getLicenseApiBase()}/api/license/status?email=${encodeURIComponent(email)}`);
-      const data = await response.json();
-      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
-        throw new Error(data.error || this.t('unlockNotFound'));
-      }
-
-      this.settings = {
-        ...this.settings,
-        licenseStatus: 'pro',
-        licenseEmail: data.licenseEmail || email
-      };
-      await this.saveSettings();
-      this.updateUI();
-      this.showNotification(this.t('proUnlocked'));
-    } catch (error) {
-      this.showNotification(error.message || this.t('unlockFailed'));
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = originalText;
-      }
-    }
+  switchDonateTab(tab, scope = 'optionsDonate') {
+    const tabSel = scope === 'optionsDonate' ? '#donate .donate-tab' : '#donateOverlay .donate-tab';
+    const wxSel = scope === 'optionsDonate' ? '#optionsDonatePanelWx' : '#donatePanelWx';
+    const paypalSel = scope === 'optionsDonate' ? '#optionsDonatePanelPaypal' : '#donatePanelPaypal';
+    document.querySelectorAll(tabSel).forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
+    const wxPanel = document.querySelector(wxSel);
+    const paypalPanel = document.querySelector(paypalSel);
+    if (wxPanel) wxPanel.hidden = (tab !== 'wx');
+    if (paypalPanel) paypalPanel.hidden = (tab !== 'paypal');
   }
 
   applyI18n() {
@@ -459,13 +331,13 @@ class OptionsManager {
         '.pixel-header h1': 'appSettings',
         '.settings-nav a[href="#behavior"]': 'behavior',
         '.settings-nav a[href="#theme"]': 'theme',
-        '.settings-nav a[href="#pro"]': 'pro',
+        '.settings-nav a[href="#donate"]': 'donate',
         '.settings-nav a[href="#language"]': 'language',
         '.settings-nav a[href="#data"]': 'data',
         '.settings-nav a[href="#about"]': 'about',
         '#behavior .section-head h2': 'behaviorSettings',
         '#theme .section-head h2': 'themeAppearance',
-        '#pro .section-head h2': 'pro',
+        '#donate .section-head h2': 'donate',
         '#language .section-head h2': 'languageSettings',
         '#data .section-head h2': 'dataManagement',
         '#about .section-head h2': 'about',
@@ -505,16 +377,10 @@ class OptionsManager {
         '#viewHistory': 'viewChangelog',
         '#saveSettings': 'saveSettings',
         '#resetSettings': 'reset',
-        '#backToPopup': 'close',
-        '#paymentEmailLabel': 'paymentEmail',
-        '#paymentEmailHint': 'paymentEmailHint',
-        '#unlockPro': 'unlockPro'
+        '#backToPopup': 'close'
       },
       title: {
         '.use-picked-btn': 'usePickedFill'
-      },
-      placeholder: {
-        '#paymentEmail': 'paymentEmailPlaceholder'
       },
       aria: {
         '.settings-nav': 'settingsGroup',
@@ -526,12 +392,11 @@ class OptionsManager {
     document.querySelector('#pickAction option[value="copy"]').textContent = this.t('copy');
     document.querySelector('#pickAction option[value="copy-save"]').textContent = this.t('copySave');
     this.updateThemePresetLabels('themePreset');
-    this.updateProStatus();
     this.updateSectionNumbers();
   }
 
   updateSectionNumbers() {
-    ['behavior', 'theme', 'pro', 'language', 'data', 'about'].forEach((id, index) => {
+    ['behavior', 'theme', 'donate', 'language', 'data', 'about'].forEach((id, index) => {
       const badge = document.querySelector(`#${id} .section-head span`);
       if (badge) badge.textContent = String(index + 1).padStart(2, '0');
     });
@@ -558,27 +423,16 @@ class OptionsManager {
     Object.entries(labels).forEach(([value, key]) => {
       const option = select.querySelector(`option[value="${value}"]`);
       if (option) {
-        const locked = !this.canUseThemePreset(value);
-        option.textContent = `${this.t(key)}${locked ? ' PRO' : ''}`;
-        option.disabled = locked && value === 'custom';
+        option.textContent = this.t(key);
+        option.disabled = false;
       }
     });
   }
 
   applyThemePresetToInputs() {
     const preset = document.getElementById('themePreset').value;
-    if (!this.canUseThemePreset(preset)) {
-      document.getElementById('themePreset').value = this.settings.themeBasePreset || 'pink';
-      this.showNotification(this.t('proThemeLocked'));
-      return;
-    }
     const colors = this.getThemePresets()[preset];
     if (!colors) {
-      if (!this.isPro()) {
-        document.getElementById('themePreset').value = this.settings.themeBasePreset || 'pink';
-        this.showNotification(this.t('customThemeLocked'));
-        return;
-      }
       this.syncColorLabels();
       this.applyThemeFromInputs();
       return;
@@ -771,15 +625,6 @@ class OptionsManager {
   }
 
   async handleSave() {
-    const selectedTheme = document.getElementById('themePreset').value;
-    if (!this.canUseThemePreset(selectedTheme)) {
-      this.showNotification(this.t('proThemeLocked'));
-      return;
-    }
-    if (!this.isPro() && selectedTheme === 'custom') {
-      this.showNotification(this.t('customThemeLocked'));
-      return;
-    }
     this.collectSettingsFromInputs();
     await this.saveSettings();
     this.applyTheme();
@@ -788,15 +633,7 @@ class OptionsManager {
   }
 
   async handleReset() {
-    const licenseStatus = this.settings?.licenseStatus || 'free';
-    const licenseEmail = this.settings?.licenseEmail || '';
-    const licenseApiBase = this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev';
-    const proPurchaseUrl = this.settings?.proPurchaseUrl || '';
     this.settings = this.getDefaultSettings();
-    this.settings.licenseStatus = licenseStatus;
-    this.settings.licenseEmail = licenseEmail;
-    this.settings.licenseApiBase = licenseApiBase;
-    this.settings.proPurchaseUrl = proPurchaseUrl;
     this.themeBasePreset = 'pink';
     this.updateUI();
     await this.saveSettings();

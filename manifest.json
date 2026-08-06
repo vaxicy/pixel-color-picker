@@ -1,16 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Pixel Color Picker - 像素吸色器",
-  "version": "1.0.1",
-  "description": "小巧可爱的像素风网页吸色工具，支持颜色收藏和色卡导出",
+  "default_locale": "zh_CN",
+  "name": "__MSG_name__",
+  "version": "1.1.0",
+  "description": "__MSG_description__",
   "permissions": [
     "activeTab",
     "storage",
     "clipboardWrite",
     "downloads"
-  ],
-  "host_permissions": [
-    "https://pixel-color-picker-pro.huangzero2004.workers.dev/*"
   ],
   "background": {
     "service_worker": "background/background.js"

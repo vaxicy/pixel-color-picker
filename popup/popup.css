@@ -2470,49 +2470,11 @@ button, input {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.pro-status-row {
-  grid-template-columns: minmax(0, 1fr) auto;
-  background: rgba(255, 240, 168, 0.34);
-}
-
 .pro-upgrade-btn {
   width: auto;
   min-width: 54px;
   padding: 0 8px;
   background: var(--cream);
-}
-
-.pro-upgrade-btn:disabled {
-  background: rgba(105,217,191,0.42);
-  color: var(--text-soft);
-  cursor: default;
-}
-
-.pro-detail-panel {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-}
-
-.pro-detail-panel div {
-  display: grid;
-  gap: 3px;
-  padding: 6px;
-  background: rgba(255,255,255,0.68);
-  border: 2px solid rgba(63,52,64,0.32);
-}
-
-.pro-detail-panel strong {
-  color: var(--text);
-  font-size: 10px;
-  line-height: 1;
-  font-weight: normal;
-}
-
-.pro-detail-panel span {
-  color: var(--text-soft);
-  font-size: 9px;
-  line-height: 1.2;
 }
 
 .data-actions {
@@ -3108,31 +3070,152 @@ button,
   line-height: 1.35;
 }
 
-.popup-pro-activation {
+/* donate dialog */
+.donate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(63, 52, 64, 0.42);
   display: grid;
-  gap: 7px;
-  padding: 8px;
-  background: #fffdf4;
-  border: 2px solid rgba(63,52,64,0.28);
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
 }
 
-.popup-pro-activation label {
-  color: var(--text);
-  font-size: 11px;
-}
-
-.popup-pro-activation input {
-  width: 100%;
-  min-width: 0;
-  padding: 8px;
-  border: 2px solid var(--border);
+.donate-dialog {
+  width: min(360px, 100%);
   background: var(--panel);
-  color: var(--text);
-  font: inherit;
-  font-size: 10px;
-  text-transform: uppercase;
+  border: 3px solid var(--border);
+  box-shadow: 4px 4px 0 rgba(63, 52, 64, 0.32);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  max-height: 92vh;
+  overflow: hidden;
 }
 
-.pro-activate-btn {
+.donate-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--header-bg, #fff9fc);
+  border-bottom: 2px solid var(--border);
+}
+
+.donate-header h2 {
+  margin: 2px 0 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.donate-body {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.donate-hint {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.donate-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 2px solid var(--border);
+  background: var(--bg);
+}
+
+.donate-tab {
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.donate-tab + .donate-tab {
+  border-left: 2px solid var(--border);
+}
+
+.donate-tab.active {
+  background: var(--cream, #fff0a8);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.donate-panel {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  padding: 6px 0 2px;
+  min-width: 0;
+}
+
+.donate-qr {
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+  border: 2px solid var(--border);
+  background: #fff;
+  object-fit: contain;
+}
+
+.donate-thanks {
+  margin: 6px 0 0;
+  color: var(--text);
+  font-size: 13px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.donate-subhint {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.donate-paypal-btn {
+  display: block;
   width: 100%;
+  padding: 12px 16px;
+  background: #0070ba;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid #003087;
+  box-shadow: 2px 2px 0 rgba(63, 52, 64, 0.32);
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.donate-paypal-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(63, 52, 64, 0.32);
+  color: #fff;
+}
+
+.donate-paypal-btn:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 rgba(63, 52, 64, 0.32);
+}
+
+.donate-actions {
+  padding: 10px 14px;
+  border-top: 2px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }

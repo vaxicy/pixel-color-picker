@@ -1,0 +1,28 @@
+# Pixel Color Picker vsce package exclude
+# Anything matched here is excluded from the packaged .zip/.crx
+
+# Local-only / working memory
+.codebuddy/
+.codebuddy/**
+*.log
+*.bak
+*.tmp
+
+# Dev dependencies / build output
+node_modules/
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Git metadata
+.git/
+.gitignore
+.github/
+
+# Local secrets (if any leaked into repo)
+.env
+.env.*
+wrangler.toml
+.dev.vars

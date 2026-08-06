@@ -20,9 +20,6 @@ class PixelColorPicker {
     this.swatchLabelMode = 'note';
     this.themeBasePreset = 'pink';
     this.pickConfirmTimer = null;
-    this.freePaletteLimit = 5;
-    this.freeThemePresets = ['pink', 'green', 'night', 'purple'];
-    this.freeProUntil = new Date('2026-07-25T23:59:59').getTime();
 
     this.init();
   }
@@ -39,10 +36,6 @@ class PixelColorPicker {
       chrome.storage.sync.get(['palettes', 'currentPaletteId', 'palette', 'settings', 'colorHistory', 'lastPickedColor'], (result) => {
         this.settings = {
           language: 'zh-CN',
-          licenseStatus: 'free',
-          licenseEmail: '',
-          licenseApiBase: 'https://pixel-color-picker-pro.huangzero2004.workers.dev',
-          proPurchaseUrl: '',
           ...(result.settings || {})
         };
         this.colorHistory = Array.isArray(result.colorHistory) ? result.colorHistory : [];
@@ -172,66 +165,23 @@ class PixelColorPicker {
     return window.PixelI18n?.t(this.getLanguage(), key) || key;
   }
 
-  isPro() {
-    return this.settings?.licenseStatus === 'pro' || Date.now() <= this.freeProUntil;
+  openDonationDialog() {
+    const overlay = document.getElementById('donateOverlay');
+    if (overlay) overlay.hidden = false;
   }
 
-  isFreeProPeriod() {
-    return Date.now() <= this.freeProUntil;
+  closeDonationDialog() {
+    const overlay = document.getElementById('donateOverlay');
+    if (overlay) overlay.hidden = true;
   }
 
-  getFreeProRemaining() {
-    const ms = Math.max(0, this.freeProUntil - Date.now());
-    const totalHours = Math.floor(ms / (60 * 60 * 1000));
-    return { days: Math.floor(totalHours / 24), hours: totalHours % 24 };
-  }
-
-  getLicenseLabel() {
-    return this.isPro() ? this.t('proVersion') : this.t('freeVersion');
-  }
-
-  isFreeThemePreset(preset) {
-    return this.freeThemePresets.includes(preset);
-  }
-
-  canUseThemePreset(preset) {
-    return this.isPro() || this.isFreeThemePreset(preset);
-  }
-
-  async showProUpgradeDialog(reason = '') {
-    const result = await this.openPixelDialog({
-      eyebrow: 'PIXEL PRO',
-      title: this.t('upgradePro'),
-      message: reason || this.t('proUnlockAll'),
-      detailHtml: `
-        <div class="pro-detail-panel">
-          <div><strong>${this.t('freeVersion')}</strong><span>${this.t('freePaletteLimit')}</span></div>
-          <div><strong>${this.t('proVersion')}</strong><span>${this.t('proUnlockAll')}</span></div>
-        </div>
-      `,
-      actions: [
-        { id: 'upgrade', label: this.t('upgradePro'), tone: 'primary' },
-        { id: 'cancel', label: this.t('cancel') }
-      ]
-    });
-
-    if (result.action !== 'upgrade') return;
-    const url = this.getUpgradeUrl();
-    if (!url) {
-      this.showNotification(this.t('purchaseUrlMissing'));
-      return;
-    }
-    window.open(url, '_blank');
-  }
-
-  getLicenseApiBase() {
-    return (this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev').replace(/\/+$/, '');
-  }
-
-  getUpgradeUrl() {
-    const rawUrl = this.settings?.proPurchaseUrl || `${this.getLicenseApiBase()}/v2-upgrade`;
-    const separator = rawUrl.includes('?') ? '&' : '?';
-    return `${rawUrl}${separator}lang=${encodeURIComponent(this.getLanguage())}`;
+  switchDonateTab(tab) {
+    const tabs = document.querySelectorAll('#donateOverlay .donate-tab');
+    tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+    const wxPanel = document.getElementById('donatePanelWx');
+    const paypalPanel = document.getElementById('donatePanelPaypal');
+    if (wxPanel) wxPanel.hidden = (tab !== 'wx');
+    if (paypalPanel) paypalPanel.hidden = (tab !== 'paypal');
   }
 
   applyI18n() {
@@ -282,9 +232,6 @@ class PixelColorPicker {
         '#savePopupSettings': 'save',
         '#resetPopupSettings': 'reset',
         '#settingsPreviewButton': 'buttonColor',
-        '#popupPaymentEmailLabel': 'paymentEmail',
-        '#popupPaymentEmailHint': 'paymentEmailHint',
-        '#popupUnlockPro': 'unlockPro',
         '.settings-preview > small': 'previewBeforeSave'
       },
       title: {
@@ -322,8 +269,7 @@ class PixelColorPicker {
       },
       placeholder: {
         '#paletteSearch': 'searchPalettePlaceholder',
-        '#historySearch': 'searchHistoryPlaceholder',
-        '#popupPaymentEmail': 'paymentEmailPlaceholder'
+        '#historySearch': 'searchHistoryPlaceholder'
       }
     });
 
@@ -346,7 +292,7 @@ class PixelColorPicker {
       ['buttonColor', ''],
       ['bgColor', ''],
       ['panelColor', ''],
-      ['proVersion', 'freePaletteLimit'],
+      ['donate', 'donateHint'],
       ['backupManagement', 'backupHint']
     ];
     settingsRows.forEach((copy, index) => {
@@ -355,10 +301,9 @@ class PixelColorPicker {
       if (smallKey && copy.querySelector('small')) copy.querySelector('small').textContent = this.t(smallKey);
     });
     const groupTitles = document.querySelectorAll('#settingsOverlay .settings-group-title');
-    ['behavior', 'operation', 'themeAppearance', 'pro', 'data'].forEach((key, index) => {
+    ['behavior', 'operation', 'themeAppearance', 'donate', 'data'].forEach((key, index) => {
       if (groupTitles[index]) groupTitles[index].textContent = this.t(key);
     });
-    this.updatePopupProStatus();
     this.updatePaletteFilterLabels();
   }
 
@@ -383,86 +328,10 @@ class PixelColorPicker {
     Object.entries(labels).forEach(([value, key]) => {
       const option = select.querySelector(`option[value="${value}"]`);
       if (option) {
-        const locked = !this.canUseThemePreset(value);
-        option.textContent = `${this.t(key)}${locked ? ' PRO' : ''}`;
-        option.disabled = locked && value === 'custom';
+        option.textContent = this.t(key);
+        option.disabled = false;
       }
     });
-  }
-
-  updatePopupProStatus() {
-    const title = document.getElementById('popupProStatusTitle');
-    const hint = document.getElementById('popupProStatusHint');
-    const button = document.getElementById('popupUpgradePro');
-    const freePeriod = this.isFreeProPeriod();
-    if (title) {
-      title.textContent = freePeriod
-        ? this.t('limitedFree')
-        : (this.isPro() ? this.t('proVersion') : this.t('freeVersion'));
-    }
-    if (hint) {
-      if (freePeriod) {
-        const { days, hours } = this.getFreeProRemaining();
-        hint.textContent = this.t('limitedFreeCountdown').replace('{d}', days).replace('{h}', hours);
-      } else if (this.isPro()) {
-        hint.textContent = `${this.t('proUnlockedHint')}${this.settings.licenseEmail ? ` · ${this.settings.licenseEmail}` : ''}`;
-      } else {
-        hint.textContent = this.t('freePaletteLimit');
-      }
-    }
-    if (button) {
-      // 限时免费期间隐藏购买入口，结束后（未解锁时）显示
-      button.style.display = (freePeriod || this.isPro()) ? 'none' : '';
-    }
-    const unlockRow = document.getElementById('popupProUnlockRow');
-    if (unlockRow) {
-      unlockRow.style.display = (!freePeriod && !this.isPro()) ? '' : 'none';
-    }
-  }
-
-  async unlockByEmail() {
-    const input = document.getElementById('popupPaymentEmail');
-    const button = document.getElementById('popupUnlockPro');
-    const email = String(input?.value || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.showNotification(this.t('paymentEmailRequired'));
-      return;
-    }
-
-    const originalText = button?.textContent || this.t('unlockPro');
-    if (button) {
-      button.disabled = true;
-      button.textContent = this.t('unlockingPro');
-    }
-
-    try {
-      const response = await fetch(`${this.getLicenseApiBase()}/api/license/status?email=${encodeURIComponent(email)}`);
-      const data = await response.json();
-      if (!response.ok || !data.valid || data.licenseStatus !== 'pro') {
-        throw new Error(data.error || this.t('unlockNotFound'));
-      }
-
-      this.settings = {
-        ...this.settings,
-        licenseStatus: 'pro',
-        licenseEmail: data.licenseEmail || email
-      };
-      await new Promise((resolve) => {
-        chrome.storage.sync.set({ settings: this.settings }, resolve);
-      });
-
-      this.updatePopupProStatus();
-      this.updateThemePresetLabels('popupThemePreset');
-      this.applyI18n();
-      this.showNotification(this.t('proUnlocked'));
-    } catch (error) {
-      this.showNotification(error.message || this.t('unlockFailed'));
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = originalText;
-      }
-    }
   }
 
   updatePaletteFilterLabels() {
@@ -1073,8 +942,11 @@ class PixelColorPicker {
     });
     document.getElementById('savePopupSettings').addEventListener('click', () => this.savePopupSettings());
     document.getElementById('resetPopupSettings').addEventListener('click', () => this.resetPopupSettings());
-    document.getElementById('popupUpgradePro')?.addEventListener('click', () => this.showProUpgradeDialog());
-    document.getElementById('popupUnlockPro')?.addEventListener('click', () => this.unlockByEmail());
+    document.getElementById('popupOpenDonate')?.addEventListener('click', () => this.openDonationDialog());
+    document.getElementById('donateClose')?.addEventListener('click', () => this.closeDonationDialog());
+    document.getElementById('donateCancel')?.addEventListener('click', () => this.closeDonationDialog());
+    document.getElementById('donateTabWx')?.addEventListener('click', () => this.switchDonateTab('wx'));
+    document.getElementById('donateTabPaypal')?.addEventListener('click', () => this.switchDonateTab('paypal'));
     document.getElementById('exportAllData').addEventListener('click', () => this.exportAllData());
     document.getElementById('importAllData').addEventListener('click', () => this.importAllData());
     document.getElementById('clearAllData').addEventListener('click', () => this.clearAllData());
@@ -1086,11 +958,6 @@ class PixelColorPicker {
     document.getElementById('popupThemePreset').addEventListener('change', () => this.applyThemePresetToSettings());
     ['popupHeaderColor', 'popupButtonColor', 'popupBgColor', 'popupPanelColor'].forEach((id) => {
       document.getElementById(id).addEventListener('input', () => {
-        if (!this.isPro()) {
-          this.showProUpgradeDialog(this.t('customThemeLocked'));
-          this.openSettingsDialog();
-          return;
-        }
         const presetSelect = document.getElementById('popupThemePreset');
         if (presetSelect.value !== 'custom') this.themeBasePreset = presetSelect.value;
         presetSelect.value = 'custom';
@@ -1598,7 +1465,6 @@ class PixelColorPicker {
     document.getElementById('popupBgColor').value = theme.bgColor;
     document.getElementById('popupPanelColor').value = theme.panelColor;
     this.syncSettingsColorLabels();
-    this.updatePopupProStatus();
     this.updateThemePresetLabels('popupThemePreset');
     this.updateSettingsPreview();
     this.applyI18n();
@@ -1791,10 +1657,6 @@ class PixelColorPicker {
 
   getThemeSettings() {
     const presets = this.getThemePresets();
-    if (!this.canUseThemePreset(this.settings?.themePreset)) {
-      this.settings.themePreset = 'pink';
-      this.settings.themeBasePreset = 'pink';
-    }
     const themeBasePreset = this.settings?.themePreset === 'custom'
       ? (this.settings?.themeBasePreset || 'pink')
       : (presets[this.settings?.themePreset] ? this.settings.themePreset : 'pink');
@@ -1837,18 +1699,8 @@ class PixelColorPicker {
 
   applyThemePresetToSettings() {
     const preset = document.getElementById('popupThemePreset').value;
-    if (!this.canUseThemePreset(preset)) {
-      document.getElementById('popupThemePreset').value = this.getThemeSettings().themeBasePreset || 'pink';
-      this.showProUpgradeDialog(this.t('proThemeLocked'));
-      return;
-    }
     const colors = this.getThemePresets()[preset];
     if (!colors) {
-      if (!this.isPro()) {
-        document.getElementById('popupThemePreset').value = this.getThemeSettings().themeBasePreset || 'pink';
-        this.showProUpgradeDialog(this.t('customThemeLocked'));
-        return;
-      }
       this.syncSettingsColorLabels();
       return;
     }
@@ -1861,15 +1713,6 @@ class PixelColorPicker {
   }
 
   async savePopupSettings() {
-    const selectedTheme = document.getElementById('popupThemePreset').value;
-    if (!this.canUseThemePreset(selectedTheme)) {
-      await this.showProUpgradeDialog(this.t('proThemeLocked'));
-      return;
-    }
-    if (!this.isPro() && selectedTheme === 'custom') {
-      await this.showProUpgradeDialog(this.t('customThemeLocked'));
-      return;
-    }
     const maxInput = document.getElementById('popupMaxColors');
     const maxColors = Math.max(1, Math.min(100, parseInt(maxInput.value, 10) || 20));
     this.setMaxColorsInput(maxColors);
@@ -1906,20 +1749,12 @@ class PixelColorPicker {
 
   async resetPopupSettings() {
     const language = this.getLanguage();
-    const licenseStatus = this.settings?.licenseStatus || 'free';
-    const licenseEmail = this.settings?.licenseEmail || '';
-    const licenseApiBase = this.settings?.licenseApiBase || 'https://pixel-color-picker-pro.huangzero2004.workers.dev';
-    const proPurchaseUrl = this.settings?.proPurchaseUrl || '';
     this.settings = {
       defaultFormat: 'hex',
       pickAction: 'save',
       autoSave: true,
       maxColorsPerPalette: 20,
       language,
-      licenseStatus,
-      licenseEmail,
-      licenseApiBase,
-      proPurchaseUrl,
       headerColor: '#ff6b9d',
       buttonColor: '#ff6b9d',
       bgColor: '#fff9fc',
@@ -2998,10 +2833,6 @@ class PixelColorPicker {
   }
 
   async createPalette() {
-    if (!this.isPro() && this.palettes.length >= this.freePaletteLimit) {
-      await this.showProUpgradeDialog(this.t('paletteLimitProMessage'));
-      return;
-    }
     const unnamed = this.getLanguage() === 'en' ? 'Untitled palette' : '未命名色卡';
     const result = await this.openPixelDialog({
       eyebrow: 'PIXEL CARD',
