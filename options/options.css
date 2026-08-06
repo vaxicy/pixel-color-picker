@@ -26,6 +26,8 @@
   --danger: #ef4f5f;
   --header-bg: #ff6b9d;
   --button-bg: #ff6b9d;
+  --shadow: rgba(63, 52, 64, 0.22);
+  --accent: #ff6b9d;
 }
 
 * {
@@ -864,8 +866,8 @@ button {
     box-shadow: 2px 2px 0 var(--shadow);
   }
   .pixel-dialog-close:hover {
-    background: var(--accent);
-    color: #fff;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--shadow);
   }
 
   .pixel-dialog-body {

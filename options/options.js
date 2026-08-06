@@ -689,7 +689,24 @@ class OptionsManager {
 
   getChangelogEntries() {
     const language = this.getLanguage();
+    const manifestVersion = (chrome.runtime.getManifest()?.version) || '1.1.0';
     const entries = [
+      {
+        version: `v${manifestVersion}`,
+        items: language === 'en'
+          ? [
+              { kind: 'feat', text: 'Built-in changelog popup with pixel-style design' },
+              { kind: 'feat', text: 'Feedback entry inside the changelog dialog' },
+              { kind: 'fix', text: 'Changelog dialog contrast fix under the pink theme (white text was unreadable)' },
+              { kind: 'fix', text: 'Close button no longer turns invisible on hover' }
+            ]
+          : [
+              { kind: 'feat', text: '内置更新日志（像素风弹窗）' },
+              { kind: 'feat', text: '更新日志弹窗内新增反馈入口' },
+              { kind: 'fix', text: '粉主题下更新日志弹窗对比度修复（白字看不清）' },
+              { kind: 'fix', text: '关闭按钮悬浮态不再消失/变白' }
+            ]
+      },
       {
         version: 'v1.0.0',
         items: language === 'en'
