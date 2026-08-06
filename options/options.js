@@ -697,22 +697,40 @@ class OptionsManager {
 
   getChangelogEntries() {
     const language = this.getLanguage();
-    const manifestVersion = (chrome.runtime.getManifest()?.version) || '1.1.0';
+    const manifestVersion = (chrome.runtime.getManifest()?.version) || '1.1.1';
     const entries = [
       {
         version: `v${manifestVersion}`,
         items: language === 'en'
           ? [
-              { kind: 'feat', text: 'Built-in changelog popup with pixel-style design' },
-              { kind: 'feat', text: 'Feedback entry inside the changelog dialog' },
-              { kind: 'fix', text: 'Changelog dialog contrast fix under the pink theme (white text was unreadable)' },
-              { kind: 'fix', text: 'Close button no longer turns invisible on hover' }
+              { kind: 'new', text: 'Built-in changelog popup in settings (pixel-style design)' },
+              { kind: 'new', text: 'Feedback email entry inside the changelog dialog' },
+              { kind: 'fix', text: 'Changelog dialog white text contrast fixed under pink theme' },
+              { kind: 'fix', text: 'Close button no longer disappears/turns white on hover' },
+              { kind: 'feat', text: 'Removed tip entry from popup; kept it only in options' }
             ]
           : [
-              { kind: 'feat', text: '内置更新日志（像素风弹窗）' },
-              { kind: 'feat', text: '更新日志弹窗内新增反馈入口' },
-              { kind: 'fix', text: '粉主题下更新日志弹窗对比度修复（白字看不清）' },
-              { kind: 'fix', text: '关闭按钮悬浮态不再消失/变白' }
+              { kind: 'new', text: '设置页新增内置更新日志（像素风弹窗），版本自动从 manifest 读取' },
+              { kind: 'new', text: '更新日志弹窗内新增反馈邮件入口' },
+              { kind: 'fix', text: '粉主题下更新日志弹窗白字看不清问题修复' },
+              { kind: 'fix', text: '关闭按钮悬浮不再消失/变白' },
+              { kind: 'feat', text: '移除 popup 内打赏入口，仅在 options 设置页保留' }
+            ]
+      },
+      {
+        version: 'v1.1.0',
+        items: language === 'en'
+          ? [
+              { kind: 'feat', text: 'Completely free - removed Pro plan, all themes & unlimited palettes open to everyone' },
+              { kind: 'feat', text: 'Optional tips - WeChat QR / PayPal donation links' },
+              { kind: 'feat', text: 'Zero remote - removed all host_permissions' },
+              { kind: 'chore', text: 'Removed 18+ Pro-related i18n keys and 4 Pro-limit intercepts' }
+            ]
+          : [
+              { kind: 'feat', text: '完全免费 - 移除 Pro 付费模式，所有主题、自定义主题、无限色卡对所有用户开放' },
+              { kind: 'feat', text: '新增打赏 - 微信赞赏码 / PayPal 付款链接（可选）' },
+              { kind: 'feat', text: '零远程 - 删除所有 host_permissions' },
+              { kind: 'chore', text: '删除 18+ Pro 相关 i18n 字段与 4 处 Pro 限制拦截' }
             ]
       },
       {
@@ -731,7 +749,7 @@ class OptionsManager {
       }
     ];
 
-    const titleMap = { feat: 'feat', fix: 'fix', new: 'new' };
+    const titleMap = { feat: 'feat', fix: 'fix', new: 'new', chore: 'chore' };
     return entries.map((entry) => ({
       version: entry.version,
       items: entry.items.map((item) => ({
