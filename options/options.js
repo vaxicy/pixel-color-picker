@@ -10,8 +10,16 @@ class OptionsManager {
 
   async init() {
     await this.loadSettings();
+    this.updateAppVersionLabel();
     this.bindEvents();
     this.updateUI();
+  }
+
+  updateAppVersionLabel() {
+    const el = document.getElementById('appVersionLabel');
+    if (!el) return;
+    const version = (chrome.runtime?.getManifest()?.version) || '1.0.0';
+    el.textContent = `Pixel Color Picker v${version}`;
   }
 
   getThemePresets() {
