@@ -46,9 +46,13 @@
 
 ### Option 1 · Chrome Web Store (recommended)
 
-Install from the Chrome Web Store:
+<p>
+  <a href="https://chromewebstore.google.com/detail/pixel-color-picker-%E5%83%8F%E7%B4%A0%E5%90%B8%E8%89%B2%E5%99%A8/ekcbijfmpaglkgbdmiandakplmflanlo">
+    <img src="https://img.shields.io/badge/Chrome_Add--on-Install-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Install from Chrome Web Store">
+  </a>
+</p>
 
-👉 https://chromewebstore.google.com/detail/pixel-color-picker-%E5%83%8F%E7%B4%A0%E5%90%B8%E8%89%B2%E5%99%A8/ekcbijfmpaglkgbdmiandakplmflanlo
+一键安装，自动更新 — 推荐给普通用户。
 
 ### Option 2 · Load unpacked (developer mode)
 
