@@ -1,43 +1,67 @@
 === 中文详细说明 ===
 
-像素吸色器是一款可爱的 Chrome 扩展，让你一键获取网页上任意位置的颜色。
+小巧可爱的像素风网页吸色工具，支持颜色收藏和色卡导出
 
-🎨 主要功能
-- 一键取色：点扩展图标 → 点「快速取色」→ 在网页上点任意位置取色，支持 HEX / RGB / HSL 格式
-- 色卡管理：自由创建多个色卡，每个色卡可重命名、删除、单独导出
-- 12+ 套预设主题 + 完全自定义主题：少女粉、森林绿、夜空黑、鸢尾紫、燕麦咖、樱桃、游戏机、可可、薄荷、葡萄、迷雾蓝、奶油白，并支持自由调整 header / button / 背景 / 面板四种颜色
-- 多格式导出：CSS 变量 / JSON / Tailwind config / PNG 色卡图片
-- 搜索：色卡和历史记录都支持快速搜索
-- 深色模式：跟随系统自动切换
-- 中英双语：完整 zh-CN / en 翻译
-- 本地存储：所有数据存在 chrome.storage.sync，零远程调用
+Pixel Color Picker 是一款轻量、像素风格的网页取色 Chrome 扩展，适合设计师、开发者、插画师和内容创作者快速收集、整理和导出颜色。
 
-💝 全免费 + 可选打赏
-本扩展完全免费，没有任何付费功能。如果你喜欢这个工具，可以选择通过微信赞赏码或 PayPal 给我打赏一杯咖啡。
+主要功能
 
-🔒 隐私优先
-- 零远程代码、零第三方分析、零追踪
-- 所有色卡 / 设置都存本地 chrome.storage.sync
-- 可选打赏链接跳转到 paypal.com 或微信扫码 - 由用户主动触发
+- 使用浏览器取色器从网页中快速获取颜色
+- 自动保存取色历史，方便回看最近使用过的颜色
+- 创建和管理多个色卡
+- 为颜色添加备注，方便记录用途
+- 搜索、排序和整理色卡颜色
+- 支持 HEX、RGB、HSL 等常用颜色格式
+- 一键复制颜色值
+- 支持导出 CSS、SCSS、JSON、Tailwind 配置片段和 PNG 色卡图片
+- 支持导入色卡 JSON 文件
+- 支持中英文界面
+- 提供像素风主题和自定义主题设置
+
+12 套像素风预设主题全部免费，并支持自定义 header / button / 背景 / 面板四种颜色。所有功能（取色、色卡管理、历史记录、多格式导出、自定义主题）全部免费开放，无任何付费墙、Pro 等级或功能限制。
+
+隐私优先
+
+Pixel Color Picker 会将色卡、取色历史和设置保存在浏览器扩展存储中。扩展不会出售用户数据，也不会将用户色卡内容分享给第三方。所有数据仅存于你的本地浏览器（chrome.storage.sync），不向任何远程服务器发送。
+
+适合用于
+
+- 网页设计取色
+- UI 设计配色收集
+- 前端开发 CSS 变量整理
+- 品牌色、主题色和灵感色卡管理
+- 日常颜色收藏与导出
 
 === English Detailed Description ===
 
-Pixel Color Picker is a cute Chrome extension that lets you pick any color from any web page with a single click.
+A compact, cute pixel-style web color picker with color collections and palette export.
 
-🎨 Main features
-- One-click color picking: click the extension icon → click "Quick Pick" → click anywhere on a page. HEX / RGB / HSL formats supported
-- Palette management: create unlimited palettes, rename, delete, export individually
-- 12+ preset themes + fully custom themes: Pink, Green, Night, Iris, Oat, Cherry, Game Boy, Cocoa, Mint, Grape, Mist, Cream, plus custom header / button / background / panel colors
-- Multi-format export: CSS variables / JSON / Tailwind config / PNG palette images
-- Search: quickly find colors in your palettes and history
-- Dark mode: follows system automatically
-- Bilingual: complete zh-CN / en translations
-- Local storage: all data stored in chrome.storage.sync, zero remote calls
+Pixel Color Picker is a lightweight, pixel-styled Chrome extension for designers, developers, illustrators and content creators who need a quick way to pick, organize and export colors from any web page.
 
-💝 Free forever · Optional tips
-This extension is completely free with no paid features. If you enjoy using it, you can tip the developer via WeChat QR or PayPal.
+Main features
 
-🔒 Privacy first
-- Zero remote code, zero third-party analytics, zero tracking
-- All palettes and settings stored locally in chrome.storage.sync
-- Optional tip links go to paypal.com or WeChat scan - triggered manually by the user
+- Use the browser eyedropper to grab a color from any web page
+- Automatically save color history so you can revisit recently picked colors
+- Create and manage multiple palettes
+- Add notes to colors to keep track of how and where you use them
+- Search, sort and organize the colors in your palettes
+- Support for HEX, RGB and HSL formats
+- One-click copy for any color value
+- Export to CSS, SCSS, JSON, Tailwind config snippets and PNG palette images
+- Import palette JSON files
+- Bilingual interface (Chinese and English)
+- Pixel-style presets plus a custom theme editor
+
+All 12 pixel-style preset themes are free, and you can freely tweak four color slots (header, button, background, panel) in the settings. Every feature – color picking, palette management, history, multi-format export and custom themes – is completely free with no paid tier, no Pro plan and no feature lock.
+
+Privacy first
+
+Pixel Color Picker stores palettes, color history and settings in your browser's extension storage. The extension does not sell user data and never shares your palette contents with third parties. All data lives locally in your browser (chrome.storage.sync); the extension makes no requests to remote servers.
+
+Great for
+
+- Picking colors from web pages while you design
+- Collecting UI and brand color palettes
+- Building CSS variables for front-end projects
+- Managing brand, theme and inspiration palettes
+- Daily color bookmarking and exporting
