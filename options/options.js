@@ -600,6 +600,15 @@ class OptionsManager {
     this.generateThemeFromHex(hex);
   }
 
+  saveColorHistory() {
+    return new Promise((resolve) => {
+      chrome.storage.sync.set(
+        { colorHistory: this.colorHistory, lastPickedColor: this.lastPickedColor },
+        resolve
+      );
+    });
+  }
+
   async deleteThemeSourceColor(hex) {
     const upperHex = hex.toUpperCase();
     const before = this.colorHistory.length;
