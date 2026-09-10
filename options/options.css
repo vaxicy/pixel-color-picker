@@ -33,6 +33,14 @@
 * {
   box-sizing: border-box;
   image-rendering: pixelated;
+  scrollbar-width: none !important;
+}
+
+/* 全局隐藏滚动条，保留滚轮/触摸板滚动 */
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 html {
@@ -551,6 +559,16 @@ button {
   box-shadow: 2px 2px 0 rgba(63,52,64,0.14);
 }
 
+.picked-theme-head button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.picked-theme-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .picked-theme-list {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -571,6 +589,37 @@ button {
   box-shadow:
     inset -3px -3px 0 rgba(0,0,0,0.12),
     3px 3px 0 rgba(63,52,64,0.18);
+}
+
+.picked-color-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.picked-color-delete {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 2px solid var(--border);
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  box-shadow: 1px 1px 0 rgba(63,52,64,0.14);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.picked-color-wrap:hover .picked-color-delete {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .picked-empty {

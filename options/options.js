@@ -262,6 +262,7 @@ class OptionsManager {
     document.getElementById('resetSettings').addEventListener('click', () => this.handleReset());
     document.getElementById('backToPopup').addEventListener('click', () => window.close());
     document.getElementById('useLastPicked').addEventListener('click', () => this.useLastPickedForTheme());
+    document.getElementById('clearThemeColorHistory')?.addEventListener('click', () => this.clearThemeSourceColors());
     document.getElementById('closePickedTarget').addEventListener('click', () => this.closePickedTargetPanel());
     document.getElementById('pickedTargetPanel').addEventListener('click', (event) => {
       event.preventDefault();
@@ -472,15 +473,27 @@ class OptionsManager {
     }
 
     list.innerHTML = recent.map((color) => `
-      <button type="button"
-              class="picked-color"
-              data-hex="${color.hex}"
-              style="background:${color.hex}"
-              title="${this.getLanguage() === 'en' ? `Generate theme from ${color.hex}` : `用 ${color.hex} 生成主题`}"></button>
+      <div class="picked-color-wrap">
+        <button type="button"
+                class="picked-color"
+                data-hex="${color.hex}"
+                style="background:${color.hex}"
+                title="${this.getLanguage() === 'en' ? `Generate theme from ${color.hex}` : `用 ${color.hex} 生成主题`}"></button>
+        <button type="button"
+                class="picked-color-delete"
+                data-hex="${color.hex}"
+                title="${this.t('deleteColor')}">×</button>
+      </div>
     `).join('');
 
     list.querySelectorAll('.picked-color').forEach((button) => {
       button.addEventListener('click', () => this.generateThemeFromHex(button.dataset.hex));
+    });
+    list.querySelectorAll('.picked-color-delete').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.deleteThemeSourceColor(button.dataset.hex);
+      });
     });
   }
 
@@ -542,15 +555,27 @@ class OptionsManager {
     }
 
     list.innerHTML = recent.map((color) => `
-      <button type="button"
-              class="picked-color"
-              data-hex="${color.hex}"
-              style="background:${color.hex}"
-              title="${this.getLanguage() === 'en' ? `Use ${color.hex}` : `使用 ${color.hex}`}"></button>
+      <div class="picked-color-wrap">
+        <button type="button"
+                class="picked-color"
+                data-hex="${color.hex}"
+                style="background:${color.hex}"
+                title="${this.getLanguage() === 'en' ? `Use ${color.hex}` : `使用 ${color.hex}`}"></button>
+        <button type="button"
+                class="picked-color-delete"
+                data-hex="${color.hex}"
+                title="${this.t('deleteColor')}">×</button>
+      </div>
     `).join('');
 
     list.querySelectorAll('.picked-color').forEach((button) => {
       button.addEventListener('click', () => this.applyPickedColorToTarget(button.dataset.hex));
+    });
+    list.querySelectorAll('.picked-color-delete').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.deleteThemeSourceColor(button.dataset.hex);
+      });
     });
   }
 
@@ -573,6 +598,30 @@ class OptionsManager {
       return;
     }
     this.generateThemeFromHex(hex);
+  }
+
+  async deleteThemeSourceColor(hex) {
+    const upperHex = hex.toUpperCase();
+    const before = this.colorHistory.length;
+    this.colorHistory = this.colorHistory.filter((item) => item.hex?.toUpperCase() !== upperHex);
+    if (this.lastPickedColor?.hex?.toUpperCase() === upperHex) {
+      this.lastPickedColor = null;
+    }
+    if (this.colorHistory.length === before && !this.lastPickedColor) return;
+    await this.saveColorHistory();
+    this.renderThemeColorHistory();
+    this.renderTargetColorHistory();
+    this.showNotification(this.t('recentColorDeleted'));
+  }
+
+  async clearThemeSourceColors() {
+    if (!confirm(this.t('clearHistoryMessage'))) return;
+    this.colorHistory = [];
+    this.lastPickedColor = null;
+    await this.saveColorHistory();
+    this.renderThemeColorHistory();
+    this.renderTargetColorHistory();
+    this.showNotification(this.t('historyCleared'));
   }
 
   generateThemeFromHex(hex) {

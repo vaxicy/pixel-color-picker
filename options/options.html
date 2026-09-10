@@ -153,7 +153,10 @@
           <div class="picked-theme-panel">
             <div class="picked-theme-head">
               <strong>用取色生成主题</strong>
-              <button type="button" id="useLastPicked">使用最近取色</button>
+              <div class="picked-theme-actions">
+                <button type="button" id="clearThemeColorHistory" class="mini-btn danger" data-i18n="clearHistory">清空历史</button>
+                <button type="button" id="useLastPicked" data-i18n="useRecentPicked">使用最近取色</button>
+              </div>
             </div>
             <div class="picked-theme-list" id="themeColorHistory">
               <span class="picked-empty">还没有取色历史</span>
