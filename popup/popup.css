@@ -2800,22 +2800,27 @@ button, input {
   padding: 4px;
   background: var(--panel-warm);
   border: 2px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-soft) var(--panel-warm);
 }
 
 .history-list::-webkit-scrollbar,
 .changelog-list::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .history-list::-webkit-scrollbar-track,
 .changelog-list::-webkit-scrollbar-track {
-  background: rgba(255, 241, 247, 0.9);
+  background: var(--panel-warm);
+  border-left: 2px solid var(--border);
 }
 
 .history-list::-webkit-scrollbar-thumb,
 .changelog-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 107, 157, 0.72);
-  border: 1px solid rgba(63, 52, 64, 0.18);
+  background: var(--text-soft);
+  border: 2px solid var(--border);
+  border-radius: 0;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
 }
 
 .history-item {
