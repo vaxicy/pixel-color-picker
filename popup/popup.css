@@ -19,6 +19,17 @@ html {
   overflow-y: hidden;
 }
 
+/* 全局隐藏滚动条，保留滚轮/触摸板滚动 */
+* {
+  scrollbar-width: none !important;
+}
+
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
 :root {
   --primary: #ff6b9d;
   --primary-dark: #e84d84;
@@ -2800,13 +2811,6 @@ button, input {
   padding: 4px;
   background: var(--panel-warm);
   border: 2px solid var(--border);
-  scrollbar-width: none;
-}
-
-.history-list::-webkit-scrollbar,
-.changelog-list::-webkit-scrollbar {
-  width: 0;
-  display: none;
 }
 
 .history-item {
