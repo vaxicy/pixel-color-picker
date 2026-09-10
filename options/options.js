@@ -603,11 +603,12 @@ class OptionsManager {
   async deleteThemeSourceColor(hex) {
     const upperHex = hex.toUpperCase();
     const before = this.colorHistory.length;
+    const hadLastPicked = this.lastPickedColor?.hex?.toUpperCase() === upperHex;
     this.colorHistory = this.colorHistory.filter((item) => item.hex?.toUpperCase() !== upperHex);
-    if (this.lastPickedColor?.hex?.toUpperCase() === upperHex) {
+    if (hadLastPicked) {
       this.lastPickedColor = null;
     }
-    if (this.colorHistory.length === before && !this.lastPickedColor) return;
+    if (this.colorHistory.length === before && !hadLastPicked) return;
     await this.saveColorHistory();
     this.renderThemeColorHistory();
     this.renderTargetColorHistory();
