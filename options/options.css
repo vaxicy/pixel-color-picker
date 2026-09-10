@@ -576,6 +576,7 @@ button {
 }
 
 .picked-color {
+  width: 100%;
   min-width: 0;
   height: 34px;
   border: 3px solid var(--border);
@@ -993,6 +994,10 @@ button {
   .pixel-dialog-button:hover {
     transform: translate(1px, 1px);
     box-shadow: 1px 1px 0 var(--shadow);
+  }
+  .pixel-dialog-button.danger {
+    background: var(--danger);
+    color: #fff;
   }
   .pixel-dialog-footer .feedback-mail {
     background: var(--bg);

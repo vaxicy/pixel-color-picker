@@ -614,8 +614,44 @@ class OptionsManager {
     this.showNotification(this.t('recentColorDeleted'));
   }
 
+  async openConfirmDialog({ eyebrow = '', title = '', message = '', actions = [] } = {}) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('confirmOverlay');
+      document.getElementById('confirmEyebrow').textContent = eyebrow;
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmBody').textContent = message;
+      const footer = document.getElementById('confirmFooter');
+      footer.innerHTML = '';
+      actions.forEach((action) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `pixel-dialog-button ${action.tone || ''}`.trim();
+        button.textContent = action.label;
+        button.addEventListener('click', () => {
+          overlay.hidden = true;
+          resolve({ action: action.id });
+        });
+        footer.appendChild(button);
+      });
+      document.getElementById('confirmClose').onclick = () => {
+        overlay.hidden = true;
+        resolve({ action: 'cancel' });
+      };
+      overlay.hidden = false;
+    });
+  }
+
   async clearThemeSourceColors() {
-    if (!confirm(this.t('clearHistoryMessage'))) return;
+    const result = await this.openConfirmDialog({
+      eyebrow: 'PIXEL CLEAR',
+      title: this.t('clearHistory'),
+      message: this.t('clearHistoryMessage'),
+      actions: [
+        { id: 'confirm', label: this.t('clear'), tone: 'danger' },
+        { id: 'cancel', label: this.t('cancel') }
+      ]
+    });
+    if (result.action !== 'confirm') return;
     this.colorHistory = [];
     this.lastPickedColor = null;
     await this.saveColorHistory();
