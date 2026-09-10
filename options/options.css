@@ -613,14 +613,14 @@ button {
   font-size: 10px;
   line-height: 1;
   box-shadow: 1px 1px 0 rgba(63,52,64,0.14);
-  opacity: 0;
-  pointer-events: none;
+  visibility: hidden;
+  pointer-events: auto;
   cursor: pointer;
 }
 
-.picked-color-wrap:hover .picked-color-delete {
-  opacity: 1;
-  pointer-events: auto;
+.picked-color-wrap:hover .picked-color-delete,
+.picked-color-delete:hover {
+  visibility: visible;
 }
 
 .picked-empty {
