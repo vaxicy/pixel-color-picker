@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Color Picker - 隐私权政策 / Privacy Policy</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 720px; margin: 48px auto; padding: 0 24px; line-height: 1.7; color: #333; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid #e0e0e0; }
+    .tab { padding: 10px 16px; cursor: pointer; background: none; border: none; font-size: 14px; color: #666; border-bottom: 2px solid transparent; }
+    .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 500; }
+    .section { display: none; }
+    .section.active { display: block; }
+    h2 { font-size: 18px; margin-top: 28px; margin-bottom: 10px; }
+    p { margin: 10px 0; }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    .updated { color: #888; font-size: 13px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+  <h1>Pixel Color Picker</h1>
+  <div class="subtitle">隐私权政策 / Privacy Policy</div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show(event, 'zh')">中文</button>
+    <button class="tab" onclick="show(event, 'en')">English</button>
+  </div>
+
+  <!-- 中文 -->
+  <div id="zh" class="section active">
+    <p><strong>Pixel Color Picker（像素吸色器）</strong>尊重你的隐私。本扩展不会收集、存储或传输任何个人身份信息。</p>
+
+    <h2>我们如何处理你的数据</h2>
+    <p>你的色卡、取色历史、界面设置和主题偏好等数据仅保存在你的浏览器本地存储（<code>chrome.storage.sync</code>）中，由你的浏览器和 Google 账户同步机制管理。我们不会将这些数据上传到任何远程服务器，也不会出售或与第三方分享。</p>
+
+    <h2>网页访问说明</h2>
+    <p>扩展仅在以下两种情况下访问当前网页：</p>
+    <ul>
+      <li>你在网页上<strong>右键选择「用 Pixel 吸色并保存」</strong>时；</li>
+      <li>你点击 popup 中的<strong>取色按钮</strong>时。</li>
+    </ul>
+    <p>访问仅用于调用浏览器原生取色器（EyeDropper API）并读取你最终选取的颜色值。我们不会在未经你主动操作的情况下读取、记录或传输任何网页内容。</p>
+
+    <h2>第三方服务</h2>
+    <p>本扩展不包含任何第三方追踪、广告或分析服务。</p>
+
+    <h2>联系我们</h2>
+    <p>如有隐私相关问题，请联系：<a href="mailto:huangzero2004@gmail.com">huangzero2004@gmail.com</a></p>
+  </div>
+
+  <!-- English -->
+  <div id="en" class="section">
+    <p><strong>Pixel Color Picker</strong> respects your privacy. This extension does not collect, store, or transmit any personally identifiable information.</p>
+
+    <h2>How We Handle Your Data</h2>
+    <p>Your palettes, color history, interface settings, and theme preferences are stored only in your browser's local storage (<code>chrome.storage.sync</code>), managed by your browser and Google account sync. We do not upload this data to any remote server, nor do we sell or share it with third parties.</p>
+
+    <h2>Webpage Access</h2>
+    <p>The extension accesses the current webpage only when:</p>
+    <ul>
+      <li>You <strong>right-click and select "Pick color with Pixel"</strong> on a page; or</li>
+      <li>You click the <strong>color picker button</strong> in the popup.</li>
+    </ul>
+    <p>This access is used solely to invoke the browser's native EyeDropper API and retrieve the color value you choose. We do not read, record, or transmit any page content without your explicit action.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>This extension does not include any third-party tracking, advertising, or analytics services.</p>
+
+    <h2>Contact Us</h2>
+    <p>If you have any privacy-related questions, please contact us at <a href="mailto:huangzero2004@gmail.com">huangzero2004@gmail.com</a></p>
+  </div>
+
+  <div class="updated">最后更新 / Last updated: 2026-09-11</div>
+
+  <script>
+    function show(evt, lang) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(lang).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
