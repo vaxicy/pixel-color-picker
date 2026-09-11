@@ -163,7 +163,15 @@ The in-app changelog reads `version` from `manifest.json` automatically. 历史�
 
 ### v1.1.2 (2026-09-11)
 
-- 移除快捷键 — removed global keyboard shortcut pick; right-click menu "Pick and save with Pixel" remains as the single quick-entry
+- 主题系统重构 — extracted `shared/themes.js`, unified theme dropdowns in popup/options, fallback for missing color fields
+- 新增三套主题 — Rose (烟熏玫瑰), Forest (苍松翠谷), Holly (冬青红果)
+- 导出增强 — CSV / copy all HEX / Adobe ASE formats
+- 历史记录增强 — favorite-to-top and full-history CSV export
+- 取色后动作 — new "pick and close popup" option
+- 文案修复 — fixed settings label typo where "Theme preset" was shown as "Header color"
+- 取色历史修复 — delete buttons not responding, swatch compression; clear-history confirm replaced with inline pixel dialog
+- 滚动条优化 — hidden scrollbars globally in popup, pixel-art scrollbar for changelog/history
+- 取色入口调整 — removed global keyboard shortcut; kept popup button and right-click menu "Pick and save with Pixel"
 
 ### v1.1.1 (2026-08-06)
 

@@ -642,10 +642,28 @@ class OptionsManager {
         version: `v${manifestVersion}`,
         items: language === 'en'
           ? [
-              { kind: 'feat', text: 'Removed global keyboard shortcut; use right-click menu "Pick and save with Pixel" instead' }
+              { kind: 'feat', text: 'Theme system refactor: extracted shared/themes.js, unified dropdowns, fallback for missing fields' },
+              { kind: 'feat', text: 'Added 3 new themes: Rose, Forest, Holly' },
+              { kind: 'feat', text: 'Export enhancements: CSV, copy all HEX, Adobe ASE' },
+              { kind: 'feat', text: 'Color history supports favorite-to-top and full CSV export' },
+              { kind: 'feat', text: 'New after-pick action: pick and close popup' },
+              { kind: 'fix', text: 'Fixed settings label typo where "Theme preset" was shown as "Header color"' },
+              { kind: 'fix', text: 'Fixed color history delete buttons not responding and swatch compression' },
+              { kind: 'fix', text: 'Clear history confirmation replaced with inline pixel-style dialog' },
+              { kind: 'feat', text: 'Globally hidden scrollbars in popup and pixel-art scrollbar for changelog/history' },
+              { kind: 'feat', text: 'Pick entry adjusted: removed global shortcut, kept popup button and right-click menu "Pick and save with Pixel"' }
             ]
           : [
-              { kind: 'feat', text: '移除全局快捷键，改用右键菜单「用 Pixel 吸色并保存」取色' }
+              { kind: 'feat', text: '主题系统重构：抽离 shared/themes.js，统一 popup / options 主题下拉与缺字段兜底' },
+              { kind: 'feat', text: '新增三套主题：烟熏玫瑰 rose、苍松翠谷 forest、冬青红果 holly' },
+              { kind: 'feat', text: '导出增强：新增 CSV、复制全部 HEX、Adobe ASE 格式' },
+              { kind: 'feat', text: '历史记录支持收藏置顶与整段导出 CSV' },
+              { kind: 'feat', text: '取色后动作新增「取色并关闭 popup」选项' },
+              { kind: 'fix', text: '修复设置项「主题预设」误写为「标题色」的文案问题' },
+              { kind: 'fix', text: '修复取色历史删除按钮无反应、历史方块压缩等问题' },
+              { kind: 'fix', text: '清空取色历史确认改为内联像素弹窗' },
+              { kind: 'feat', text: 'popup / 更新日志 / 历史记录滚动条全局隐藏并支持像素风样式' },
+              { kind: 'feat', text: '取色入口调整：移除全局快捷键，仅保留 popup 按钮与右键菜单「用 Pixel 吸色并保存」' }
             ]
       },
       {
