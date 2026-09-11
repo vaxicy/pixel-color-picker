@@ -180,10 +180,10 @@ def small_promo():
     # right-side features — compact
     rx = 210
     features = [
-        ("网页吸色", "一键吸取页面颜色"),
-        ("色卡管理", "多色卡与搜索"),
-        ("格式导出", "CSS / JSON / PNG / CSV"),
-        ("中英双语", "Pixel 风主题"),
+        ("网页吸色", "One-click pick"),
+        ("色卡管理", "Palettes & history"),
+        ("多格式导出", "CSS / JSON / PNG / CSV"),
+        ("完全免费", "Free · 15 themes"),
     ]
     for i, (title, desc) in enumerate(features):
         fy = 76 + i * 47
@@ -208,7 +208,7 @@ def large_promo():
     text(draw, (68, 40), "Pixel Color Picker", fill="white", f=font(38, bold=True))
     # subtitle: clear gap from title, well within banner bounds
     text(draw, (70, 86),
-         "像素风网页取色 · 色卡管理 · 多格式导出 · 中英双语 · 完全免费",
+         "像素风网页取色 · 完全免费  ·  Free forever",
          fill="white", f=font(16))
 
     # ── Content area: 3 logical columns ─────────────────────
@@ -219,11 +219,11 @@ def large_promo():
     cx = 330
     cy = 130
 
-    text(draw, (cx, cy), "一键吸取网页颜色", f=font(26, bold=True))
+    text(draw, (cx, cy), "一键吸取网页颜色 · Pick colors", f=font(26, bold=True))
 
     desc_lines = [
-        "从网页中快速获取颜色，自动保存到色卡和历史记录。",
-        "适合设计师、前端开发和内容创作者整理灵感配色。",
+        "自动保存到色卡和历史，便于整理灵感配色。",
+        "Save picks to palettes & history automatically.",
     ]
     dy = cy + 38
     for line in desc_lines:
@@ -237,24 +237,24 @@ def large_promo():
 
     btn_y = panel_y + 84
     rect(draw, (cx, btn_y, cx + 186, btn_y + 48), COLORS["mint"], width=4)
-    text(draw, (cx + 93, btn_y + 13), "复制颜色", f=font(18, bold=True), anchor="ma")
+    text(draw, (cx + 93, btn_y + 13), "复制 Copy", f=font(18, bold=True), anchor="ma")
     rect(draw, (cx + 202, btn_y, cx + 408, btn_y + 48), COLORS["cream"], width=4)
-    text(draw, (cx + 305, btn_y + 13), "保存到色卡", f=font(18, bold=True), anchor="ma")
+    text(draw, (cx + 305, btn_y + 13), "保存 Save", f=font(18, bold=True), anchor="ma")
 
     # ── Col 3: Export format cards + Pro CTA (right side) ───
     rx = 850
 
     # Section label — clear separation from cards below
-    text(draw, (rx, 120), "多格式导出", f=font(18, bold=True))
+    text(draw, (rx, 120), "多格式导出 · Export", f=font(18, bold=True))
 
     # 6 export cards → 2 cols × 3 rows (even grid)
     exports = [
-        ("CSS 变量", "#ff6b9d"),
+        ("CSS",     "#ff6b9d"),
         ("SCSS",    "#8c6cff"),
         ("JSON",    "#69d9bf"),
         ("Tailwind","#fff0a8"),
-        ("PNG 色卡","#75bfe8"),
-        ("备份恢复","#f05f7d"),
+        ("CSV",     "#75bfe8"),
+        ("ASE",     "#f05f7d"),
     ]
     ew, eh = 116, 70
     gap_x, gap_y = 18, 10
@@ -279,12 +279,12 @@ def large_promo():
 
     # Features list
     text(draw, (free_x + 20, free_y + 46),
-         "15 套主题 · 无限色卡 · 自定义主题 · 全部导出",
+         "15 套主题 · 无限色卡 · 全部导出 · 无广告",
          fill=COLORS["soft"], f=font(13))
 
     # Free note
     text(draw, (free_x + 20, free_y + 64),
-         "无订阅 · 无广告 · 无需注册解锁。",
+         "All features free · No subscription · No ads",
          fill=COLORS["soft"], f=font(12))
 
     # CTA button — pink (bottom = 388+82+38 = 508, well within 560)
