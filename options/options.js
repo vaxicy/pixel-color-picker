@@ -642,6 +642,16 @@ class OptionsManager {
         version: `v${manifestVersion}`,
         items: language === 'en'
           ? [
+              { kind: 'feat', text: 'Removed global keyboard shortcut; use right-click menu "Pick and save with Pixel" instead' }
+            ]
+          : [
+              { kind: 'feat', text: '移除全局快捷键，改用右键菜单「用 Pixel 吸色并保存」取色' }
+            ]
+      },
+      {
+        version: 'v1.1.1',
+        items: language === 'en'
+          ? [
               { kind: 'new', text: 'Built-in changelog popup in settings (pixel-style design)' },
               { kind: 'new', text: 'Feedback email entry inside the changelog dialog' },
               { kind: 'fix', text: 'Changelog dialog white text contrast fixed under pink theme' },

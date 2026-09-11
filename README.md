@@ -161,6 +161,10 @@ Issues and pull requests are welcome.
 
 The in-app changelog reads `version` from `manifest.json` automatically. 历史更新记录如下：
 
+### v1.1.2 (2026-09-11)
+
+- 移除快捷键 — removed global keyboard shortcut pick; right-click menu "Pick and save with Pixel" remains as the single quick-entry
+
 ### v1.1.1 (2026-08-06)
 
 - 内置更新日志 — settings page shows a pixel-styled changelog popup, version auto-reads from manifest
