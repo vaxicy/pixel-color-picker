@@ -29,6 +29,17 @@ class PixelColorPicker {
     this.bindEvents();
     this.render();
     this.applyI18n();
+    this.maybeAutoPick();
+  }
+
+  async maybeAutoPick() {
+    try {
+      const res = await new Promise((r) => chrome.storage.session.get(['autoPick'], r));
+      if (res.autoPick) {
+        chrome.storage.session.remove('autoPick');
+        this.quickPick();
+      }
+    } catch (e) { /* session storage unavailable */ }
   }
 
   async loadData() {
@@ -38,7 +49,9 @@ class PixelColorPicker {
           language: 'zh-CN',
           ...(result.settings || {})
         };
-        this.colorHistory = Array.isArray(result.colorHistory) ? result.colorHistory : [];
+        this.colorHistory = Array.isArray(result.colorHistory)
+          ? result.colorHistory.map((c) => ({ favorite: false, ...c }))
+          : [];
         this.currentColor = this.normalizeStoredColor(result.lastPickedColor);
         if (this.settings.maxColorsPerPalette != null) {
           this.maxColorsPerPalette = this.settings.maxColorsPerPalette;
@@ -260,6 +273,7 @@ class PixelColorPicker {
       pickAction.querySelector('option[value="preview"]').textContent = this.t('preview');
       pickAction.querySelector('option[value="copy"]').textContent = this.t('copy');
       pickAction.querySelector('option[value="copy-save"]').textContent = this.t('copySave');
+      pickAction.querySelector('option[value="close"]').textContent = this.t('pickClose');
     }
     this.updateThemePresetLabels('popupThemePreset');
 
@@ -933,6 +947,7 @@ class PixelColorPicker {
       if (event.target.id === 'historyOverlay') this.closeHistoryDialog();
     });
     document.getElementById('clearHistory').addEventListener('click', () => this.clearColorHistory());
+    document.getElementById('exportHistory').addEventListener('click', () => this.exportHistoryCSV());
     document.getElementById('clearRecentColors').addEventListener('click', () => this.clearColorHistory());
     document.getElementById('historySearch').addEventListener('input', (event) => {
       this.historySearchQuery = event.target.value.trim();
@@ -1027,6 +1042,15 @@ class PixelColorPicker {
             paletteName: palette?.name
           });
         }
+        return;
+      }
+
+      if (pickAction === 'close') {
+        await this.copyColorValue(color, this.getLanguage() === 'en' ? `Copied ${this.getDefaultFormatLabel()}` : `已复制 ${this.getDefaultFormatLabel()}`);
+        if (this.settings?.autoSave !== false) {
+          await this.addColorToCurrentPalette(color, { successMessage: this.t('copiedAndSaved') });
+        }
+        window.close();
         return;
       }
 
@@ -1713,7 +1737,7 @@ class PixelColorPicker {
       ...(data.settings || {})
     };
     settings.defaultFormat = ['hex', 'rgb', 'hsl'].includes(settings.defaultFormat) ? settings.defaultFormat : 'hex';
-    settings.pickAction = ['save', 'preview', 'copy', 'copy-save'].includes(settings.pickAction) ? settings.pickAction : 'save';
+    settings.pickAction = ['save', 'preview', 'copy', 'copy-save', 'close'].includes(settings.pickAction) ? settings.pickAction : 'save';
     settings.maxColorsPerPalette = Math.max(1, Math.min(100, parseInt(settings.maxColorsPerPalette, 10) || 20));
 
     const palettes = Array.isArray(data.palettes) ? data.palettes.map((palette, paletteIndex) => {
@@ -1756,6 +1780,7 @@ class PixelColorPicker {
       return {
         ...parsed,
         id: Number(color.id) || Date.now() + index,
+        favorite: !!color.favorite,
         note: typeof color.note === 'string' ? color.note : '',
         createdAt: color.createdAt || new Date().toISOString()
       };
@@ -2040,6 +2065,7 @@ class PixelColorPicker {
       hex: color.hex,
       hsl: color.hsl || this.rgbToHsl(color.r, color.g, color.b),
       note: color.note || '',
+      favorite: false,
       createdAt: new Date().toISOString()
     };
 
@@ -2117,6 +2143,7 @@ class PixelColorPicker {
         </div>
         <button class="history-add" data-action="add" data-id="${color.id}" title="${this.getLanguage() === 'en' ? 'Add to current palette' : '加入当前色卡'}">+</button>
         <button class="history-copy" data-action="copy" data-id="${color.id}" title="${this.getLanguage() === 'en' ? 'Copy default format' : '复制默认格式'}">⧉</button>
+        <button class="history-fav ${color.favorite ? 'is-fav' : ''}" data-action="fav" data-id="${color.id}" title="${this.t('favorite')}">${color.favorite ? '★' : '☆'}</button>
       </div>
     `).join('');
 
@@ -2129,11 +2156,24 @@ class PixelColorPicker {
     list.querySelectorAll('[data-action="add"]').forEach((button) => {
       button.addEventListener('click', () => this.addHistoryColorToPalette(Number(button.dataset.id)));
     });
+    list.querySelectorAll('[data-action="fav"]').forEach((button) => {
+      button.addEventListener('click', () => this.toggleHistoryFavorite(Number(button.dataset.id)));
+    });
+  }
+
+  async toggleHistoryFavorite(id) {
+    const color = this.colorHistory.find((item) => item.id === id);
+    if (!color) return;
+    color.favorite = !color.favorite;
+    await this.saveHistory();
+    this.renderHistoryList();
   }
 
   getFilteredHistory() {
     const query = this.historySearchQuery.trim().toLowerCase();
-    if (!query) return this.colorHistory;
+    if (!query) {
+      return [...this.colorHistory].sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
+    }
 
     return this.colorHistory.filter((color) => {
       const hsl = color.hsl || this.rgbToHsl(color.r, color.g, color.b);
@@ -2606,6 +2646,15 @@ class PixelColorPicker {
       case 'png':
         this.exportPNG();
         break;
+      case 'csv':
+        this.exportCSV();
+        break;
+      case 'copyall':
+        this.exportCopyAllHex();
+        break;
+      case 'ase':
+        this.exportASE();
+        break;
       case 'css':
       default:
         this.exportCSS();
@@ -3015,6 +3064,115 @@ class PixelColorPicker {
     });
   }
 
+  exportCSV() {
+    const palette = this.getCurrentPalette();
+    if (!palette || palette.colors.length === 0) {
+      this.showNotification(this.t('emptyPalette'));
+      return;
+    }
+    const rows = [['hex', 'r', 'g', 'b', 'hsl', 'note']];
+    palette.colors.forEach((color) => {
+      const hsl = color.hsl || this.rgbToHsl(color.r, color.g, color.b);
+      rows.push([
+        color.hex, color.r, color.g, color.b,
+        `${hsl.h}, ${hsl.s}%, ${hsl.l}%`,
+        (color.note || '').replace(/[",\n]/g, ' ')
+      ]);
+    });
+    const csv = rows.map((row) => row.map((v) => `"${v}"`).join(',')).join('\n');
+    this.downloadFile(csv, 'palette.csv', 'text/csv');
+    this.showNotification(this.t('csvExported'));
+  }
+
+  exportCopyAllHex() {
+    const palette = this.getCurrentPalette();
+    if (!palette || palette.colors.length === 0) {
+      this.showNotification(this.t('emptyPalette'));
+      return;
+    }
+    const text = palette.colors.map((c) => c.hex).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      this.showNotification(this.t('copiedAllFormats'));
+    }).catch(() => this.showNotification(this.t('copyFailed')));
+  }
+
+  exportASE() {
+    const palette = this.getCurrentPalette();
+    if (!palette || palette.colors.length === 0) {
+      this.showNotification(this.t('emptyPalette'));
+      return;
+    }
+    const bytes = this.buildASE(palette.colors);
+    let binary = '';
+    bytes.forEach((b) => { binary += String.fromCharCode(b); });
+    const url = 'data:application/octet-stream;base64,' + btoa(binary);
+    chrome.downloads.download({ url, filename: 'palette.ase', saveAs: true }, () => {
+      if (chrome.runtime.lastError) {
+        this.showNotification(this.t('exportFailed'));
+      } else {
+        this.showNotification(this.t('aseExported'));
+      }
+    });
+  }
+
+  buildASE(colors) {
+    const blocks = [];
+    colors.forEach((color) => {
+      const name = (color.note || color.hex || '').toString();
+      const nameU16 = [];
+      for (const ch of name) {
+        const cp = ch.charCodeAt(0);
+        nameU16.push((cp >> 8) & 0xff, cp & 0xff);
+      }
+      nameU16.push(0x00, 0x00);
+      const nameLen = nameU16.length / 2;
+      const floats = new Uint8Array(12);
+      const dv = new DataView(floats.buffer);
+      dv.setFloat32(0, color.r / 255, false);
+      dv.setFloat32(4, color.g / 255, false);
+      dv.setFloat32(8, color.b / 255, false);
+      const body = [];
+      body.push((nameLen >> 8) & 0xff, nameLen & 0xff);
+      nameU16.forEach((b) => body.push(b));
+      [0x52, 0x47, 0x42, 0x20].forEach((b) => body.push(b));
+      floats.forEach((b) => body.push(b));
+      [0x00, 0x00, 0x00, 0x01].forEach((b) => body.push(b));
+      const bodyBytes = new Uint8Array(body);
+      const blockLen = bodyBytes.length;
+      const block = [0x00, 0x01, (blockLen >> 24) & 0xff, (blockLen >> 16) & 0xff, (blockLen >> 8) & 0xff, blockLen & 0xff];
+      block.push(...bodyBytes);
+      blocks.push(new Uint8Array(block));
+    });
+    const header = [0x41, 0x53, 0x45, 0x46, 0x00, 0x01, 0x00, 0x00];
+    const count = colors.length;
+    header.push((count >> 24) & 0xff, (count >> 16) & 0xff, (count >> 8) & 0xff, count & 0xff);
+    const out = [];
+    header.forEach((b) => out.push(b));
+    blocks.forEach((b) => b.forEach((x) => out.push(x)));
+    return new Uint8Array(out);
+  }
+
+  exportHistoryCSV() {
+    if (this.colorHistory.length === 0) {
+      this.showNotification(this.t('noColorHistory'));
+      return;
+    }
+    const rows = [['hex', 'r', 'g', 'b', 'hsl', 'note', 'favorite', 'createdAt']];
+    this.colorHistory.forEach((color) => {
+      const hsl = color.hsl || this.rgbToHsl(color.r, color.g, color.b);
+      rows.push([
+        color.hex, color.r, color.g, color.b,
+        `${hsl.h}, ${hsl.s}%, ${hsl.l}%`,
+        (color.note || '').replace(/[",\n]/g, ' '),
+        color.favorite ? 1 : 0,
+        color.createdAt || ''
+      ]);
+    });
+    const csv = rows.map((row) => row.map((v) => `"${v}"`).join(',')).join('\n');
+    this.downloadFile(csv, 'color-history.csv', 'text/csv');
+    this.showNotification(this.t('historyCsvExported'));
+  }
+
   parseSRGBHex(hex) {
     const match = /^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})$/.exec(hex);
     if (!match) return null;
@@ -3128,7 +3286,7 @@ class PixelColorPicker {
 
   getPickAction() {
     const action = this.settings?.pickAction;
-    if (['save', 'preview', 'copy', 'copy-save'].includes(action)) return action;
+    if (['save', 'preview', 'copy', 'copy-save', 'close'].includes(action)) return action;
     return this.settings?.autoSave === false ? 'preview' : 'save';
   }
 

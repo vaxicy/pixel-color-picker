@@ -8,7 +8,9 @@
     "activeTab",
     "storage",
     "clipboardWrite",
-    "downloads"
+    "downloads",
+    "contextMenus",
+    "scripting"
   ],
   "background": {
     "service_worker": "background/background.js"
@@ -19,6 +21,14 @@
       "16": "images/icon-16.png",
       "48": "images/icon-48.png",
       "128": "images/icon-128.png"
+    }
+  },
+  "commands": {
+    "quick-pick": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E"
+      },
+      "description": "快速取色并保存 (Quick pick)"
     }
   },
   "options_page": "options/options.html",

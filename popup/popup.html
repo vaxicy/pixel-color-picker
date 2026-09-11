@@ -159,6 +159,7 @@
       <div class="history-panel active" id="historyColorsPanel">
         <div class="history-actions">
           <span class="history-count" id="historyCount">0 条</span>
+          <button class="mini-btn" id="exportHistory" title="导出全部历史">⇡</button>
           <button class="mini-btn" id="clearHistory">清空</button>
         </div>
         <div class="history-search">
@@ -206,6 +207,9 @@
         <button class="export-option" data-format="json"><strong>JSON</strong><small>可再次导入</small></button>
         <button class="export-option" data-format="tailwind"><strong>Tailwind</strong><small>配置片段</small></button>
         <button class="export-option" data-format="png"><strong>PNG</strong><small>色卡图片</small></button>
+        <button class="export-option" data-format="csv"><strong>CSV</strong><small>表格</small></button>
+        <button class="export-option" data-format="copyall"><strong>复制全部</strong><small>一键 HEX</small></button>
+        <button class="export-option" data-format="ase"><strong>ASE</strong><small>Adobe</small></button>
       </div>
     </section>
   </div>
@@ -310,13 +314,14 @@
             <option value="preview">预览</option>
             <option value="copy">复制</option>
             <option value="copy-save">复制并保存</option>
+            <option value="close">取色并关闭</option>
           </select>
         </label>
 
         <div class="settings-group-title">主题</div>
         <label class="settings-row">
           <span class="settings-copy">
-            <strong>标题色</strong>
+            <strong>主题预设</strong>
           </span>
           <select id="popupThemePreset" class="settings-select theme-select"></select>
 
