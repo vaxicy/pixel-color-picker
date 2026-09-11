@@ -24,6 +24,10 @@ COLORS = {
 
 TEXTS = {
     "zh": {
+        "s1_hero": "Pixel Color Picker",
+        "s2_hero": "色卡与历史",
+        "s3_hero": "为开发者导出",
+        "s5_hero": "主题与语言",
         "s1_sub": "像素风网页取色、色卡管理和导出工具",
         "s1_head": "一键吸取网页颜色",
         "s1_desc": "从网页中快速获取颜色，自动保存到色卡和历史记录。适合设计师、前端开发和内容创作者整理灵感配色。",
@@ -62,6 +66,10 @@ TEXTS = {
         "s5_lang": "简体中文 / English",
     },
     "en": {
+        "s1_hero": "Pixel Color Picker",
+        "s2_hero": "Palettes & History",
+        "s3_hero": "Export For Developers",
+        "s5_hero": "Themes & Languages",
         "s1_sub": "Pixel-style color picking, palettes & export",
         "s1_head": "Pick colors from any page",
         "s1_desc": "Grab colors from any webpage and save them to palettes and history automatically. Great for designers, front-end developers and content creators.",
@@ -239,7 +247,7 @@ def export_card(draw, x, y, label, detail, color):
 
 def screenshot_1(t, outdir):
     img, draw = base()
-    hero(draw, "Pixel Color Picker", t["s1_sub"])
+    hero(draw, t["s1_hero"], t["s1_sub"])
     popup_mock(draw, 82, 230, t)
     text(draw, (520, 268), t["s1_head"], f=F["h2"])
     paragraph(draw, (522, 322), t["s1_desc"], 610, f=F["body"])
@@ -255,7 +263,7 @@ def screenshot_1(t, outdir):
 
 def screenshot_2(t, outdir):
     img, draw = base()
-    hero(draw, "Palettes & History", t["s2_sub"])
+    hero(draw, t["s2_hero"], t["s2_sub"])
     palette_board(draw, 74, 234, 710, 486, t)
     rect(draw, (836, 234, 1190, 720), COLORS["white"], width=5)
     text(draw, (868, 270), t["s2_history"], f=F["h3"])
@@ -272,7 +280,7 @@ def screenshot_2(t, outdir):
 
 def screenshot_3(t, outdir):
     img, draw = base()
-    hero(draw, "Export For Developers", t["s3_sub"])
+    hero(draw, t["s3_hero"], t["s3_sub"])
     text(draw, (82, 242), t["s3_head"], f=F["h2"])
     paragraph(draw, (84, 300), t["s3_desc"], 560, f=F["body"])
     for i, (label, detail, color) in enumerate([
@@ -311,7 +319,7 @@ def screenshot_4(t, outdir):
 
 def screenshot_5(t, outdir):
     img, draw = base()
-    hero(draw, "Themes & Languages", t["s5_sub"])
+    hero(draw, t["s5_hero"], t["s5_sub"])
     rect(draw, (82, 238, 1198, 690), COLORS["white"], width=5)
     text(draw, (124, 286), t["s5_head"], f=F["h2"])
     names = t["s5_names"]
