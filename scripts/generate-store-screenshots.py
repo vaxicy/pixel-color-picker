@@ -235,7 +235,7 @@ def export_card(draw, x, y, label, detail, color):
     paragraph(draw, (x + 88, y + 56), detail, 74, f=F["tiny"], fill=COLORS["soft"], leading=4)
 
 
-def screenshot_1(t, suffix):
+def screenshot_1(t, outdir):
     img, draw = base()
     hero(draw, "Pixel Color Picker", t["s1_sub"])
     popup_mock(draw, 82, 230, t)
@@ -248,10 +248,10 @@ def screenshot_1(t, suffix):
     text(draw, (580, 606), t["copy"], f=font(22, bold=True))
     rect(draw, (780, 586, 1016, 654), COLORS["cream"], width=4)
     text(draw, (812, 606), t["save"], f=font(22, bold=True))
-    img.save(OUT / f"screenshot-01-picker{suffix}.png")
+    img.save(outdir / "screenshot-01-picker.png")
 
 
-def screenshot_2(t, suffix):
+def screenshot_2(t, outdir):
     img, draw = base()
     hero(draw, "Palettes & History", t["s2_sub"])
     palette_board(draw, 74, 234, 710, 486, t)
@@ -265,10 +265,10 @@ def screenshot_2(t, suffix):
         draw.rectangle((888, yy + 13, 918, yy + 43), fill=c, outline=COLORS["ink"], width=2)
         text(draw, (940, yy + 10), c, f=F["small"])
         text(draw, (940, yy + 32), label, fill=COLORS["soft"], f=F["tiny"])
-    img.save(OUT / f"screenshot-02-palettes-history{suffix}.png")
+    img.save(outdir / "screenshot-02-palettes-history.png")
 
 
-def screenshot_3(t, suffix):
+def screenshot_3(t, outdir):
     img, draw = base()
     hero(draw, "Export For Developers", t["s3_sub"])
     text(draw, (82, 242), t["s3_head"], f=F["h2"])
@@ -286,10 +286,10 @@ def screenshot_3(t, suffix):
     text(draw, (770, 258), ":root {", fill="#f8edf7", f=F["body"])
     text(draw, (798, 290), "--primary: #FF6B9D;", fill="#69d9bf", f=F["small"])
     text(draw, (798, 318), "--accent:  #8C6CFF;", fill="#fff0a8", f=F["small"])
-    img.save(OUT / f"screenshot-03-export{suffix}.png")
+    img.save(outdir / "screenshot-03-export.png")
 
 
-def screenshot_4(t, suffix):
+def screenshot_4(t, outdir):
     img, draw = base()
     hero(draw, "Free Forever · 完全免费", t["s4_sub"])
     rect(draw, (80, 240, 620, 650), COLORS["white"], width=5)
@@ -304,10 +304,10 @@ def screenshot_4(t, suffix):
         rect(draw, (736, yy, 1164, yy + 56), COLORS["panel"], width=3)
         text(draw, (760, yy + 8), t1, f=font(18, bold=True))
         text(draw, (760, yy + 32), t2, fill=COLORS["soft"], f=F["tiny"])
-    img.save(OUT / f"screenshot-04-free{suffix}.png")
+    img.save(outdir / "screenshot-04-free.png")
 
 
-def screenshot_5(t, suffix):
+def screenshot_5(t, outdir):
     img, draw = base()
     hero(draw, "Themes & Languages", t["s5_sub"])
     rect(draw, (82, 238, 1198, 690), COLORS["white"], width=5)
@@ -323,21 +323,23 @@ def screenshot_5(t, suffix):
         text(draw, (x + 78, y + 44), "Theme preset", fill=COLORS["soft"], f=F["tiny"])
     rect(draw, (882, 286, 1128, 338), COLORS["cream"], width=3)
     text(draw, (912, 300), t["s5_lang"], f=F["small"])
-    img.save(OUT / f"screenshot-05-themes-language{suffix}.png")
+    img.save(outdir / "screenshot-05-themes-language.png")
 
 
 def main():
     for lang in ("zh", "en"):
         t = TEXTS[lang]
-        suffix = "-en" if lang == "en" else ""
-        screenshot_1(t, suffix)
-        screenshot_2(t, suffix)
-        screenshot_3(t, suffix)
-        screenshot_4(t, suffix)
-        screenshot_5(t, suffix)
-        print(f"Generated 5 '{lang}' screenshots with suffix '{suffix or '(none)'}'")
+        outdir = OUT / lang
+        outdir.mkdir(parents=True, exist_ok=True)
+        screenshot_1(t, outdir)
+        screenshot_2(t, outdir)
+        screenshot_3(t, outdir)
+        screenshot_4(t, outdir)
+        screenshot_5(t, outdir)
+        print(f"Generated 5 '{lang}' screenshots in {outdir}")
 
 
 if __name__ == "__main__":
     main()
     print(f"Output: {OUT}")
+
