@@ -179,6 +179,18 @@ class OptionsManager {
         textColor: '#2C2C2C',
         textSoftColor: '#8A5A6D',
         borderColor: '#2C2C2C'
+      },
+      forest: {
+        headerColor: '#12544F',
+        buttonColor: '#2A835F',
+        bgColor: '#f0faf5',
+        panelColor: '#ffffff',
+        panelWarmColor: '#e4f0e8',
+        bgDotColor: 'rgba(42, 131, 95, 0.20)',
+        bgLineColor: 'rgba(9, 35, 40, 0.05)',
+        textColor: '#092328',
+        textSoftColor: '#5a7a70',
+        borderColor: '#092328'
       }
     };
   }
@@ -428,6 +440,7 @@ class OptionsManager {
       grape: 'themeGrape',
       mist: 'themeMist',
       rose: 'themeRose',
+      forest: 'themeForest',
       custom: 'themeCustom'
     };
     Object.entries(labels).forEach(([value, key]) => {
