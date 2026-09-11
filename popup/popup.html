@@ -159,8 +159,10 @@
       <div class="history-panel active" id="historyColorsPanel">
         <div class="history-actions">
           <span class="history-count" id="historyCount">0 条</span>
-          <button class="mini-btn" id="exportHistory" title="导出全部历史">⇡</button>
-          <button class="mini-btn" id="clearHistory">清空</button>
+          <div class="history-actions-right">
+            <button class="mini-btn" id="exportHistory" data-tooltip="导出全部历史">⇡</button>
+            <button class="mini-btn" id="clearHistory">清空</button>
+          </div>
         </div>
         <div class="history-search">
           <input type="search" id="historySearch" placeholder="搜索 HEX / RGB / HSL">

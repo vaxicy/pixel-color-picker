@@ -29,17 +29,6 @@ class PixelColorPicker {
     this.bindEvents();
     this.render();
     this.applyI18n();
-    this.maybeAutoPick();
-  }
-
-  async maybeAutoPick() {
-    try {
-      const res = await new Promise((r) => chrome.storage.session.get(['autoPick'], r));
-      if (res.autoPick) {
-        chrome.storage.session.remove('autoPick');
-        this.quickPick();
-      }
-    } catch (e) { /* session storage unavailable */ }
   }
 
   async loadData() {
@@ -182,6 +171,11 @@ class PixelColorPicker {
     if (!window.PixelI18n) return;
     const language = this.getLanguage();
     document.documentElement.lang = language;
+    const exportHistoryBtn = document.getElementById('exportHistory');
+    if (exportHistoryBtn) {
+      exportHistoryBtn.dataset.tooltip = this.t('exportAllHistory');
+      exportHistoryBtn.setAttribute('aria-label', this.t('exportAllHistory'));
+    }
     window.PixelI18n.applyMap(document, language, {
       text: {
         '#listView .pixel-header h1': 'appName',

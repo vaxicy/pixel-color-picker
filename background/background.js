@@ -45,14 +45,18 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// 全局快捷键：打开 popup 并由 popup 自动取色（保留用户手势，EyeDropper 可用）
+// 全局快捷键：直接在当前页注入脚本取色（比 openPopup 更稳，EyeDropper 用户手势不丢失）
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== 'quick-pick') return;
   try {
-    await chrome.storage.session.set({ autoPick: true });
-    await chrome.action.openPopup();
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && tab.id) {
+      await runPagePick(tab.id);
+    } else {
+      console.error('[Pixel] quick-pick: no active tab');
+    }
   } catch (error) {
-    console.error('[Pixel] openPopup failed', error);
+    console.error('[Pixel] quick-pick failed', error);
   }
 });
 
