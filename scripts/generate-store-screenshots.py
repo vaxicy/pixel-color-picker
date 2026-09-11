@@ -46,6 +46,7 @@ TEXTS = {
         "s3_desc": "一键导出常用格式，方便放进设计系统、前端项目或团队文档。",
         "s3_cards": [("CSS", "变量格式"), ("SCSS", "$ 变量"), ("JSON", "可再次导入"),
                      ("Tailwind", "配置片段"), ("CSV", "表格数据"), ("ASE", "PS 色板")],
+        "s4_hero": "永久免费",
         "s4_sub": "无订阅 · 无广告 · 全部功能开放",
         "s4_free_title": "完全免费",
         "s4_free_desc": "已移除全部付费墙：15 套主题、无限色卡、自定义主题和所有导出格式对每位用户开放。",
@@ -83,6 +84,7 @@ TEXTS = {
         "s3_desc": "Export in common formats for design systems, front-end projects and team docs.",
         "s3_cards": [("CSS", "CSS variables"), ("SCSS", "$ variables"), ("JSON", "Re-import"),
                      ("Tailwind", "Config snippet"), ("CSV", "CSV table"), ("ASE", "Swatches")],
+        "s4_hero": "Free Forever",
         "s4_sub": "No subscription · No ads · All features",
         "s4_free_title": "Completely free",
         "s4_free_desc": "All paywalls removed: 15 themes, unlimited palettes, custom themes and every export format are open to everyone.",
@@ -291,7 +293,7 @@ def screenshot_3(t, outdir):
 
 def screenshot_4(t, outdir):
     img, draw = base()
-    hero(draw, "Free Forever · 完全免费", t["s4_sub"])
+    hero(draw, t["s4_hero"], t["s4_sub"])
     rect(draw, (80, 240, 620, 650), COLORS["white"], width=5)
     text(draw, (116, 282), t["s4_free_title"], f=F["h2"])
     paragraph(draw, (120, 340), t["s4_free_desc"], 440, f=F["body"])
