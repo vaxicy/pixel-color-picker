@@ -81,14 +81,14 @@ def popup_mock(draw, x, y, scale=1.0):
     hdr_h = int(56 * scale) if scale < 0.6 else int(80 * scale)
     rect(draw, (x + 14, y + 14, x + w - 18, y + 14 + hdr_h), COLORS["pink"], width=int(4 * scale))
     if scale < 0.6:
-        text(draw, (x + 36 * scale, y + 24 * scale), "PIXEL TOOL", fill="white", f=font(int(9 * scale), pixel=True))
-        text(draw, (x + 36 * scale, y + 38 * scale), "像素吸色器", fill="white", f=font(int(12 * scale), bold=True))
+        text(draw, (x + 36 * scale, y + 16), "PIXEL TOOL", fill="white", f=font(9, pixel=True))
+        text(draw, (x + 36 * scale, y + 27), "像素吸色器", fill="white", f=font(11, bold=True))
     else:
         text(draw, (x + 38 * scale, y + 28 * scale), "PIXEL TOOL", fill="white", f=F["pixel_small"])
         text(draw, (x + 38 * scale, y + 50 * scale), "像素吸色器", fill="white", f=font(17, bold=True))
 
     # quick-pick
-    qpk_top = int(86 * scale)
+    qpk_top = int(86 if scale < 0.6 else 106) * scale
     qpk_h = int(48 * scale)
     rect(draw, (x + 28 * scale, y + qpk_top, x + w - 28 * scale, y + qpk_top + qpk_h),
          COLORS["mint"], width=int(4 * scale))
@@ -97,14 +97,14 @@ def popup_mock(draw, x, y, scale=1.0):
          f=font(qpk_font, bold=True), anchor="ma")
 
     # palettes section
-    pal_y = y + int(144 if scale < 0.6 else 160) * scale
+    pal_y = y + int(148 if scale < 0.6 else 170) * scale
     pal_font = int(13 if scale < 0.6 else 17) * scale
     text(draw, (x + 28 * scale, pal_y), "我的色卡组", f=font(pal_font, bold=True))
 
     swatches = ["#ff6b9d", "#8c6cff", "#69d9bf", "#fff0a8", "#75bfe8", "#f05f7d"]
-    card_start = int(162 if scale < 0.6 else 188) * scale
-    card_h = int(46 if scale < 0.6 else 56) * scale
-    card_gap = int(54 if scale < 0.6 else 72) * scale
+    card_start = int(184 if scale < 0.6 else 210) * scale
+    card_h = int(50 if scale < 0.6 else 56) * scale
+    card_gap = int(10 if scale < 0.6 else 14) * scale
     title_sz = int(11 if scale < 0.6 else 15) * scale
     sub_sz   = int(9 if scale < 0.6 else 11)
     sw_w = int(18 if scale < 0.6 else 22) * scale
@@ -114,7 +114,7 @@ def popup_mock(draw, x, y, scale=1.0):
     ty_sub   = int(24 if scale < 0.6 else 34) * scale
 
     for i in range(3):
-        yy = card_start + i * (card_h + card_gap)
+        yy = y + card_start + i * (card_h + card_gap)
         rect(draw, (x + 28 * scale, yy, x + w - 28 * scale, yy + card_h),
              COLORS["panel"], width=int(3 * scale))
         sh = int(20 if scale < 0.6 else 24) * scale
@@ -136,7 +136,33 @@ def popup_mock(draw, x, y, scale=1.0):
          COLORS["cream"], width=int(3 * scale))
     bt_font = int(10 if scale < 0.6 else 14)
     text(draw, (x + w // 2, y + h - int(52 if scale < 0.6 else 62) * scale),
-         "历史 · 设置 · Pro", f=font(bt_font), anchor="ma")
+         "历史 · 设置 · 主题", f=font(bt_font), anchor="ma")
+
+
+# ── Compact popup mock for the small tile (fits 440×280 canvas) ──
+def small_popup_mock(draw, x, y):
+    w, h = 176, 200
+    rect(draw, (x + 5, y + 5, x + w + 5, y + h + 5), "#d8d1d8", outline="#d8d1d8", width=0)
+    rect(draw, (x, y, x + w, y + h), COLORS["white"], width=4)
+    # header
+    rect(draw, (x + 10, y + 10, x + w - 12, y + 36), COLORS["pink"], width=3)
+    text(draw, (x + 18, y + 14), "像素吸色器", fill="white", f=font(12, bold=True))
+    # quick pick
+    rect(draw, (x + 16, y + 44, x + w - 16, y + 72), COLORS["mint"], width=3)
+    text(draw, (x + w // 2, y + 51), "快速取色", f=font(13, bold=True), anchor="ma")
+    # section title
+    text(draw, (x + 16, y + 82), "我的色卡组", f=font(12, bold=True))
+    # 2 palette cards
+    swatches = ["#ff6b9d", "#8c6cff", "#69d9bf", "#fff0a8"]
+    for i in range(2):
+        yy = y + 104 + i * 46
+        rect(draw, (x + 16, yy, x + w - 16, yy + 38), COLORS["panel"], width=2)
+        for j in range(4):
+            sx = x + 26 + j * 15
+            draw.rectangle((sx, yy + 9, sx + 12, yy + 21),
+                           fill=swatches[(i + j) % 4], outline=COLORS["ink"], width=1)
+        text(draw, (x + 88, yy + 5), ["默认色卡", "品牌灵感"][i], f=font(11, bold=True))
+        text(draw, (x + 88, yy + 21), f"{4 + i}/20 色", fill=COLORS["soft"], f=font(9))
 
 
 # ── Small Promo Tile (440 × 280) ──────────────────────────────
@@ -148,15 +174,15 @@ def small_promo():
     rect(draw, (16, 14, 424, 58), COLORS["pink"], width=3)
     text(draw, (28, 23), "Pixel Color Picker", fill="white", f=font(19, bold=True))
 
-    # popup (scaled ~50% — slightly smaller than before to prevent overflow)
-    popup_mock(draw, 18, 68, scale=0.50)
+    # compact popup — fully inside the canvas (68+200+12 < 280)
+    small_popup_mock(draw, 18, 68)
 
     # right-side features — compact
     rx = 210
     features = [
         ("网页吸色", "一键吸取页面颜色"),
         ("色卡管理", "多色卡与搜索"),
-        ("格式导出", "CSS / JSON / PNG"),
+        ("格式导出", "CSS / JSON / PNG / CSV"),
         ("中英双语", "Pixel 风主题"),
     ]
     for i, (title, desc) in enumerate(features):
@@ -182,7 +208,7 @@ def large_promo():
     text(draw, (68, 40), "Pixel Color Picker", fill="white", f=font(38, bold=True))
     # subtitle: clear gap from title, well within banner bounds
     text(draw, (70, 86),
-         "像素风网页取色 · 色卡管理 · 多格式导出 · 中英双语 · 14 天免费试用",
+         "像素风网页取色 · 色卡管理 · 多格式导出 · 中英双语 · 完全免费",
          fill="white", f=font(16))
 
     # ── Content area: 3 logical columns ─────────────────────
@@ -241,33 +267,33 @@ def large_promo():
         rect(draw, (ex + 12, ey + 9, ex + 46, ey + 43), color, width=3)
         text(draw, (ex + ew // 2, ey + 50), label, f=font(13, bold=True), anchor="ma")
 
-    # Pro CTA block — compact, with safe bottom margin
-    pro_x, pro_y = 850, 388
-    rect(draw, (pro_x, pro_y, 1364, 528), COLORS["white"], width=5)
+    # Free block — replaces the old Pro CTA, with safe bottom margin
+    free_x, free_y = 850, 388
+    rect(draw, (free_x, free_y, 1364, 528), COLORS["white"], width=5)
 
-    # Pro badge + title
-    rect(draw, (pro_x + 20, pro_y + 12, pro_x + 106, pro_y + 38), COLORS["pink"], width=3)
-    text(draw, (pro_x + 63, pro_y + 15), "PRO", fill="white",
-         f=font(14, bold=True), anchor="ma")
-    text(draw, (pro_x + 116, pro_y + 15), "专业版", f=font(20, bold=True))
+    # FREE badge + title
+    rect(draw, (free_x + 20, free_y + 12, free_x + 106, free_y + 38), COLORS["mint"], width=3)
+    text(draw, (free_x + 63, free_y + 16), "FREE",
+         f=font(13, bold=True), anchor="ma")
+    text(draw, (free_x + 116, free_y + 15), "完全免费", f=font(20, bold=True))
 
     # Features list
-    text(draw, (pro_x + 20, pro_y + 46),
-         "无限色卡 · Pro 主题 · 自定义主题 · 高级工具",
+    text(draw, (free_x + 20, free_y + 46),
+         "15 套主题 · 无限色卡 · 自定义主题 · 全部导出",
          fill=COLORS["soft"], f=font(13))
 
-    # Trial note
-    text(draw, (pro_x + 20, pro_y + 64),
-         "提供 14 天免费试用，付款后用邮箱解锁。",
+    # Free note
+    text(draw, (free_x + 20, free_y + 64),
+         "无订阅 · 无广告 · 无需注册解锁。",
          fill=COLORS["soft"], f=font(12))
 
-    # CTA button — mint (bottom = 388+82+38 = 508, well within 560)
+    # CTA button — pink (bottom = 388+82+38 = 508, well within 560)
     cta_w = 196
     cta_h = 38
-    cta_x = pro_x + 20
-    cta_y = pro_y + 82
-    rect(draw, (cta_x, cta_y, cta_x + cta_w, cta_y + cta_h), COLORS["mint"], width=4)
-    text(draw, (cta_x + cta_w // 2, cta_y + 9), "14 天免费试用",
+    cta_x = free_x + 20
+    cta_y = free_y + 82
+    rect(draw, (cta_x, cta_y, cta_x + cta_w, cta_y + cta_h), COLORS["pink"], width=4)
+    text(draw, (cta_x + cta_w // 2, cta_y + 9), "添加到 Chrome",
          f=font(18, bold=True), anchor="ma")
 
     img.save(OUT / "promo-large-1400x560.png")

@@ -118,7 +118,7 @@ def popup_mock(draw, x, y, scale=1):
     text(draw, (x + 28, y + 186), "我的色卡组", f=font(20, bold=True))
     swatches = ["#ff6b9d", "#8c6cff", "#69d9bf", "#fff0a8", "#75bfe8", "#f05f7d"]
     for i in range(3):
-        yy = y + 222 + i * 78
+        yy = y + 222 + i * 72
         rect(draw, (x + 28, yy, x + w - 28, yy + 56), COLORS["panel"], width=3)
         for j in range(4):
             color = swatches[(i + j) % len(swatches)]
@@ -126,7 +126,7 @@ def popup_mock(draw, x, y, scale=1):
         text(draw, (x + 150, yy + 12), ["默认色卡", "品牌灵感", "网页主题"][i], f=font(16, bold=True))
         text(draw, (x + 150, yy + 34), f"{4 + i}/20 色", fill=COLORS["soft"], f=F["small"])
     rect(draw, (x + 28, y + h - 82, x + w - 28, y + h - 28), COLORS["cream"], width=3)
-    text(draw, (x + w // 2, y + h - 66), "历史  ·  设置  ·  Pro", f=F["small"], anchor="ma")
+    text(draw, (x + w // 2, y + h - 66), "历史  ·  设置  ·  主题", f=F["small"], anchor="ma")
 
 
 def palette_board(draw, x, y, w, h):
@@ -146,7 +146,7 @@ def palette_board(draw, x, y, w, h):
 
 
 def export_card(draw, x, y, label, detail, color):
-    rect(draw, (x, y, x + 178, y + 126), COLORS["panel"], width=4)
+    rect(draw, (x, y, x + 176, y + 126), COLORS["panel"], width=4)
     rect(draw, (x + 18, y + 18, x + 68, y + 68), color, width=3)
     text(draw, (x + 88, y + 24), label, f=font(18, bold=True))
     paragraph(draw, (x + 88, y + 56), detail, 70, f=F["tiny"], fill=COLORS["soft"], leading=4)
@@ -194,9 +194,10 @@ def screenshot_3():
         ("SCSS", "$ 变量", "#8c6cff"),
         ("JSON", "可再次导入", "#69d9bf"),
         ("Tailwind", "配置片段", "#fff0a8"),
-        ("PNG", "色卡图片", "#75bfe8"),
+        ("CSV", "表格数据", "#75bfe8"),
+        ("ASE", "PS 色板", "#f05f7d"),
     ]):
-        export_card(draw, 84 + i * 222, 430, label, detail, color)
+        export_card(draw, 80 + i * 188, 430, label, detail, color)
     rect(draw, (740, 230, 1160, 360), "#201c2b", outline=COLORS["ink"], width=5)
     text(draw, (770, 258), ":root {", fill="#f8edf7", f=F["body"])
     text(draw, (798, 290), "--primary: #FF6B9D;", fill="#69d9bf", f=F["small"])
@@ -206,27 +207,37 @@ def screenshot_3():
 
 def screenshot_4():
     img, draw = base()
-    hero(draw, "Pixel Pro", "免费可用，Pro 解锁更多主题和无限色卡")
-    rect(draw, (80, 240, 580, 650), COLORS["white"], width=5)
-    text(draw, (116, 282), "免费版", f=F["h2"])
-    paragraph(draw, (120, 340), "基础取色、历史记录、导出功能和最多 5 个色卡。", 390, f=F["body"])
-    rect(draw, (120, 506, 432, 574), COLORS["cream"], width=4)
-    text(draw, (154, 526), "适合先体验", f=font(22, bold=True))
+    hero(draw, "Free Forever · 完全免费", "无订阅 · 无广告 · 全部功能开放")
+    # 左栏：完全免费说明
+    rect(draw, (80, 240, 620, 650), COLORS["white"], width=5)
+    text(draw, (116, 282), "完全免费", f=F["h2"])
+    paragraph(draw, (120, 340), "已移除全部付费墙：15 套主题、无限色卡、自定义主题和所有导出格式对每位用户开放。", 440, f=F["body"])
+    rect(draw, (120, 506, 432, 574), COLORS["mint"], width=4)
+    text(draw, (154, 526), "免费使用", f=font(22, bold=True))
+    # 右栏：亮点功能
     rect(draw, (700, 240, 1200, 650), COLORS["white"], width=5)
-    text(draw, (736, 282), "Pro 版", f=F["h2"])
-    paragraph(draw, (740, 340), "解锁无限色卡、Pro 主题、自定义主题和后续高级工具。提供 14 天免费试用，支持 PayPal 付款，付款后用邮箱在扩展内解锁。", 390, f=F["body"])
-    rect(draw, (740, 506, 1060, 574), COLORS["mint"], width=4)
-    text(draw, (770, 526), "14 天免费试用", f=font(22, bold=True))
-    img.save(OUT / "screenshot-04-pro.png")
+    text(draw, (736, 282), "亮点功能", f=F["h2"])
+    feats = [
+        ("右键快速取色", "页面右键一键吸色并存卡"),
+        ("多格式导出", "CSS / JSON / PNG / CSV / ASE"),
+        ("历史收藏置顶", "常用颜色一键置顶"),
+        ("中英双语", "15 套像素主题任意切换"),
+    ]
+    for i, (t1, t2) in enumerate(feats):
+        yy = 340 + i * 72
+        rect(draw, (736, yy, 1164, yy + 56), COLORS["panel"], width=3)
+        text(draw, (760, yy + 8), t1, f=font(18, bold=True))
+        text(draw, (760, yy + 32), t2, fill=COLORS["soft"], f=F["tiny"])
+    img.save(OUT / "screenshot-04-free.png")
 
 
 def screenshot_5():
     img, draw = base()
-    hero(draw, "Themes & Languages", "中英文界面、多套像素主题、可自定义颜色")
+    hero(draw, "Themes & Languages", "15 套像素主题、中英双语、可自定义颜色")
     rect(draw, (82, 238, 1198, 690), COLORS["white"], width=5)
     text(draw, (124, 286), "主题预设", f=F["h2"])
-    names = ["莓果像素", "森绿软糖", "月夜霓虹", "海盐气泡", "绿屏掌机", "雾粉灰调"]
-    cols = ["#ff6b9d", "#70c59b", "#6f5bd8", "#75bfe8", "#6f8f55", "#c78ca0"]
+    names = ["莓果像素", "苍松翠谷", "冬青红果", "烟熏玫瑰", "海盐气泡", "月夜霓虹"]
+    cols = ["#ff6b9d", "#12544F", "#7F2020", "#853953", "#75bfe8", "#6f5bd8"]
     for i, (name, color) in enumerate(zip(names, cols)):
         x = 124 + (i % 3) * 330
         y = 370 + (i // 3) * 116
