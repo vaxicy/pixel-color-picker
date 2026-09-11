@@ -26,14 +26,6 @@
       "128": "images/icon-128.png"
     }
   },
-  "commands": {
-    "quick-pick": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+K"
-      },
-      "description": "快速取色并保存 (Quick pick)"
-    }
-  },
   "options_page": "options/options.html",
   "icons": {
     "16": "images/icon-16.png",

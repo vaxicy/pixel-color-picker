@@ -45,25 +45,6 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// 全局快捷键：直接在当前页注入脚本取色（比 openPopup 更稳，EyeDropper 用户手势不丢失）
-chrome.commands.onCommand.addListener((command) => {
-  if (command !== 'quick-pick') return;
-  // 触发标记：按了键后图标短暂显示「P」，证明 onCommand 已被接收；
-  // 若按了键却完全没出现「P」，说明快捷键没绑上（去 chrome://extensions/shortcuts 设置）。
-  chrome.action.setBadgeText({ text: 'P' });
-  chrome.action.setBadgeBackgroundColor({ color: '#ff6b9d' });
-  const clearBadge = () => setTimeout(() => chrome.action.setBadgeText({ text: '' }), 600);
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tab = tabs && tabs[0];
-    if (tab && tab.id) {
-      runPagePick(tab.id).finally(clearBadge);
-    } else {
-      console.error('[Pixel] quick-pick: no active tab');
-      clearBadge();
-    }
-  });
-});
-
 // 右键菜单：在页面注入脚本取色
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId !== 'pixel-quick-pick') return;
