@@ -305,6 +305,7 @@ class PixelColorPicker {
       mist: 'themeMist',
       rose: 'themeRose',
       forest: 'themeForest',
+      holly: 'themeHolly',
       custom: 'themeCustom'
     };
     Object.entries(labels).forEach(([value, key]) => {
@@ -1652,6 +1653,18 @@ class PixelColorPicker {
         textColor: '#092328',
         textSoftColor: '#5a7a70',
         borderColor: '#092328'
+      },
+      holly: {
+        headerColor: '#7F2020',
+        buttonColor: '#869B7E',
+        bgColor: '#F6F3EB',
+        panelColor: '#ffffff',
+        panelWarmColor: '#E8E9D6',
+        bgDotColor: 'rgba(134, 155, 126, 0.18)',
+        bgLineColor: 'rgba(61, 43, 43, 0.05)',
+        textColor: '#3D2B2B',
+        textSoftColor: '#7A6B6B',
+        borderColor: '#3D2B2B'
       }
     };
   }
