@@ -29,7 +29,7 @@
   "commands": {
     "quick-pick": {
       "suggested_key": {
-        "default": "Ctrl+Shift+E"
+        "default": "Ctrl+Shift+K"
       },
       "description": "快速取色并保存 (Quick pick)"
     }
