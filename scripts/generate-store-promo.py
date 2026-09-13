@@ -183,7 +183,7 @@ def small_promo():
         ("网页吸色", "One-click pick"),
         ("色卡管理", "Palettes & history"),
         ("多格式导出", "CSS / JSON / PNG / CSV"),
-        ("完全免费", "Free · 15 themes"),
+        ("中英双语", "Chinese / English UI"),
     ]
     for i, (title, desc) in enumerate(features):
         fy = 76 + i * 47
@@ -208,7 +208,7 @@ def large_promo():
     text(draw, (68, 40), "Pixel Color Picker", fill="white", f=font(38, bold=True))
     # subtitle: clear gap from title, well within banner bounds
     text(draw, (70, 86),
-         "像素风网页取色 · 完全免费  ·  Free forever",
+         "像素风网页取色 · 轻松整理与导出配色",
          fill="white", f=font(16))
 
     # ── Content area: 3 logical columns ─────────────────────
@@ -267,33 +267,30 @@ def large_promo():
         rect(draw, (ex + 12, ey + 9, ex + 46, ey + 43), color, width=3)
         text(draw, (ex + ew // 2, ey + 50), label, f=font(13, bold=True), anchor="ma")
 
-    # Free block — replaces the old Pro CTA, with safe bottom margin
-    free_x, free_y = 850, 388
-    rect(draw, (free_x, free_y, 1364, 528), COLORS["white"], width=5)
+    # Feature highlight block — replaces the old Pro/Free CTA
+    feat_x, feat_y = 850, 388
+    rect(draw, (feat_x, feat_y, 1364, 528), COLORS["white"], width=5)
 
-    # FREE badge + title
-    rect(draw, (free_x + 20, free_y + 12, free_x + 106, free_y + 38), COLORS["mint"], width=3)
-    text(draw, (free_x + 63, free_y + 16), "FREE",
-         f=font(13, bold=True), anchor="ma")
-    text(draw, (free_x + 116, free_y + 15), "完全免费", f=font(20, bold=True))
+    # Title
+    text(draw, (feat_x + 20, feat_y + 15), "功能亮点", f=font(20, bold=True))
 
     # Features list
-    text(draw, (free_x + 20, free_y + 46),
-         "15 套主题 · 无限色卡 · 全部导出 · 无广告",
+    text(draw, (feat_x + 20, feat_y + 46),
+         "主题切换 · 多色卡管理 · 多格式导出 · 中英双语",
          fill=COLORS["soft"], f=font(13))
 
-    # Free note
-    text(draw, (free_x + 20, free_y + 64),
-         "All features free · No subscription · No ads",
+    # Feature note
+    text(draw, (feat_x + 20, feat_y + 64),
+         "Right-click pick · Auto-save palettes · Export to code",
          fill=COLORS["soft"], f=font(12))
 
     # CTA button — pink (bottom = 388+82+38 = 508, well within 560)
     cta_w = 196
     cta_h = 38
-    cta_x = free_x + 20
-    cta_y = free_y + 82
+    cta_x = feat_x + 20
+    cta_y = feat_y + 82
     rect(draw, (cta_x, cta_y, cta_x + cta_w, cta_y + cta_h), COLORS["pink"], width=4)
-    text(draw, (cta_x + cta_w // 2, cta_y + 9), "添加到 Chrome",
+    text(draw, (cta_x + cta_w // 2, cta_y + 9), "开始使用",
          f=font(18, bold=True), anchor="ma")
 
     img.save(OUT / "promo-large-1400x560.png")

@@ -3,6 +3,6 @@
     "message": "Pixel Color Picker - 像素吸色器"
   },
   "description": {
-    "message": "小巧可爱的像素风网页吸色工具，支持颜色收藏和色卡导出"
+    "message": "在任意网页右键吸色，自动保存色卡与历史，支持多格式导出。数据仅存本地浏览器。"
   }
 }

@@ -688,13 +688,13 @@ class OptionsManager {
         version: 'v1.1.0',
         items: language === 'en'
           ? [
-              { kind: 'feat', text: 'Completely free - removed Pro plan, all themes & unlimited palettes open to everyone' },
+              { kind: 'feat', text: 'Removed Pro plan gating, all themes and unlimited palettes available to everyone' },
               { kind: 'feat', text: 'Optional tips - WeChat QR / PayPal donation links' },
               { kind: 'feat', text: 'Zero remote - removed all host_permissions' },
               { kind: 'chore', text: 'Removed 18+ Pro-related i18n keys and 4 Pro-limit intercepts' }
             ]
           : [
-              { kind: 'feat', text: '完全免费 - 移除 Pro 付费模式，所有主题、自定义主题、无限色卡对所有用户开放' },
+              { kind: 'feat', text: '移除 Pro 限制，所有主题与无限色卡向所有用户开放' },
               { kind: 'feat', text: '新增打赏 - 微信赞赏码 / PayPal 付款链接（可选）' },
               { kind: 'feat', text: '零远程 - 删除所有 host_permissions' },
               { kind: 'chore', text: '删除 18+ Pro 相关 i18n 字段与 4 处 Pro 限制拦截' }

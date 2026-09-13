@@ -18,7 +18,7 @@
 
 <p align="center">
   A pixel-art style Chrome extension for picking colors from any web page.<br>
-  Free forever, with optional tips.
+  Available to all users, with optional tips.
 </p>
 
 <p align="center">
@@ -183,7 +183,7 @@ The in-app changelog reads `version` from `manifest.json` automatically. 历史�
 
 ### v1.1.0 (2026-08-06)
 
-- 完全免费 — removed Pro paid plan; all themes, custom themes, and unlimited palettes are open to every user
+- 移除 Pro 付费限制 — all themes, custom themes, and unlimited palettes are open to every user
 - 新增打赏 — WeChat 赞赏码 / PayPal 付款链接（可选）
 - 零远程 — removed all `host_permissions`; the extension no longer sends requests to any server
 - 冗余清理 — removed 18+ Pro-related i18n strings and 4 Pro-limit interception points

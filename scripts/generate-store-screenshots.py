@@ -50,11 +50,11 @@ TEXTS = {
         "s3_desc": "一键导出常用格式，方便放进设计系统、前端项目或团队文档。",
         "s3_cards": [("CSS", "变量格式"), ("SCSS", "$ 变量"), ("JSON", "可再次导入"),
                      ("Tailwind", "配置片段"), ("CSV", "表格数据"), ("ASE", "PS 色板")],
-        "s4_hero": "永久免费",
-        "s4_sub": "无订阅 · 无广告 · 全部功能开放",
-        "s4_free_title": "完全免费",
-        "s4_free_desc": "已移除全部付费墙：15 套主题、无限色卡、自定义主题和所有导出格式对每位用户开放。",
-        "s4_free_cta": "免费使用",
+        "s4_hero": "本地优先",
+        "s4_sub": "色卡与历史仅保存在浏览器",
+        "s4_free_title": "数据本地存储",
+        "s4_free_desc": "你的色卡、取色历史和主题设置仅保存在浏览器本地存储中，不上传服务器。",
+        "s4_free_cta": "开始使用",
         "s4_high": "亮点功能",
         "s4_feats": [("右键快速取色", "页面右键一键吸色并存卡"),
                      ("多格式导出", "CSS / JSON / PNG / CSV / ASE"),
@@ -92,11 +92,11 @@ TEXTS = {
         "s3_desc": "Export in common formats for design systems, front-end projects and team docs.",
         "s3_cards": [("CSS", "CSS variables"), ("SCSS", "$ variables"), ("JSON", "Re-import"),
                      ("Tailwind", "Config snippet"), ("CSV", "CSV table"), ("ASE", "Swatches")],
-        "s4_hero": "Free Forever",
-        "s4_sub": "No subscription · No ads · All features",
-        "s4_free_title": "Completely free",
-        "s4_free_desc": "All paywalls removed: 15 themes, unlimited palettes, custom themes and every export format are open to everyone.",
-        "s4_free_cta": "Use it free",
+        "s4_hero": "Local-first",
+        "s4_sub": "Palettes and history stay in your browser",
+        "s4_free_title": "Stored locally",
+        "s4_free_desc": "Your palettes, color history and theme settings are saved only in your browser's local storage. Nothing is uploaded.",
+        "s4_free_cta": "Get started",
         "s4_high": "Highlights",
         "s4_feats": [("Context-menu pick", "Pick & save from the right-click menu"),
                      ("Multi-format export", "CSS / JSON / PNG / CSV / ASE"),
@@ -314,7 +314,7 @@ def screenshot_4(t, outdir):
         rect(draw, (736, yy, 1164, yy + 56), COLORS["panel"], width=3)
         text(draw, (760, yy + 8), t1, f=font(18, bold=True))
         text(draw, (760, yy + 32), t2, fill=COLORS["soft"], f=F["tiny"])
-    img.save(outdir / "screenshot-04-free.png")
+    img.save(outdir / "screenshot-04-local.png")
 
 
 def screenshot_5(t, outdir):

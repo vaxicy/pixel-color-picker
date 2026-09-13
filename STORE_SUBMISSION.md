@@ -45,7 +45,7 @@ Features:
 - Switch between Chinese and English
 - Choose from playful pixel-style themes
 
-The first release is free. Pro features are prepared in the interface but payment will be enabled in a later update.
+The first release is open to all users. Payment features are prepared in the interface but will be enabled in a later update.
 
 Category:
 Developer Tools or Productivity

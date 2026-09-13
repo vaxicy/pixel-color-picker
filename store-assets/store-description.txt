@@ -1,28 +1,24 @@
 === 中文详细说明 ===
 
-小巧可爱的像素风网页吸色工具，支持颜色收藏和色卡导出
+Pixel Color Picker - 像素吸色器
 
-Pixel Color Picker 是一款轻量、像素风格的网页取色 Chrome 扩展，适合设计师、开发者、插画师和内容创作者快速收集、整理和导出颜色。
+一款轻量、像素风格的网页取色 Chrome 扩展。在任意网页右键即可吸取颜色，自动保存为色卡与历史，并支持多种格式导出与收藏整理。色卡、取色历史和主题设置仅保存在浏览器本地存储中，不会上传任何远程服务器。
 
 主要功能
 
-- 使用浏览器取色器从网页中快速获取颜色
-- 自动保存取色历史，方便回看最近使用过的颜色
-- 创建和管理多个色卡
-- 为颜色添加备注，方便记录用途
-- 搜索、排序和整理色卡颜色
+- 在任意网页右键吸色，自动保存到色卡和历史
+- 创建和管理多个色卡，为颜色添加备注
+- 搜索、排序和整理色卡中的颜色
 - 支持 HEX、RGB、HSL 等常用颜色格式
 - 一键复制颜色值
-- 支持导出 CSS、SCSS、JSON、Tailwind 配置片段和 PNG 色卡图片
-- 支持导入色卡 JSON 文件
+- 导出为 CSS、SCSS、JSON、Tailwind、PNG、CSV、ASE 等格式
+- 导入色卡 JSON 文件
 - 支持中英文界面
-- 提供像素风主题和自定义主题设置
-
-12 套像素风预设主题全部免费，并支持自定义 header / button / 背景 / 面板四种颜色。所有功能（取色、色卡管理、历史记录、多格式导出、自定义主题）全部免费开放，无任何付费墙、Pro 等级或功能限制。
+- 像素风主题与自定义颜色
 
 隐私优先
 
-Pixel Color Picker 会将色卡、取色历史和设置保存在浏览器扩展存储中。扩展不会出售用户数据，也不会将用户色卡内容分享给第三方。所有数据仅存于你的本地浏览器（chrome.storage.sync），不向任何远程服务器发送。
+Pixel Color Picker 将色卡、取色历史和设置保存在浏览器扩展存储中。扩展不会出售用户数据，也不会与第三方分享。所有数据仅存于本地浏览器，不向任何远程服务器发送。
 
 适合用于
 
@@ -34,34 +30,30 @@ Pixel Color Picker 会将色卡、取色历史和设置保存在浏览器扩展�
 
 === English Detailed Description ===
 
-A compact, cute pixel-style web color picker with color collections and palette export.
+Pixel Color Picker
 
-Pixel Color Picker is a lightweight, pixel-styled Chrome extension for designers, developers, illustrators and content creators who need a quick way to pick, organize and export colors from any web page.
+A lightweight, pixel-style color picker for Chrome. Right-click any webpage to grab a color, automatically save it to palettes and history, and export it in multiple formats. Your palettes, history and theme settings are stored only in your browser's local storage and are never uploaded to remote servers.
 
 Main features
 
-- Use the browser eyedropper to grab a color from any web page
-- Automatically save color history so you can revisit recently picked colors
+- Right-click to pick colors from any webpage and auto-save to palettes and history
 - Create and manage multiple palettes
-- Add notes to colors to keep track of how and where you use them
-- Search, sort and organize the colors in your palettes
-- Support for HEX, RGB and HSL formats
-- One-click copy for any color value
-- Export to CSS, SCSS, JSON, Tailwind config snippets and PNG palette images
+- Add notes, search, sort and organize colors
+- Support HEX, RGB, HSL and other common formats
+- One-click copy of color values
+- Export to CSS, SCSS, JSON, Tailwind, PNG, CSV, ASE and more
 - Import palette JSON files
-- Bilingual interface (Chinese and English)
-- Pixel-style presets plus a custom theme editor
-
-All 12 pixel-style preset themes are free, and you can freely tweak four color slots (header, button, background, panel) in the settings. Every feature – color picking, palette management, history, multi-format export and custom themes – is completely free with no paid tier, no Pro plan and no feature lock.
+- Chinese and English UI
+- Pixel-style themes and custom colors
 
 Privacy first
 
-Pixel Color Picker stores palettes, color history and settings in your browser's extension storage. The extension does not sell user data and never shares your palette contents with third parties. All data lives locally in your browser (chrome.storage.sync); the extension makes no requests to remote servers.
+Pixel Color Picker stores your palettes, color history and settings in your browser's extension storage. The extension does not sell user data or share it with third parties. All data stays locally in your browser and is not sent to any remote server.
 
 Great for
 
-- Picking colors from web pages while you design
+- Picking colors from web pages while designing
 - Collecting UI and brand color palettes
 - Building CSS variables for front-end projects
 - Managing brand, theme and inspiration palettes
-- Daily color bookmarking and exporting
+- Everyday color bookmarking and exporting
