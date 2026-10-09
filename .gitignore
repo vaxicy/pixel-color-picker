@@ -11,3 +11,6 @@ cloudflare/.dev.vars
 
 # AI working memory (must NOT enter git or vsix)
 .codebuddy/
+
+# Nested GitHub Pages repo (privacy policy), not part of the extension
+pixel-color-picker-privacy/
