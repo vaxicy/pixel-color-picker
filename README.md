@@ -18,21 +18,21 @@
 
 <p align="center">
   A pixel-art style Chrome extension for picking colors from any web page.<br>
-  Available to all users, with optional tips.
+  All features are available to every user; donations are optional.
 </p>
 
 <p align="center">
-  可爱的像素风网页取色工具 · 全免费 · 自由打赏
+  像素风网页取色工具 · 全部功能免费 · 可选打赏
 </p>
 
 ---
 
 ## Features · 功能特性
 
-- Web color picking — one-click HEX / RGB / HSL from any pixel on the page
+- Web color picking — copy HEX / RGB / HSL from any pixel on the page
 - Color collections — save favorites into palettes
 - Palette management — create, rename, delete and reorder palettes
-- 12 pixel-art themes — 少女粉 / 森林绿 / 夜空黑 / 鸢尾紫 / 燕麦咖 / 樱桃 / 游戏机 / 可可 / 薄荷 / 葡萄 / 迷雾蓝 / 奶油白 + custom theme editor (全部免费)
+- 15 pixel-art themes — 莓果像素 / 森绿软糖 / 月夜霓虹 / 薰衣草云 / 奶油布丁 / 海盐气泡 / 樱桃软糖 / 绿屏掌机 / 焦糖可可 / 薄荷奶昔 / 葡萄汽水 / 雾粉灰调 / 烟熏玫瑰 / 苍松翠谷 / 冬青红果 + custom theme editor (all free)
 - Multi-format export — CSS variables, JSON, Tailwind config, PNG palette image
 - Palette search — quickly find colors across history and palettes
 - Dark mode — follows your system
@@ -40,7 +40,7 @@
 - Local storage only — everything in `chrome.storage.sync`, no remote calls
 - Optional donations — WeChat QR / PayPal link, your choice
 
-网页取色（HEX/RGB/HSL）· 颜色收藏 · 色卡管理 · 12+ 套主题 · 多格式导出 · 色卡搜索 · 深色模式 · 中英双语 · 本地存储 · 自由打赏
+网页取色（HEX/RGB/HSL）· 颜色收藏 · 色卡管理 · 15 套主题 · 多格式导出 · 色卡搜索 · 深色模式 · 中英双语 · 本地存储 · 可选打赏
 
 ## Install · 安装方法
 
@@ -52,7 +52,7 @@
   </a>
 </p>
 
-一键安装，自动更新 — 推荐给普通用户。
+通过 Chrome Web Store 安装，版本自动更新。
 
 ### Option 2 · Load unpacked (developer mode)
 
@@ -80,7 +80,7 @@
 
 ### Themes
 
-- **Presets** — pick from 12 pixel-art themes
+- **Presets** — pick from 15 pixel-art themes
 - **Custom theme** — adjust 4 color slots (header / button / background / panel) in settings, auto-saves as your theme
 - **Reset** — one click to restore default
 
@@ -91,7 +91,7 @@ Click the **Settings** button at the bottom of the popup:
 - Default color format (HEX / RGB / HSL)
 - Auto-save strategy
 - Switch language (zh-CN / en)
-- 12 themes + custom theme editor (all free)
+- 15 themes + custom theme editor (all free)
 - Data import / export / clear
 - Support the author — optional WeChat QR / PayPal donation
 
